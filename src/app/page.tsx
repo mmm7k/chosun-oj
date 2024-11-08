@@ -1,28 +1,28 @@
 'use client';
 
-import React from 'react';
-import { Modal } from 'antd';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Checkbox } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Noto_Sans_KR } from 'next/font/google';
 import { login } from '@/services/account/login';
-import api from '@/services/account/api';
-
-const notoSansKr = Noto_Sans_KR({
-  weight: ['700'],
-  subsets: ['latin'],
-});
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Home() {
   const router = useRouter();
   const [isProfessor, setIsProfessor] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    document.cookie = 'sessionid=; Max-Age=0';
+    document.cookie = 'csrftoken=; Max-Age=0';
+  }, []);
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('아이디를 입력해주세요'),
@@ -39,23 +39,16 @@ export default function Home() {
     resolver: yupResolver(validationSchema),
   });
 
-  // const error = () => {
-  //   Modal.error({
-  //     title: <span className={notoSansKr.className}>로그인 실패</span>,
-  //     content: (
-  //       <span className={notoSansKr.className}>
-  //         학번 또는 비밀번호가 올바르지 않습니다.
-  //       </span>
-  //     ),
-  //   });
-  // };
   const onSubmit = async (data: { username: string; password: string }) => {
     const { username, password } = data;
+    setIsLoading(true);
     try {
       await login(username, password);
-      // router.push('/student');
+      router.push('/student');
     } catch (error: any) {
       alert(error.response?.data?.msg);
+    } finally {
+      setIsLoading(false);
     }
     // if (username === 'root' && password === 'root') {
     //   if (isProfessor) {
@@ -70,19 +63,14 @@ export default function Home() {
     // }
   };
 
-  const logout = async () => {
-    try {
-      const response = await api.get('/account/logout/');
-      router.push('/'); // 로그아웃 후 리다이렉트
-      return response.data;
-    } catch (error) {
-      console.error('Error during logout:', error);
-      throw error;
-    }
-  };
-
   return (
     <>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <div className="w-screen h-[100dvh] flex">
         {/* left */}
         <section className="items-center justify-center flex-1 hidden lg:flex bg-primary">
@@ -101,7 +89,7 @@ export default function Home() {
           <div className="w-[70%] h-[70%] lg:w-1/2 lg:h-1/2  space-y-4 rounded-sm border-solid border-[1px] border-slate-200 shadow-xl flex flex-col justify-center items-center">
             <div className="mb-4 font-bold ">
               <span className="text-2xl text-primary sm:text-3xl md:text-4xl lg:text-2xl">
-                Chosun{' '}
+                Chosun
               </span>
               <span className="text-2xl text-secondary sm:text-3xl md:text-4xl lg:text-2xl">
                 Online Judge
@@ -174,7 +162,6 @@ export default function Home() {
             >
               회원가입
             </Link>
-            <button onClick={logout}>logouttest</button>
           </div>
         </section>
       </div>

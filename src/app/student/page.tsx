@@ -15,7 +15,7 @@ import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import '@/app/styles/heatmap.css';
 import { BiSolidAward } from 'react-icons/bi';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -23,6 +23,9 @@ import Image from 'next/image';
 import { FaUserGraduate } from 'react-icons/fa6';
 import { RiEdit2Line } from 'react-icons/ri';
 import Link from 'next/link';
+import { getMyInformation, getMyProfile } from '@/services/account/profile';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 
 ChartJS.register(
   ArcElement,
@@ -32,7 +35,58 @@ ChartJS.register(
   Tooltip,
 );
 
+interface ProfileData {
+  accepted_number: number;
+  id: number;
+  major: string;
+  school: string;
+  submission_number: number;
+  total_score: number;
+  user: {
+    username: string;
+    student_number: string;
+    name: string;
+  };
+}
+
 export default function StudentMain() {
+  const [rank, setRank] = useState<string>('');
+
+  const { data: profile } = useQuery({
+    queryKey: ['profileData'],
+    queryFn: getMyProfile,
+  });
+  const profileData: ProfileData | null = profile?.data;
+
+  useEffect(() => {
+    if (profileData) {
+      const calculateRank = () => {
+        const totalScore = profileData.total_score;
+        if (totalScore >= 150) return 'Challenger';
+        if (totalScore >= 125) return 'Grandmaster';
+        if (totalScore >= 100)
+          return `Diamond ${Math.ceil((125 - totalScore) / 5)}`;
+        if (totalScore >= 75)
+          return `Platinum ${Math.ceil((100 - totalScore) / 5)}`;
+        if (totalScore >= 50) return `Gold ${Math.ceil((75 - totalScore) / 5)}`;
+        if (totalScore >= 25)
+          return `Silver ${Math.ceil((50 - totalScore) / 5)}`;
+        return `Bronze ${Math.ceil((25 - totalScore) / 5)}`;
+      };
+      setRank(calculateRank());
+    }
+  }, [profileData]);
+
+  const rankColor = useMemo(() => {
+    if (rank.startsWith('Challenger')) return '#ff0000';
+    if (rank.startsWith('Grandmaster')) return '#ff4500';
+    if (rank.startsWith('Diamond')) return '#00ffff';
+    if (rank.startsWith('Platinum')) return '#00d9ff';
+    if (rank.startsWith('Gold')) return '#FFD700';
+    if (rank.startsWith('Silver')) return '#C0C0C0';
+    return '#cd7f32';
+  }, [rank]);
+
   // 배너 캐러셀 세팅
   const bannerSettings = {
     dots: true,
@@ -76,50 +130,6 @@ export default function StudentMain() {
       count: Math.floor(Math.random() * 5), // 0에서 4 사이의 랜덤 값 생성
     };
   });
-
-  // 랭크
-  const rank = useMemo(() => {
-    const totalGrass = heatmapData.filter((item) => item.count > 0).length;
-
-    if (totalGrass >= 150) {
-      return 'Challenger';
-    } else if (totalGrass >= 125) {
-      return 'Grandmaster';
-    } else if (totalGrass >= 100) {
-      const level = Math.ceil((125 - totalGrass) / 5);
-      return `Diamond ${level}`;
-    } else if (totalGrass >= 75) {
-      const level = Math.ceil((100 - totalGrass) / 5);
-      return `Platinum ${level}`;
-    } else if (totalGrass >= 50) {
-      const level = Math.ceil((75 - totalGrass) / 5);
-      return `Gold ${level}`;
-    } else if (totalGrass >= 25) {
-      const level = Math.ceil((50 - totalGrass) / 5);
-      return `Silver ${level}`;
-    } else {
-      const level = Math.ceil((25 - totalGrass) / 5);
-      return `Bronze ${level}`;
-    }
-  }, [heatmapData]);
-
-  const rankColor = useMemo(() => {
-    if (rank.startsWith('Challenger')) {
-      return '#ff0000'; // 빨간색
-    } else if (rank.startsWith('Grandmaster')) {
-      return '#ff4500'; // 주황색
-    } else if (rank.startsWith('Diamond')) {
-      return '#00ffff'; // 청록색
-    } else if (rank.startsWith('Platinum')) {
-      return '#00d9ff'; // 플래티넘 은색
-    } else if (rank.startsWith('Gold')) {
-      return '#FFD700'; // 황금색
-    } else if (rank.startsWith('Silver')) {
-      return '#C0C0C0'; // 은색
-    } else {
-      return '#cd7f32'; // 청동색
-    }
-  }, [rank]);
 
   //도넛 차트 데이터
   const donutData = {
@@ -213,11 +223,6 @@ export default function StudentMain() {
   const calculateTagPercentage = (value: number) => {
     return ((value / totalTag) * 100).toFixed(1); // 소수점 1자리까지 계산
   };
-
-  // 스텟
-  const totalGrass = useMemo(() => {
-    return heatmapData.filter((item) => item.count > 0).length;
-  }, [heatmapData]);
 
   const highestLevel = useMemo(() => {
     const maxIndex = donutData.datasets[0].data.indexOf(
@@ -332,13 +337,17 @@ export default function StudentMain() {
             <RiEdit2Line className="absolute right-4 top-4 text-2xl cursor-pointer" />
           </Link>
           <FaUserGraduate className="text-primary text-[4rem] mb-2" />
-          <span className="text-xl font-semibold">김민수</span>
+          <span className="text-xl font-semibold">
+            {profileData?.user?.name}
+          </span>
           <span className="text-lg ">Developer</span>
           <div>
-            <span className="font-semibold">Major : </span> 컴퓨터 공학과
+            <span className="font-semibold">Major : </span>
+            {profileData?.major ?? 'Computer Science'}
           </div>
           <div>
-            <span className="font-semibold">ID : </span> 20214931
+            <span className="font-semibold">ID : </span>
+            {profileData?.user?.student_number}
           </div>
         </div>
         {/* 오른쪽 섹션 랭크,잔디 */}
@@ -355,9 +364,9 @@ export default function StudentMain() {
                 <span className="text-gray-900 ">{rank}</span>
               </span>
               <div className="text-xs lg:text-base">
-                <span> 🌱 Total Grass: </span>
+                <span> 🏃‍♀️ Total Score: </span>
                 <span className="font-semibold text-gray-900">
-                  {totalGrass}
+                  {profileData?.total_score}
                 </span>
               </div>
               <div className="text-xs lg:text-base">

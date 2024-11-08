@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MdLogout } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import api from '@/services/account/api';
+import { logout } from '@/services/account/login';
 
 export default function HeaderNav() {
   const pathname = usePathname();
@@ -20,14 +21,24 @@ export default function HeaderNav() {
     return null; // 헤더를 렌더링하지 않음
   }
 
-  const logout = async () => {
+  // const logout = async () => {
+  //   try {
+  //     const response = await api.get('/account/logout/');
+  //     router.push('/'); // 로그아웃 후 리다이렉트
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('Error during logout:', error);
+  //     throw error;
+  //   }
+  // };
+
+  const onClickLogout = async () => {
     try {
-      const response = await api.get('/account/logout/');
-      router.push('/'); // 로그아웃 후 리다이렉트
-      return response.data;
-    } catch (error) {
-      console.error('Error during logout:', error);
-      throw error;
+      await logout();
+      router.push('/');
+    } catch (error: any) {
+      alert(error.response?.data?.message);
+      router.push('/');
     }
   };
 
@@ -136,15 +147,13 @@ export default function HeaderNav() {
         {/* 로그아웃 (sm 이상에서만 표시) */}
 
         <section className="items-center hidden ml-auto sm:flex">
-          {/* <Link href="/"> */}
           <div
-            onClick={logout}
+            onClick={onClickLogout}
             className="flex items-center transition cursor-pointer hover:text-secondaryHover"
           >
-            <span> 로그아웃</span>
+            <span>로그아웃</span>
             <MdLogout className="ml-2 text-xl" />
           </div>
-          {/* </Link> */}
         </section>
       </div>
       {/* 모바일 메뉴 (햄버거 메뉴 클릭 시 열림) */}
@@ -213,14 +222,14 @@ export default function HeaderNav() {
           <span className="font-semibold transition cursor-pointer ">대회</span>
         </Link>
 
-        <Link
-          href="/"
+        <div
           className="flex items-center justify-center w-full py-3 hover:bg-gray-100 "
+          onClick={onClickLogout}
         >
           <span className="flex items-center font-semibold transition cursor-pointer">
             로그아웃 <MdLogout className="ml-2 text-lg" />
           </span>
-        </Link>
+        </div>
       </section>
     </nav>
   );
