@@ -11,7 +11,7 @@ import {
   checkStudentNumber,
   checkUsername,
   registerUser,
-} from '@/services/signup/signup';
+} from '@/services/account/signup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -70,7 +70,6 @@ export default function Signup() {
       return;
     }
 
-    // confirmPassword 제외한 데이터로 전송 준비
     const { confirmPassword, studentNumber, ...filteredData } = data;
     const payload = {
       ...filteredData,
@@ -79,7 +78,7 @@ export default function Signup() {
 
     try {
       await registerUser(payload);
-      alert('회원가입이 완료되었습니다!');
+      alert('회원가입이 완료되었습니다.');
       router.push('/');
     } catch (error: any) {
       alert(error.response?.data?.msg);

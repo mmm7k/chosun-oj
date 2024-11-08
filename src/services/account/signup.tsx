@@ -1,11 +1,8 @@
-// api/account.js
-import axios from 'axios';
-
-const BASE_URL = 'http://chosuncnl.shop:8000/api/v1/account';
+import api from './api';
 
 export const checkUsername = async (username: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/check_username/`, {
+    const response = await api.post('/account/check_username/', {
       username,
     });
     console.log(response);
@@ -18,7 +15,7 @@ export const checkUsername = async (username: string) => {
 
 export const checkEmail = async (email: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/check_email/`, { email });
+    const response = await api.post('/account/check_email/', { email });
     return response.data;
   } catch (error) {
     console.error('Error checking email:', error);
@@ -28,7 +25,7 @@ export const checkEmail = async (email: string) => {
 
 export const checkStudentNumber = async (studentNumber: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/check_student_number/`, {
+    const response = await api.post('/account/check_student_number/', {
       student_number: studentNumber,
     });
     return response.data;
@@ -40,7 +37,7 @@ export const checkStudentNumber = async (studentNumber: string) => {
 
 export const registerUser = async (data: any) => {
   try {
-    const response = await axios.post(`${BASE_URL}/register/`, data);
+    const response = await api.post('/account/register/', data);
     return response.data;
   } catch (error) {
     console.error('Error registering user:', error);
