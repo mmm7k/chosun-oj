@@ -26,7 +26,7 @@
     "highlight.js": "^11.10.0",
     "lucide-react": "^0.439.0",
     "markdown-it": "^14.1.0",
-    "next": "14.2.7",
+    "next": "^14.2.7",
     "react": "^18",
     "react-bash": "^1.6.0",
     "react-calendar-heatmap": "^1.9.0",

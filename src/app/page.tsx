@@ -60,7 +60,7 @@ export default function Home() {
     // if (username === 'root' && password === 'root') {
     //   if (isProfessor) {
     //     router.push('/professor/dashboard');
-    //   } else if (isAdmin) {
+    //   } else if (isAdmin) {`
     //     router.push('/admin/dashboard');
     //   } else {
     //     router.push('/student');
@@ -174,7 +174,7 @@ export default function Home() {
             >
               회원가입
             </Link>
-            <button onClick={logout}>logout</button>
+            <button onClick={logout}>logouttest</button>
           </div>
         </section>
       </div>
