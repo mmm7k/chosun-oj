@@ -33,7 +33,7 @@ export const getMyInformation = async () => {
 
 export const modifyInfo = async (payload: ModifyInfoPayload) => {
   try {
-    const response = await api.patch('/account/login/modify', payload);
+    const response = await api.patch('/account/profile/modify', payload);
     alert('정보가 수정되었습니다.');
     return response.data;
   } catch (error: any) {

@@ -2,6 +2,8 @@
 
 import { getMyInformation, modifyInfo } from '@/services/account/profile';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -23,6 +25,7 @@ interface ModifyInfoPayload {
 
 export default function EditAccount() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { data: information } = useQuery({
     queryKey: ['informationData'],
     queryFn: getMyInformation,
@@ -54,7 +57,7 @@ export default function EditAccount() {
   const mutation = useMutation({
     mutationFn: modifyInfo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['informationData'] });
+      router.push('/student');
     },
   });
 
