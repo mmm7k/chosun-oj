@@ -21,8 +21,8 @@ services:
 
     ports:
       - '5000:5000'
-    env_file:
-      - .env.local
+    # env_file:
+    #   - .env.local
     command: npm start
     networks:
       - oj-network
