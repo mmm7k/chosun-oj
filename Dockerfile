@@ -12,8 +12,8 @@ RUN pnpm install
 COPY . .
 
 RUN pnpm build
-
-EXPOSE 3000
+ENV PORT=5000
+EXPOSE 5000
 CMD ["pnpm", "run", "start"]
 
 
