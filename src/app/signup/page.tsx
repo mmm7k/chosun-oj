@@ -11,7 +11,7 @@ import {
   checkStudentNumber,
   checkUsername,
   registerUser,
-} from '@/services/account/signup';
+} from '@/services/accountUser/signup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 

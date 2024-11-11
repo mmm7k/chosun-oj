@@ -5,38 +5,39 @@ import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { getAllUser } from '@/services/accountAdmin/getUser';
+import { TbEdit } from 'react-icons/tb';
 
-export default function StudentList() {
+export default function UserList() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [studentList, setStudentList] = useState<any[]>([]);
+  const { data: userListData } = useQuery({
+    queryKey: ['userListData'],
+    queryFn: getAllUser,
+  });
+
+  const userList = userListData?.results;
+  const matchingRole: { [key: string]: string } = {
+    'Regular User': '학생',
+    Professor: '교수',
+    'Super Admin': '관리자',
+  };
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 15;
   const pagesPerBlock = 5;
 
-  useEffect(() => {
-    const fetchStudentList = async () => {
-      try {
-        const response = await axios.get(
-          '/mock/professor/student/studentlist.json',
-        );
-        setStudentList(response.data);
-        console.log('Student List:', response.data);
-      } catch (error) {
-        console.error('Error fetching student list:', error);
-      }
-    };
+  const currentItems = userList
+    ? userList.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage,
+      )
+    : [];
 
-    fetchStudentList();
-  }, []);
+  const totalPages = userList ? Math.ceil(userList.length / itemsPerPage) : 1;
 
-  const currentItems = studentList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  const totalPages = Math.ceil(studentList.length / itemsPerPage);
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
@@ -47,7 +48,7 @@ export default function StudentList() {
 
   const changePage = (page: number) => {
     setCurrentPage(page);
-    router.push(`/admin/student/list?page=${page}`);
+    router.push(`/admin/user/list?page=${page}`);
   };
 
   return (
@@ -55,20 +56,20 @@ export default function StudentList() {
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         {/* Header */}
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
-          <h1 className="mb-3 text-lg md:mb-0">학생 전체 목록</h1>
+          <h1 className="mb-3 text-lg md:mb-0">유저 전체 목록</h1>
           <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
             <IoSearchSharp className="mr-2 text-lg text-gray-500" />
             <input
               className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
               type="text"
-              placeholder="학번, 이름으로 검색해보세요"
+              placeholder="학번으로 검색해보세요"
             />
           </div>
         </section>
 
         <hr className="mt-5 border-t-2 border-gray-200" />
 
-        {/* Student List */}
+        {/* user List */}
         <section className="px-3 overflow-x-auto sm:px-16">
           <table className="w-full text-sm text-left border-b-2 table-auto">
             <thead>
@@ -76,24 +77,28 @@ export default function StudentList() {
                 <th className="p-4">학번</th>
                 <th className="p-4">이름</th>
                 <th className="p-4">아이디</th>
-                <th className="p-4">이메일</th>
-                <th className="p-4">학생 관리</th>
+                <th className="p-4">권한</th>
+                <th className="p-4">유저 관리</th>
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((item) => (
+              {currentItems.map((item: any) => (
                 <tr
                   key={item.id}
                   className="border-b cursor-pointer hover:bg-gray-50"
                 >
                   <td className="p-4 text-xs sm:text-sm">
-                    {item.studentNumber}
+                    {item.student_number}
                   </td>
                   <td className="p-4 text-xs sm:text-sm">{item.name}</td>
-                  <td className="p-4 text-xs sm:text-sm">{item.student_id}</td>
-                  <td className="p-4 text-xs sm:text-sm">{item.email}</td>
-                  <td className="p-4 text-lg sm:text-xl">
-                    <FiTrash2 className="text-lg lg:text-xl" />
+                  <td className="p-4 text-xs sm:text-sm">{item.username}</td>
+                  <td className="p-4 text-xs sm:text-sm">
+                    {' '}
+                    {matchingRole[item.admin_type] || 'undefined'}
+                  </td>
+                  <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
+                    <TbEdit className="text-lg cursor-pointer lg:text-xl" />
+                    <FiTrash2 className="text-lg cursor-pointer lg:text-xl" />
                   </td>
                 </tr>
               ))}

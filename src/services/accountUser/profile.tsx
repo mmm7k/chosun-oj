@@ -1,5 +1,4 @@
-import { useRouter } from 'next/navigation';
-import api from './api';
+import api from '../api';
 
 interface ModifyInfoPayload {
   user: {
@@ -15,7 +14,6 @@ export const getMyProfile = async () => {
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);
-    window.location.href = '/';
     return error;
   }
 };
@@ -26,7 +24,6 @@ export const getMyInformation = async () => {
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);
-    window.location.href = '/';
     return error;
   }
 };
@@ -38,7 +35,6 @@ export const modifyInfo = async (payload: ModifyInfoPayload) => {
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);
-    window.location.href = '/';
     return error;
   }
 };

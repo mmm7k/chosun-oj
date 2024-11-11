@@ -122,11 +122,11 @@ export default function SideNav() {
               </ul>
             </div>
 
-            {/* 학생 드롭다운 */}
+            {/* 유저 드롭다운 */}
             <div>
               <div
                 className={`flex justify-between cursor-pointer items-center ${
-                  pathname.startsWith('/admin/student')
+                  pathname.startsWith('/admin/user')
                     ? 'text-white underline decoration-dotted'
                     : 'text-white'
                 }`}
@@ -134,7 +134,7 @@ export default function SideNav() {
               >
                 <div className="flex items-center transition">
                   <PiStudent className="mr-2 text-xl" />
-                  <span>학생</span>
+                  <span>유저</span>
                 </div>
                 {isStudentDropdownOpen ? (
                   <RiArrowDropUpLine className="text-3xl" />
@@ -149,27 +149,24 @@ export default function SideNav() {
               >
                 <li
                   className={`transition mt-5 ${
-                    pathname === '/admin/student/list'
+                    pathname === '/admin/user/list'
                       ? 'text-white underline decoration-dotted'
                       : 'text-white'
                   }`}
                 >
-                  <Link href="/admin/student/list" onClick={closeAllDropdowns}>
-                    학생 목록
+                  <Link href="/admin/user/list" onClick={closeAllDropdowns}>
+                    유저 목록
                   </Link>
                 </li>
                 <li
                   className={`transition mt-5 ${
-                    pathname === '/admin/student/enroll'
+                    pathname === '/admin/user/enroll'
                       ? 'text-white underline decoration-dotted'
                       : 'text-white'
                   }`}
                 >
-                  <Link
-                    href="/admin/student/enroll"
-                    onClick={closeAllDropdowns}
-                  >
-                    학생 등록
+                  <Link href="/admin/user/enroll" onClick={closeAllDropdowns}>
+                    유저 등록
                   </Link>
                 </li>
               </ul>
@@ -441,18 +438,18 @@ export default function SideNav() {
             )}
           </div>
 
-          {/* 학생 드롭다운 */}
+          {/* 유저 드롭다운 */}
           <div className="w-full">
             <div
               className={`flex justify-center cursor-pointer items-center px-5 py-3 hover:bg-gray-100 ${
-                pathname.startsWith('/admin/student') &&
+                pathname.startsWith('/admin/user') &&
                 'text-primary font-semibold'
               }`}
               onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
             >
               <span className="flex items-center">
                 <PiStudent className="mr-2 text-xl" />
-                학생
+                유저
               </span>
               {isStudentDropdownOpen ? (
                 <RiArrowDropUpLine className="text-3xl" />
@@ -463,7 +460,7 @@ export default function SideNav() {
             {isStudentDropdownOpen && (
               <ul className="w-full space-y-2 bg-white">
                 <Link
-                  href="/admin/student/list"
+                  href="/admin/user/list"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -471,15 +468,15 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/admin/student/list' &&
+                      pathname === '/admin/user/list' &&
                       'text-primary font-semibold'
                     }`}
                   >
-                    학생 목록
+                    유저 목록
                   </li>
                 </Link>
                 <Link
-                  href="/admin/student/enroll"
+                  href="/admin/user/enroll"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -487,11 +484,11 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/admin/student/enroll' &&
+                      pathname === '/admin/user/enroll' &&
                       'text-primary font-semibold'
                     }`}
                   >
-                    학생 등록
+                    유저 등록
                   </li>
                 </Link>
               </ul>

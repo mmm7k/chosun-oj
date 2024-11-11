@@ -23,7 +23,7 @@ import Image from 'next/image';
 import { FaUserGraduate } from 'react-icons/fa6';
 import { RiEdit2Line } from 'react-icons/ri';
 import Link from 'next/link';
-import { getMyInformation, getMyProfile } from '@/services/account/profile';
+import { getMyInformation, getMyProfile } from '@/services/accountUser/profile';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
@@ -46,6 +46,7 @@ interface ProfileData {
     username: string;
     student_number: string;
     name: string;
+    admin_type: string;
   };
 }
 
@@ -57,7 +58,13 @@ export default function StudentMain() {
     queryFn: getMyProfile,
   });
   const profileData: ProfileData | null = profile?.data;
-
+  const userType = profileData?.user.admin_type;
+  const matchingRole: { [key: string]: string } = {
+    'Regular User': '학생',
+    Professor: '교수',
+    'Super Admin': '관리자',
+  };
+  const role = matchingRole[(userType as string) ?? ''];
   useEffect(() => {
     if (profileData) {
       const calculateRank = () => {
@@ -340,7 +347,7 @@ export default function StudentMain() {
           <span className="text-xl font-semibold">
             {profileData?.user?.name}
           </span>
-          <span className="text-lg ">Developer</span>
+          <span className="text-lg ">{role}</span>
           <div>
             <span className="font-semibold">Major : </span>
             {profileData?.major ?? 'Computer Science'}

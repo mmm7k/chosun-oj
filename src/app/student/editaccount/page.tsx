@@ -1,8 +1,8 @@
 'use client';
 
-import { getMyInformation, modifyInfo } from '@/services/account/profile';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime';
+import { getMyInformation, modifyInfo } from '@/services/accountUser/profile';
+import { useMutation, useQuery } from '@tanstack/react-query';
+
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -24,7 +24,6 @@ interface ModifyInfoPayload {
 }
 
 export default function EditAccount() {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const { data: information } = useQuery({
     queryKey: ['informationData'],

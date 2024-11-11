@@ -10,7 +10,7 @@ import { set, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Noto_Sans_KR } from 'next/font/google';
-import { login } from '@/services/account/login';
+import { login } from '@/services/accountUser/login';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 

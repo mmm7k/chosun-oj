@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { MdLogout } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import api from '@/services/account/api';
-import { logout } from '@/services/account/login';
+import api from '@/services/api';
+import { logout } from '@/services/accountUser/login';
 
 export default function HeaderNav() {
   const pathname = usePathname();
