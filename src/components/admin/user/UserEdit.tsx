@@ -40,6 +40,7 @@ export default function UserEdit() {
     major: Yup.string().nullable(),
     isDisabled: Yup.string().required('계정 활성화 여부를 선택해주세요.'),
     adminType: Yup.string().required('관리자 유형을 선택해주세요.'),
+    problemPermission: Yup.string().required('문제 권한을 선택해주세요.'),
   });
 
   const {
@@ -65,6 +66,7 @@ export default function UserEdit() {
           ? 'true'
           : 'false',
         adminType: userModifyInformation.data.user.admin_type,
+        problemPermission: userModifyInformation.data.user.problem_permission,
       });
     }
   }, [userModifyInformation, reset]);
@@ -79,7 +81,7 @@ export default function UserEdit() {
           admin_type: data.adminType,
           name: data.userName,
           student_number: data.userNumber,
-          problem_permission: 'None', // 기본값으로 설정
+          problem_permission: data.problemPermission,
           is_disabled: data.isDisabled,
         },
         school: data.school || null, // 비어 있을 때 null로 전송
@@ -281,6 +283,47 @@ export default function UserEdit() {
             {errors.major && (
               <p className="text-xs text-red-500 mt-1">
                 {errors.major.message}
+              </p>
+            )}
+          </div>
+
+          {/* 문제 접근권한 */}
+          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+            <div className="flex items-center space-x-2">
+              <label>문제 접근 권한:</label>
+              <div className="ml-3 space-x-2">
+                <label>
+                  <input
+                    {...register('problemPermission')}
+                    type="radio"
+                    value="All"
+                    className="mr-1"
+                  />
+                  All
+                </label>
+                <label>
+                  <input
+                    {...register('problemPermission')}
+                    type="radio"
+                    value="None"
+                    className="mr-1"
+                  />
+                  None
+                </label>
+                <label>
+                  <input
+                    {...register('problemPermission')}
+                    type="radio"
+                    value="Own"
+                    className="mr-1"
+                  />
+                  Own
+                </label>
+              </div>
+            </div>
+            {errors.isDisabled && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.isDisabled.message}
               </p>
             )}
           </div>

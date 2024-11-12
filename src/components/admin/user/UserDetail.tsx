@@ -16,7 +16,13 @@ export default function UserDetail() {
     enabled: !!userId, // userId가 존재할 때만 쿼리 실행
   });
 
-  const userData = userInformation?.data || {};
+  const userData: UserData = userInformation?.data || ({} as UserData);
+  // admin_type에 따른 권한 매핑
+  const matchingRole: { [key: string]: string } = {
+    'Regular User': '학생',
+    Professor: '교수',
+    'Super Admin': '관리자',
+  };
 
   return (
     <div className="flex min-h-screen p-8">
@@ -42,7 +48,7 @@ export default function UserDetail() {
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>권한:</span>
-            <span>{userData.admin_type}</span>
+            <span> {matchingRole[userData.admin_type] || 'undefined'}</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>생성 시간:</span>
@@ -55,6 +61,10 @@ export default function UserDetail() {
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>학번:</span>
             <span>{userData.student_number}</span>
+          </div>
+          <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
+            <span>문제 접근 권한:</span>
+            <span>{userData.problem_permission}</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>계정 활성화 상태:</span>
