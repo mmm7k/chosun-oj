@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-
-export default function UserDetail() {
+import UserDetail from '@/components/admin/user/UserDetail';
+export default function UserDetailPage() {
   return (
     <Suspense>
       <UserDetail />
