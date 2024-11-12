@@ -32,9 +32,9 @@ export default function UserDetail() {
             <span>아이디:</span>
             <span>{userData.username}</span>
           </div>
-          <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
+          <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10  ">
             <span>비밀번호:</span>
-            <span>{userData.password}</span>
+            <span>*******</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>이름:</span>

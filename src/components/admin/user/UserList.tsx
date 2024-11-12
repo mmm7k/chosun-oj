@@ -9,6 +9,8 @@ import { getAllUser } from '@/services/accountAdmin/getAllUser';
 import { TbEdit } from 'react-icons/tb';
 import Link from 'next/link';
 import Skeleton from '@mui/material/Skeleton';
+import { deleteUser } from '@/services/accountAdmin/deleteUser';
+import { Modal, message } from 'antd';
 
 export default function UserList() {
   const router = useRouter();
@@ -55,6 +57,21 @@ export default function UserList() {
       ? Math.min(endPage + 1, totalPages)
       : Math.max(startPage - pagesPerBlock, 1);
     changePage(newPage);
+  };
+
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: '이 작업은 되돌릴 수 없습니다.',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: async () => {
+        await deleteUser(id);
+        message.success('유저가 성공적으로 삭제되었습니다.');
+        refetch();
+      },
+    });
   };
 
   return (
@@ -114,30 +131,40 @@ export default function UserList() {
               </thead>
               <tbody>
                 {userList.map((item: UserList) => (
-                  <Link
-                    href={`/admin/user/list/${item.id}`}
-                    className="contents"
+                  <tr
+                    className="border-b cursor-pointer hover:bg-gray-50"
                     key={item.id}
+                    onClick={() => router.push(`/admin/user/list/${item.id}`)}
                   >
-                    <tr className="border-b cursor-pointer hover:bg-gray-50">
-                      <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                        {item.student_number}
-                      </td>
-                      <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                        {item.name}
-                      </td>
-                      <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                        {item.username}
-                      </td>
-                      <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                        {matchingRole[item.admin_type] || 'undefined'}
-                      </td>
-                      <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                        <TbEdit className="text-lg cursor-pointer lg:text-xl" />
-                        <FiTrash2 className="text-lg cursor-pointer lg:text-xl" />
-                      </td>
-                    </tr>
-                  </Link>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.student_number}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.name}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.username}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {matchingRole[item.admin_type] || 'undefined'}
+                    </td>
+                    <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
+                      <TbEdit
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/user/edit/${item.id}`);
+                        }}
+                      />
+                      <FiTrash2
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                      />
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
