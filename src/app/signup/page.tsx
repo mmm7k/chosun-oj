@@ -17,10 +17,6 @@ import { useRouter } from 'next/navigation';
 
 type CheckType = 'username' | 'email' | 'studentNumber';
 
-interface ResponseData {
-  msg: string;
-}
-
 export default function Signup() {
   const router = useRouter();
   const [isDuplicateChecked, setIsDuplicateChecked] = useState({
@@ -88,7 +84,7 @@ export default function Signup() {
   const handleDuplicateCheck = async (type: CheckType) => {
     const value = getValues(type);
     try {
-      let response: ResponseData;
+      let response: any;
       if (type === 'username') {
         response = await checkUsername(value);
       } else if (type === 'email') {

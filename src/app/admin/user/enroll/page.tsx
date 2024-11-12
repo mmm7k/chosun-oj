@@ -274,12 +274,12 @@ import { enrollUsers } from '@/services/accountAdmin/enrollUser';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
-export default function Enroll() {
+export default function UserEnroll() {
   const router = useRouter();
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
 
-  // Validation schema for Yup
   const validationSchema = Yup.object().shape({
     userId: Yup.string().required('아이디를 입력해주세요.'),
     userPassword: Yup.string()
@@ -345,14 +345,25 @@ export default function Enroll() {
     setSelectedUsers((prev) => [...prev, newUser]);
     reset();
   };
-  const handleFinalRegister = async () => {
-    try {
-      await enrollUsers(selectedUsers);
+
+  const mutation = useMutation({
+    mutationFn: () => enrollUsers(selectedUsers),
+    onSuccess: () => {
       alert('유저 등록이 완료되었습니다.');
       setSelectedUsers([]); // 등록 후 초기화
-    } catch (error: any) {
-      alert(error.response?.data?.msg);
-    }
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
+        router.push('/');
+      } else {
+        alert(error.response?.data?.message);
+      }
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -531,7 +542,7 @@ export default function Enroll() {
             <span>&nbsp; 유저 추가 후 등록 버튼을 눌러주세요.</span>
           </span>
           <button
-            onClick={handleFinalRegister}
+            onClick={onSubmit}
             className={`px-4 py-2 text-base font-normal text-white rounded-xl  ${
               selectedUsers.length > 0
                 ? 'bg-primary hover:bg-primaryButtonHover'

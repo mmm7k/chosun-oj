@@ -6,13 +6,29 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { MdLogout } from 'react-icons/md';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import api from '@/services/api';
 import { logout } from '@/services/accountUser/login';
+import { useQuery } from '@tanstack/react-query';
+import { getMyProfile } from '@/services/accountUser/profile';
+import { IoMdArrowForward } from 'react-icons/io';
+import { FaPersonWalkingArrowLoopLeft } from 'react-icons/fa6';
 
 export default function HeaderNav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
+
+  const { data: profile } = useQuery({
+    queryKey: ['userRole'],
+    queryFn: getMyProfile,
+  });
+  const profileData: ProfileData | null = profile?.data;
+  const userType = profileData?.user.admin_type;
+  const matchingRole: { [key: string]: string } = {
+    // 'Regular User': '학생',
+    Professor: '교수',
+    'Super Admin': '관리자',
+  };
+  const role = matchingRole[(userType as string) ?? ''];
   if (
     pathname.includes('/problems/') ||
     pathname.match(/^\/student\/assignment\/[^\/]+\/[^\/]+$/) ||
@@ -20,17 +36,6 @@ export default function HeaderNav() {
   ) {
     return null; // 헤더를 렌더링하지 않음
   }
-
-  // const logout = async () => {
-  //   try {
-  //     const response = await api.get('/account/logout/');
-  //     router.push('/'); // 로그아웃 후 리다이렉트
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Error during logout:', error);
-  //     throw error;
-  //   }
-  // };
 
   const onClickLogout = async () => {
     try {
@@ -146,7 +151,17 @@ export default function HeaderNav() {
 
         {/* 로그아웃 (sm 이상에서만 표시) */}
 
-        <section className="items-center hidden ml-auto sm:flex">
+        <section className="items-center hidden ml-auto sm:flex space-x-3">
+          {(role === '관리자' || role === '교수') && (
+            <Link href={role === '관리자' ? '/admin' : '/professor'}>
+              <div className="flex items-center transition cursor-pointer hover:text-secondaryHover">
+                <span>{role}</span>
+
+                <FaPersonWalkingArrowLoopLeft className="ml-2 text-xl" />
+              </div>
+            </Link>
+          )}
+
           <div
             onClick={onClickLogout}
             className="flex items-center transition cursor-pointer hover:text-secondaryHover"
@@ -215,12 +230,23 @@ export default function HeaderNav() {
         <Link
           href={'/student/contest'}
           className={`w-full flex justify-center items-center py-3 hover:bg-gray-100  ${
-            pathname.startsWith('/student/contest') && 'text-primary   '
+            pathname.startsWith('/student/contest') && 'text-primary '
           }`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span className="font-semibold transition cursor-pointer ">대회</span>
         </Link>
+
+        {(role === '관리자' || role === '교수') && (
+          <Link
+            href={role === '관리자' ? '/admin' : '/professor'}
+            className="flex items-center justify-center w-full py-3 hover:bg-gray-100"
+          >
+            <span className="font-semibold transition cursor-pointer flex items-center">
+              {role} <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
+            </span>
+          </Link>
+        )}
 
         <div
           className="flex items-center justify-center w-full py-3 hover:bg-gray-100 "

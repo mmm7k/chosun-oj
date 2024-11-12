@@ -2,26 +2,9 @@
 
 import { getMyInformation, modifyInfo } from '@/services/accountUser/profile';
 import { useMutation, useQuery } from '@tanstack/react-query';
-
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-
-interface InformationData {
-  major: string;
-  school: string;
-  user: {
-    email: string;
-  };
-}
-
-interface ModifyInfoPayload {
-  user: {
-    email: string;
-  };
-  school: string;
-  major: string;
-}
 
 export default function EditAccount() {
   const router = useRouter();
@@ -57,6 +40,14 @@ export default function EditAccount() {
     mutationFn: modifyInfo,
     onSuccess: () => {
       router.push('/student');
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
+        router.push('/');
+      } else {
+        alert(error.response?.data?.message);
+      }
     },
   });
 

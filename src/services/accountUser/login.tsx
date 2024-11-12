@@ -23,8 +23,9 @@ export const login = async (username: string, password: string) => {
         password,
       });
       return retryResponse.data;
-    } catch (retryError) {
-      throw retryError; // 재시도 실패 시 최종 에러 반환
+    } catch (retryError: any) {
+      alert(retryError.response?.data?.message);
+      throw retryError;
     }
   }
 };
@@ -33,7 +34,8 @@ export const logout = async () => {
   try {
     const response = await api.get('/account/logout/');
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    alert(error.response?.data?.message);
     throw error;
   }
 };

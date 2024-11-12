@@ -7,8 +7,8 @@ export const checkUsername = async (username: string) => {
     });
     console.log(response);
     return response.data;
-  } catch (error) {
-    console.error('Error checking username:', error);
+  } catch (error: any) {
+    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -17,8 +17,8 @@ export const checkEmail = async (email: string) => {
   try {
     const response = await api.post('/account/check_email/', { email });
     return response.data;
-  } catch (error) {
-    console.error('Error checking email:', error);
+  } catch (error: any) {
+    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -29,8 +29,8 @@ export const checkStudentNumber = async (studentNumber: string) => {
       student_number: studentNumber,
     });
     return response.data;
-  } catch (error) {
-    console.error('Error checking student number:', error);
+  } catch (error: any) {
+    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -39,8 +39,8 @@ export const registerUser = async (data: any) => {
   try {
     const response = await api.post('/account/register/', data);
     return response.data;
-  } catch (error) {
-    console.error('Error registering user:', error);
+  } catch (error: any) {
+    alert(error.response?.data?.message);
     throw error;
   }
 };

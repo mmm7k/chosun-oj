@@ -6,6 +6,6 @@ export const getAllUser = async () => {
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);
-    return error;
+    throw error;
   }
 };

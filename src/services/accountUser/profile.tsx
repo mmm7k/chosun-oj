@@ -1,20 +1,12 @@
 import api from '../api';
 
-interface ModifyInfoPayload {
-  user: {
-    email: string;
-  };
-  school: string;
-  major: string;
-}
-
 export const getMyProfile = async () => {
   try {
     const response = await api.get('/account/profile/');
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);
-    return error;
+    throw error;
   }
 };
 
@@ -24,7 +16,7 @@ export const getMyInformation = async () => {
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);
-    return error;
+    throw error;
   }
 };
 
@@ -34,7 +26,6 @@ export const modifyInfo = async (payload: ModifyInfoPayload) => {
     alert('정보가 수정되었습니다.');
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
-    return error;
+    throw error;
   }
 };
