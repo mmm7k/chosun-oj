@@ -1,6 +1,5 @@
 'use client';
 
-import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
@@ -12,49 +11,49 @@ import { TbEdit } from 'react-icons/tb';
 export default function UserList() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const pagesPerBlock = 5;
 
-  const { data: userListData } = useQuery({
-    queryKey: ['userListData'],
-    queryFn: getAllUser,
+  const { data: userListData, refetch } = useQuery({
+    queryKey: ['userListData', currentPage],
+    queryFn: () => getAllUser(currentPage),
   });
 
-  const userList = userListData?.results;
+  useEffect(() => {
+    router.push(`/admin/user/list?page=${currentPage}`);
+    refetch();
+  }, [currentPage, router, refetch]);
+
+  const userList = userListData?.data?.data;
+  const totalPages = userListData?.data?.total_count
+    ? Math.ceil(userListData.data.total_count / 15)
+    : 1;
+
   const matchingRole: { [key: string]: string } = {
     'Regular User': '학생',
     Professor: '교수',
     'Super Admin': '관리자',
   };
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 15;
-  const pagesPerBlock = 5;
-
-  const currentItems = userList
-    ? userList.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage,
-      )
-    : [];
-
-  const totalPages = userList ? Math.ceil(userList.length / itemsPerPage) : 1;
-
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
-  const pages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i,
-  );
 
   const changePage = (page: number) => {
     setCurrentPage(page);
-    router.push(`/admin/user/list?page=${page}`);
+  };
+
+  const changePageBlock = (isNext: boolean) => {
+    const newPage = isNext
+      ? Math.min(endPage + 1, totalPages)
+      : Math.max(startPage - pagesPerBlock, 1);
+    changePage(newPage);
   };
 
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        {/* Header */}
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">유저 전체 목록</h1>
           <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
@@ -69,9 +68,11 @@ export default function UserList() {
 
         <hr className="mt-5 border-t-2 border-gray-200" />
 
-        {/* user List */}
         <section className="px-3 overflow-x-auto sm:px-16">
-          <table className="w-full text-sm text-left border-b-2 table-auto">
+          <table
+            className="w-full text-sm text-left border-b-2 table-auto"
+            style={{ tableLayout: 'fixed' }}
+          >
             <thead>
               <tr className="border-b-2">
                 <th className="p-4">학번</th>
@@ -82,18 +83,21 @@ export default function UserList() {
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((item: any) => (
+              {userList.map((item: UserList) => (
                 <tr
                   key={item.id}
                   className="border-b cursor-pointer hover:bg-gray-50"
                 >
-                  <td className="p-4 text-xs sm:text-sm">
+                  <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                     {item.student_number}
                   </td>
-                  <td className="p-4 text-xs sm:text-sm">{item.name}</td>
-                  <td className="p-4 text-xs sm:text-sm">{item.username}</td>
-                  <td className="p-4 text-xs sm:text-sm">
-                    {' '}
+                  <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                    {item.name}
+                  </td>
+                  <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                    {item.username}
+                  </td>
+                  <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                     {matchingRole[item.admin_type] || 'undefined'}
                   </td>
                   <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
@@ -106,22 +110,28 @@ export default function UserList() {
           </table>
         </section>
 
-        {/* Pagination */}
         <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
           <div className="flex items-center space-x-1">
             <button
-              onClick={() => changePage(Math.max(startPage - pagesPerBlock, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300 disabled:opacity-50"
+              onClick={() => changePageBlock(false)}
+              disabled={currentBlock === 1}
+              className={`px-3 py-1 rounded-xl ${
+                currentBlock === 1
+                  ? 'bg-gray-200 opacity-50 '
+                  : 'bg-gray-200 hover:bg-gray-300'
+              }`}
             >
               &lt;
             </button>
             <div className="flex space-x-1 font-normal">
-              {pages.map((page) => (
+              {Array.from(
+                { length: endPage - startPage + 1 },
+                (_, i) => startPage + i,
+              ).map((page) => (
                 <button
                   key={page}
                   onClick={() => changePage(page)}
-                  className={`px-3 py-1 rounded-xl ${
+                  className={`px-3 py-1 rounded-xl transition-all ${
                     page === currentPage
                       ? 'bg-primary text-white hover:bg-primaryButtonHover'
                       : 'bg-gray-200 hover:bg-gray-300'
@@ -132,11 +142,13 @@ export default function UserList() {
               ))}
             </div>
             <button
-              onClick={() =>
-                changePage(Math.min(startPage + pagesPerBlock, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300 disabled:opacity-50"
+              onClick={() => changePageBlock(true)}
+              disabled={endPage === totalPages}
+              className={`px-3 py-1 rounded-xl ${
+                endPage === totalPages
+                  ? 'bg-gray-200 opacity-50'
+                  : 'bg-gray-200 hover:bg-gray-300'
+              }`}
             >
               &gt;
             </button>

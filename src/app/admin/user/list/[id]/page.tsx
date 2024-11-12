@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
-export default function UserEnroll() {
+export default function UserEdit() {
   const router = useRouter();
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
 
@@ -107,7 +107,7 @@ export default function UserEnroll() {
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex items-center justify-between px-16">
-          <h1 className="text-lg">유저 계정 등록</h1>
+          <h1 className="text-lg">유저 계정 수정</h1>
           <Upload
             accept=".xlsx, .xls"
             showUploadList={false}
