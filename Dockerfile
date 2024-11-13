@@ -12,8 +12,8 @@ RUN pnpm install
 COPY . .
 
 RUN pnpm build
-ENV PORT=80
-EXPOSE 80
+ENV PORT=5555
+EXPOSE 5555
 CMD ["pnpm", "run", "start"]
 
 
