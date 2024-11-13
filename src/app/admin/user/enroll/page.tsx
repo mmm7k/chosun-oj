@@ -187,6 +187,9 @@ export default function UserEnroll() {
                 className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
                 type="number"
                 placeholder="학번을 입력해주세요"
+                style={{
+                  MozAppearance: 'textfield',
+                }}
               />
               {errors.userNumber && (
                 <p className="text-xs text-red-500 mt-1">

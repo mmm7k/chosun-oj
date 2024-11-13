@@ -123,12 +123,12 @@ export default function SideNav() {
                 </li>
                 <li
                   className={`transition mt-5 ${
-                    pathname === '/admin/course/enroll'
+                    pathname === '/admin/course/post'
                       ? 'text-white underline decoration-dotted'
                       : 'text-white'
                   }`}
                 >
-                  <Link href="/admin/course/enroll" onClick={closeAllDropdowns}>
+                  <Link href="/admin/course/post" onClick={closeAllDropdowns}>
                     강의 개설
                   </Link>
                 </li>
@@ -435,7 +435,7 @@ export default function SideNav() {
                   </li>
                 </Link>
                 <Link
-                  href="/admin/course/enroll"
+                  href="/admin/course/post"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -443,7 +443,7 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/admin/course/enroll' &&
+                      pathname === '/admin/course/post' &&
                       'text-primary font-semibold'
                     }`}
                   >

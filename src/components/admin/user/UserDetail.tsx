@@ -24,6 +24,16 @@ export default function UserDetail() {
     'Super Admin': '관리자',
   };
 
+  const formattedDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
+
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
@@ -52,7 +62,7 @@ export default function UserDetail() {
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>생성 시간:</span>
-            <span>{userData.create_time}</span>
+            <span>{formattedDate(userData.create_time)}</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>이메일:</span>

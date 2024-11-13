@@ -1,55 +1,81 @@
 'use client';
 
-import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
+import { useQuery } from '@tanstack/react-query';
+import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
+import Skeleton from '@mui/material/Skeleton';
+import { Modal, message } from 'antd';
+import { deleteCourse } from '@/services/courseAdmin/deleteCourse';
 
 export default function CourseList() {
   const router = useRouter();
-
-  const [studentList, setStudentList] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 15;
+  const searchParams = useSearchParams();
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
 
+  const {
+    data: courseListData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ['courseListData', currentPage],
+    queryFn: () => getAllCourse(currentPage),
+  });
+
   useEffect(() => {
-    const fetchStudentList = async () => {
-      try {
-        const response = await axios.get(
-          '/mock/professor/student/studentlist.json',
-        );
-        setStudentList(response.data);
-        console.log('Student List:', response.data);
-      } catch (error) {
-        console.error('Error fetching student list:', error);
-      }
-    };
+    router.push(`/admin/course/list?page=${currentPage}`);
+    refetch();
+  }, [currentPage, router, refetch]);
 
-    fetchStudentList();
-  }, []);
+  const courseList = courseListData?.data?.results || [];
+  const totalPages = courseListData?.data?.count
+    ? Math.ceil(courseListData.data.count / 10)
+    : 1;
 
-  const currentItems = studentList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  const totalPages = Math.ceil(studentList.length / itemsPerPage);
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
-  const pages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i,
-  );
+  const changePageBlock = (isNext: boolean) => {
+    const newPage = isNext
+      ? Math.min(endPage + 1, totalPages)
+      : Math.max(startPage - pagesPerBlock, 1);
+    changePage(newPage);
+  };
 
   const changePage = (page: number) => {
     setCurrentPage(page);
     router.push(`/admin/course/list?page=${page}`);
   };
 
+  const formattedDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
+
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: '이 작업은 되돌릴 수 없습니다.',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: async () => {
+        await deleteCourse(id);
+        message.success('강의가 성공적으로 삭제되었습니다.');
+        refetch();
+      },
+    });
+  };
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
@@ -70,82 +96,137 @@ export default function CourseList() {
 
         {/* Course List */}
         <section className="px-3 overflow-x-auto sm:px-16">
-          <table className="w-full text-sm text-left border-b-2 table-auto">
-            <thead>
-              <tr className="border-b-2">
-                <th className="p-4">강의</th>
-                <th className="p-4">설명</th>
-                <th className="p-4">과목 코드</th>
-                <th className="p-4">년도</th>
-                <th className="p-4">강의 관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b cursor-pointer hover:bg-gray-50"
-                >
-                  {/* <td className="p-4 text-xs sm:text-sm">
-                    {item.studentNumber}
-                  </td> */}
-                  <td className="p-4 text-xs sm:text-sm">기초프로그래밍</td>
-                  {/* <td className="p-4 text-xs sm:text-sm">{item.name}</td> */}
-                  <td className="p-4 text-xs sm:text-sm">
-                    2024년도 1학기 기초프로그래밍
-                  </td>
-
-                  {/* <td className="p-4 text-xs sm:text-sm">{item.student_id}</td> */}
-                  <td className="p-4 text-xs sm:text-sm">40098</td>
-
-                  {/* <td className="p-4 text-xs sm:text-sm">{item.email}</td> */}
-                  <td className="p-4 text-xs sm:text-sm">2024</td>
-
-                  <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                    <TbEdit className="text-lg cursor-pointer lg:text-xl" />
-                    <FiTrash2 className="text-lg lg:text-xl" />
-                  </td>
+          {isLoading ? (
+            <table className="w-full text-sm text-left border-b-2 table-auto">
+              <thead>
+                <tr>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <th key={index} className="p-4">
+                      <Skeleton animation="wave" width="100%" height={30} />
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {Array.from({ length: 15 }).map((_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Array.from({ length: 5 }).map((_, colIndex) => (
+                      <td key={colIndex} className="p-4">
+                        <Skeleton animation="wave" width="100%" height={20} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table
+              className="w-full text-sm text-left border-b-2 table-auto"
+              style={{ tableLayout: 'fixed' }}
+            >
+              <thead>
+                <tr className="border-b-2">
+                  <th className="p-4">id</th>
+                  <th className="p-4">과목코드</th>
+                  <th className="p-4">과목</th>
+                  <th className="p-4">생성시간</th>
+                  <th className="p-4">강의 관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {courseList.map((item: CourseList) => (
+                  <tr
+                    className="border-b cursor-pointer hover:bg-gray-50"
+                    key={item.id}
+                    onClick={() => router.push(`/admin/course/list/${item.id}`)}
+                  >
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.id}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.code}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.title}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {formattedDate(item.created_time)}
+                    </td>
+                    <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
+                      <TbEdit
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/course/edit/${item.id}`);
+                        }}
+                      />
+                      <FiTrash2
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
 
         {/* Pagination */}
         <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={() => changePage(Math.max(startPage - pagesPerBlock, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300 disabled:opacity-50"
-            >
-              &lt;
-            </button>
-            <div className="flex space-x-1 font-normal">
-              {pages.map((page) => (
-                <button
-                  key={page}
-                  onClick={() => changePage(page)}
-                  className={`px-3 py-1 rounded-xl ${
-                    page === currentPage
-                      ? 'bg-primary text-white hover:bg-primaryButtonHover'
-                      : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  {page}
-                </button>
+          {isLoading ? (
+            <div className="flex space-x-2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={index} animation="wave" width={40} height={30} />
               ))}
             </div>
-            <button
-              onClick={() =>
-                changePage(Math.min(startPage + pagesPerBlock, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300 disabled:opacity-50"
-            >
-              &gt;
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => changePageBlock(false)}
+                disabled={currentBlock === 1}
+                className={`px-3 py-1 rounded-xl ${
+                  currentBlock === 1
+                    ? 'bg-gray-200 opacity-50 '
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                &lt;
+              </button>
+              <div className="flex space-x-1 font-normal">
+                {Array.from(
+                  { length: endPage - startPage + 1 },
+                  (_, i) => startPage + i,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => changePage(page)}
+                    className={`px-3 py-1 rounded-xl transition-all ${
+                      page === currentPage
+                        ? 'bg-primary text-white hover:bg-primaryButtonHover'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => changePageBlock(true)}
+                disabled={endPage === totalPages}
+                className={`px-3 py-1 rounded-xl ${
+                  endPage === totalPages
+                    ? 'bg-gray-200 opacity-50'
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                &gt;
+              </button>
+            </div>
+          )}
         </section>
       </div>
     </div>
