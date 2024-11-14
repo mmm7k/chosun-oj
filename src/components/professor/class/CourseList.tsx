@@ -5,7 +5,7 @@ import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
 import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
@@ -28,7 +28,7 @@ export default function CourseList() {
   });
 
   useEffect(() => {
-    router.push(`/admin/course/list?page=${currentPage}`);
+    router.push(`/professor/class/courselist?page=${currentPage}`);
     refetch();
   }, [currentPage, router, refetch]);
 
@@ -49,7 +49,7 @@ export default function CourseList() {
 
   const changePage = (page: number) => {
     setCurrentPage(page);
-    router.push(`/admin/course/list?page=${page}`);
+    router.push(`/professor/class/courselist?page=${page}`);
   };
 
   const formattedDate = (dateString: string) => {
@@ -62,42 +62,12 @@ export default function CourseList() {
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteCourse(id),
-    onSuccess: () => {
-      message.success('강의가 성공적으로 삭제되었습니다.');
-      refetch();
-    },
-    onError: (error: any) => {
-      if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
-        router.push('/');
-      } else {
-        message.error(
-          error.response?.data?.message || '삭제 중 오류가 발생했습니다.',
-        );
-      }
-    },
-  });
-
-  const handleDelete = (id: number) => {
-    Modal.confirm({
-      title: '정말 삭제하시겠습니까?',
-      content: '이 작업은 되돌릴 수 없습니다.',
-      okText: '삭제',
-      okType: 'danger',
-      cancelText: '취소',
-      onOk: () => {
-        deleteMutation.mutate(id); // 삭제 뮤테이션 호출
-      },
-    });
-  };
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         {/* Header */}
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
-          <h1 className="mb-3 text-lg md:mb-0">강의 목록</h1>
+          <h1 className="mb-3 text-lg md:mb-0">개설 강의 목록</h1>
           <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
             <IoSearchSharp className="mr-2 text-lg text-gray-500" />
             <input
@@ -146,7 +116,6 @@ export default function CourseList() {
                   <th className="p-4">강의코드</th>
                   <th className="p-4">강의명</th>
                   <th className="p-4">생성시간</th>
-                  <th className="p-4">강의 관리</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,7 +123,9 @@ export default function CourseList() {
                   <tr
                     className="border-b cursor-pointer hover:bg-gray-50"
                     key={item.id}
-                    onClick={() => router.push(`/admin/course/list/${item.id}`)}
+                    onClick={() =>
+                      router.push(`/professor/class/courselist/${item.id}`)
+                    }
                   >
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                       {item.id}
@@ -167,22 +138,6 @@ export default function CourseList() {
                     </td>
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                       {formattedDate(item.created_time)}
-                    </td>
-                    <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                      <TbEdit
-                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/admin/course/edit/${item.id}`);
-                        }}
-                      />
-                      <FiTrash2
-                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(item.id);
-                        }}
-                      />
                     </td>
                   </tr>
                 ))}

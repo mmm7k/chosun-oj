@@ -1,22 +1,34 @@
 'use client';
 
-import { enrollClass } from '@/services/classProfessor/enrollClass';
+import { editClass } from '@/services/classProfessor/editClass';
+import { getClass } from '@/services/classProfessor/getClass';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { Select } from 'antd';
 
 const { Option } = Select;
 
-export default function EnrollClass() {
+export default function ClassEdit() {
+  const pathname = usePathname();
   const router = useRouter();
+  // URL의 마지막 숫자 추출
+  const classId = Number(pathname.split('/').pop());
+
+  const { data: classModifyInformation } = useQuery({
+    queryKey: ['classModifyInformation', classId],
+    queryFn: () => getClass(classId),
+    enabled: !!classId, // classId가 존재할 때만 쿼리 실행
+  });
+
   const validationSchema = Yup.object().shape({
     group_name: Yup.string().required('분반 이름을 입력해주세요.'),
     description: Yup.string().required('분반 정보를 입력해주세요.'),
     short_description: Yup.string().required('분반 설명을 입력해주세요.'),
-    course: Yup.number().required('개설된 분반 ID를 입력해주세요.'),
+    course: Yup.number().required('강의 코드를 입력해주세요.'),
     year: Yup.number().required('개설년도를 입력해주세요.'),
     quarter: Yup.string().required('학기를 선택해주세요.'),
     language: Yup.string().required('분반에 사용될 언어를 선택해주세요.'),
@@ -25,38 +37,52 @@ export default function EnrollClass() {
   const {
     register,
     handleSubmit,
+    reset,
     setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
+  useEffect(() => {
+    if (classModifyInformation) {
+      reset({
+        group_name: classModifyInformation.data.group_name,
+        description: classModifyInformation.data.description,
+        short_description: classModifyInformation.data.short_description,
+        course: classModifyInformation.data.course?.code,
+        year: classModifyInformation.data.year,
+        quarter: classModifyInformation.data.quarter,
+        language: classModifyInformation.data.language,
+      });
+    }
+  }, [classModifyInformation, reset]);
+
   const mutation = useMutation({
-    mutationFn: (data) => enrollClass(data),
+    mutationFn: (data: any) => editClass(classId, data),
     onSuccess: () => {
-      alert('분반 개설이 완료되었습니다.');
+      alert('분반 수정이 완료되었습니다.');
       router.push('/professor/class/list');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        alert(error.response?.data?.message);
       }
     },
   });
+
   const onSubmit = (data: any) => {
     mutation.mutate(data);
   };
-
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <form onSubmit={handleSubmit(onSubmit)}>
           <section className="flex items-center justify-between px-16">
-            <h1 className="text-lg">분반 개설</h1>
+            <h1 className="text-lg">분반 수정</h1>
           </section>
           <hr className="mt-5 border-t-2 border-gray-200" />
           {/* 분반 정보 입력 */}
@@ -89,7 +115,7 @@ export default function EnrollClass() {
                   className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
                   id="class-description"
                   type="text"
-                  placeholder="분반 정보를 입력해주세요"
+                  placeholder="분반 정보 입력해주세요"
                 />
               </div>
               {errors.description && (
@@ -98,6 +124,7 @@ export default function EnrollClass() {
                 </p>
               )}
             </div>
+
             {/* 분반 설명 */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
@@ -107,7 +134,7 @@ export default function EnrollClass() {
                   className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
                   id="class-short-description"
                   type="text"
-                  placeholder="분반 설명을 입력해주세요"
+                  placeholder="분반 정보 입력해주세요"
                 />
               </div>
               {errors.short_description && (
@@ -116,6 +143,7 @@ export default function EnrollClass() {
                 </p>
               )}
             </div>
+
             {/* 강의 코드 */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
@@ -138,14 +166,14 @@ export default function EnrollClass() {
               )}
             </div>
 
-            {/* 강의 코드 */}
+            {/* 개설년도 */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="course-year">개설년도:</label>
+                <label htmlFor="class-year">개설년도:</label>
                 <input
                   {...register('year')}
                   className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                  id="course-year"
+                  id="class-year"
                   type="number"
                   placeholder="개설년도를 입력해주세요"
                   style={{
@@ -153,12 +181,13 @@ export default function EnrollClass() {
                   }}
                 />
               </div>
-              {errors.year && (
+              {errors.course && (
                 <p className="text-xs text-red-500 mt-1">
-                  {errors.year.message}
+                  {errors.course.message}
                 </p>
               )}
             </div>
+
             {/* 학기 선택 */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
@@ -167,6 +196,7 @@ export default function EnrollClass() {
                   {...register('quarter')}
                   className="ml-3 w-[60%] sm:w-[30%] "
                   placeholder="학기를 선택해주세요"
+                  value={classModifyInformation?.data.quarter}
                   onChange={(value) => setValue('quarter', value)}
                 >
                   <Option value="1학기">1학기</Option>
@@ -189,6 +219,7 @@ export default function EnrollClass() {
                 <Select
                   {...register('language')}
                   className="ml-3 w-[60%] sm:w-[30%] "
+                  value={classModifyInformation?.data.language}
                   placeholder="언어를 선택해주세요"
                   onChange={(value) => setValue('language', value)}
                 >
@@ -211,7 +242,7 @@ export default function EnrollClass() {
               className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
               type="submit"
             >
-              분반 개설
+              분반 수정
             </button>
           </div>
         </form>

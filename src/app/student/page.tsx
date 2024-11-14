@@ -335,10 +335,10 @@ export default function StudentMain() {
           <span className="text-lg ">{role}</span>
           <div>
             <span className="font-semibold">Major : </span>
-            {profileData?.major ?? 'Computer Science'}
+            {profileData?.major ?? ''}
           </div>
           <div>
-            <span className="font-semibold">ID : </span>
+            <span className="font-semibold">학번 : </span>
             {profileData?.user?.student_number}
           </div>
         </div>

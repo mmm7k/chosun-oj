@@ -9,7 +9,6 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { logout } from '@/services/accountUser/login';
 import { useQuery } from '@tanstack/react-query';
 import { getMyProfile } from '@/services/accountUser/profile';
-import { IoMdArrowForward } from 'react-icons/io';
 import { FaPersonWalkingArrowLoopLeft } from 'react-icons/fa6';
 
 export default function HeaderNav() {
@@ -77,7 +76,7 @@ export default function HeaderNav() {
         </div>
 
         {/* 메뉴 (sm 이상에서만 표시) */}
-        <section className="hidden sm:flex ml-[3%] space-x-9">
+        <section className="hidden sm:flex ml-[3%] space-x-3 xl:space-x-9">
           <Link href={'/student/problems?category=all'}>
             <span
               className={`cursor-pointer transition ${
@@ -152,11 +151,40 @@ export default function HeaderNav() {
         {/* 로그아웃 (sm 이상에서만 표시) */}
 
         <section className="items-center hidden ml-auto sm:flex space-x-3">
-          {(role === '관리자' || role === '교수') && (
+          {/* {(role === '관리자' || role === '교수') && (
             <Link href={role === '관리자' ? '/admin' : '/professor'}>
               <div className="flex items-center transition cursor-pointer hover:text-secondaryHover">
                 <span>{role}</span>
 
+                <FaPersonWalkingArrowLoopLeft className="ml-2 text-xl" />
+              </div>
+            </Link>
+          )} */}
+
+          {role === '관리자' && (
+            <>
+              {/* 관리자 전용 링크 */}
+              <Link href="/admin">
+                <div className="flex items-center transition cursor-pointer hover:text-secondaryHover">
+                  <span>관리자</span>
+                  <FaPersonWalkingArrowLoopLeft className="ml-2 text-xl" />
+                </div>
+              </Link>
+
+              {/* 교수 전용 링크 */}
+              <Link href="/professor">
+                <div className="flex items-center transition cursor-pointer hover:text-secondaryHover">
+                  <span>교수</span>
+                  <FaPersonWalkingArrowLoopLeft className="ml-2 text-xl" />
+                </div>
+              </Link>
+            </>
+          )}
+
+          {role === '교수' && (
+            <Link href="/professor">
+              <div className="flex items-center transition cursor-pointer hover:text-secondaryHover">
+                <span>교수</span>
                 <FaPersonWalkingArrowLoopLeft className="ml-2 text-xl" />
               </div>
             </Link>
@@ -237,13 +265,48 @@ export default function HeaderNav() {
           <span className="font-semibold transition cursor-pointer ">대회</span>
         </Link>
 
-        {(role === '관리자' || role === '교수') && (
+        {/* {(role === '관리자' || role === '교수') && (
           <Link
             href={role === '관리자' ? '/admin' : '/professor'}
             className="flex items-center justify-center w-full py-3 hover:bg-gray-100"
           >
             <span className="font-semibold transition cursor-pointer flex items-center">
               {role} <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
+            </span>
+          </Link>
+        )} */}
+
+        {role === '관리자' && (
+          <>
+            {/* 관리자 전용 링크 */}
+            <Link
+              href="/admin"
+              className="flex items-center justify-center w-full py-3 hover:bg-gray-100"
+            >
+              <span className="font-semibold transition cursor-pointer flex items-center">
+                관리자 <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
+              </span>
+            </Link>
+
+            {/* 교수 전용 링크 */}
+            <Link
+              href="/professor"
+              className="flex items-center justify-center w-full py-3 hover:bg-gray-100"
+            >
+              <span className="font-semibold transition cursor-pointer flex items-center">
+                교수 <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
+              </span>
+            </Link>
+          </>
+        )}
+
+        {role === '교수' && (
+          <Link
+            href="/professor"
+            className="flex items-center justify-center w-full py-3 hover:bg-gray-100"
+          >
+            <span className="font-semibold transition cursor-pointer flex items-center">
+              교수 <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
             </span>
           </Link>
         )}

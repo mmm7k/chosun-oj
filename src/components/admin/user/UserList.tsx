@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getAllUser } from '@/services/accountAdmin/getAllUser';
 import { TbEdit } from 'react-icons/tb';
 import Link from 'next/link';
@@ -59,6 +59,24 @@ export default function UserList() {
     changePage(newPage);
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteUser(id),
+    onSuccess: () => {
+      message.success('유저가 성공적으로 삭제되었습니다.');
+      refetch();
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
+        router.push('/');
+      } else {
+        message.error(
+          error.response?.data?.message || '삭제 중 오류가 발생했습니다.',
+        );
+      }
+    },
+  });
+
   const handleDelete = (id: number) => {
     Modal.confirm({
       title: '정말 삭제하시겠습니까?',
@@ -66,14 +84,11 @@ export default function UserList() {
       okText: '삭제',
       okType: 'danger',
       cancelText: '취소',
-      onOk: async () => {
-        await deleteUser(id);
-        message.success('유저가 성공적으로 삭제되었습니다.');
-        refetch();
+      onOk: () => {
+        deleteMutation.mutate(id); // 삭제 뮤테이션 호출
       },
     });
   };
-
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">

@@ -16,8 +16,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Home() {
   const router = useRouter();
-  const [isProfessor, setIsProfessor] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     document.cookie = 'sessionid=; Max-Age=0';
@@ -50,17 +48,6 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-    // if (username === 'root' && password === 'root') {
-    //   if (isProfessor) {
-    //     router.push('/professor/dashboard');
-    //   } else if (isAdmin) {`
-    //     router.push('/admin/dashboard');
-    //   } else {
-    //     router.push('/student');
-    //   }
-    // } else {
-    //   error();
-    // }
   };
 
   return (
@@ -126,29 +113,7 @@ export default function Home() {
                   </p>
                 )}
               </div>
-              <div className="flex items-center  w-3/4 space-x-2">
-                {/* 교수 로그인 체크박스 */}
-                <div className=" flex  text-[#5a5a5a] items-center">
-                  <Checkbox
-                    checked={isProfessor}
-                    onChange={(e) => setIsProfessor(e.target.checked)}
-                  />
-                  <span className="ml-2  md:text-lg lg:text-sm">
-                    교수 로그인
-                  </span>
-                </div>
 
-                {/* 관리자 로그인 체크박스 */}
-                <div className="  flex  text-[#5a5a5a] items-center">
-                  <Checkbox
-                    checked={isAdmin}
-                    onChange={(e) => setIsAdmin(e.target.checked)}
-                  />
-                  <span className="ml-2  md:text-lg lg:text-sm">
-                    관리자 로그인
-                  </span>
-                </div>
-              </div>
               <button
                 type="submit"
                 className="flex items-center justify-center w-3/4 py-2 text-white transition rounded-md cursor-pointer md:py-5 lg:py-2 bg-primary hover:bg-primaryButtonHover"

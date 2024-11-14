@@ -1,168 +1,250 @@
 'use client';
 
-import { Modal } from 'antd';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
-import { FiTrash2 } from 'react-icons/fi';
-import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
+import Skeleton from '@mui/material/Skeleton';
+import { Modal, message } from 'antd';
+import { deleteCourse } from '@/services/courseAdmin/deleteCourse';
+import { getAllClass } from '@/services/classProfessor/getAllClass';
+import { deleteClass } from '@/services/classProfessor/deleteClass';
+import { RiUserAddLine } from 'react-icons/ri';
 
 export default function ClassList() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
-
-  const pageParam = searchParams.get('page') || '1';
-  const [currentPage, setCurrentPage] = useState<number>(parseInt(pageParam));
-
-  const list = Array.from({ length: 3 }, (_, i) => ({
-    id: i + 1,
-    name: `기초프로그래밍 0${i + 1}분반`,
-    registrationTime: `2024-9-2 16:19:${i + 1}`,
-  }));
-
-  const itemsPerPage = 15;
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
 
-  const currentItems = list.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const {
+    data: classListData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ['classListData', currentPage],
+    queryFn: () => getAllClass(currentPage),
+  });
 
-  const totalPages = Math.ceil(list.length / itemsPerPage);
+  useEffect(() => {
+    router.push(`/professor/class/list?page=${currentPage}`);
+    refetch();
+  }, [currentPage, router, refetch]);
+
+  const classList = classListData?.data?.results || [];
+  const totalPages = classListData?.data?.count
+    ? Math.ceil(classListData.data.count / 10)
+    : 1;
+
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
-  const pages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i,
-  );
+  const changePageBlock = (isNext: boolean) => {
+    const newPage = isNext
+      ? Math.min(endPage + 1, totalPages)
+      : Math.max(startPage - pagesPerBlock, 1);
+    changePage(newPage);
+  };
 
   const changePage = (page: number) => {
     setCurrentPage(page);
-    const query = new URLSearchParams({ page: page.toString() });
-    router.push(`/professor/class/list?${query.toString()}`);
+    router.push(`/professor/class/list?page=${page}`);
   };
 
-  const showDeleteModal = (id: number) => {
-    setDeleteItemId(id);
-    setIsModalVisible(true);
+  const formattedDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
-  const handleDelete = () => {
-    if (deleteItemId !== null) {
-      console.log(`Delete item with ID: ${deleteItemId}`);
-    }
-    setIsModalVisible(false);
-    setDeleteItemId(null);
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: '이 작업은 되돌릴 수 없습니다.',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: async () => {
+        await deleteClass(id);
+        message.success('분반이 성공적으로 삭제되었습니다.');
+        refetch();
+      },
+    });
   };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setDeleteItemId(null);
-  };
-
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <section className="flex items-center justify-between px-0 md:px-16">
-          <h1 className="text-lg">분반 목록</h1>
+        {/* Header */}
+        <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
+          <h1 className="mb-3 text-lg md:mb-0">분반 목록</h1>
           <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
             <IoSearchSharp className="mr-2 text-lg text-gray-500" />
             <input
               className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
               type="text"
-              placeholder="분반을 검색해보세요"
+              placeholder="분반 이름으로 검색해보세요"
             />
           </div>
         </section>
 
         <hr className="mt-5 border-t-2 border-gray-200" />
 
+        {/* Course List */}
         <section className="px-3 overflow-x-auto sm:px-16">
-          <table className="w-full text-sm text-left border-b-2 table-auto">
-            <thead>
-              <tr className="border-b-2">
-                <th className="p-4">ID</th>
-                <th className="p-4">분반 이름</th>
-                <th className="p-4">등록 시간</th>
-                <th className="p-4">분반 관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b cursor-pointer hover:bg-gray-100"
-                >
-                  <td className="p-4 text-xs sm:text-sm">{item.id}</td>
-                  <td className="p-4 text-xs sm:text-sm">{item.name}</td>
-                  <td className="p-4 text-xs sm:text-sm">
-                    {item.registrationTime}
-                  </td>
-                  <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                    <Link href={`/professor/contest/list/${item.id}`}>
-                      <TbEdit className="text-lg cursor-pointer lg:text-xl" />
-                    </Link>
-                    <FiTrash2
-                      className="text-lg cursor-pointer lg:text-xl"
-                      onClick={() => showDeleteModal(item.id)}
-                    />
-                  </td>
+          {isLoading ? (
+            <table className="w-full text-sm text-left border-b-2 table-auto">
+              <thead>
+                <tr>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <th key={index} className="p-4">
+                      <Skeleton animation="wave" width="100%" height={30} />
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {Array.from({ length: 15 }).map((_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Array.from({ length: 5 }).map((_, colIndex) => (
+                      <td key={colIndex} className="p-4">
+                        <Skeleton animation="wave" width="100%" height={20} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table
+              className="w-full text-sm text-left border-b-2 table-auto"
+              style={{ tableLayout: 'fixed' }}
+            >
+              <thead>
+                <tr className="border-b-2">
+                  <th className="p-4">id</th>
+                  <th className="p-4">강의명</th>
+                  <th className="p-4">분반명</th>
+                  <th className="p-4">년도</th>
+                  <th className="p-4">학기</th>
+                  <th className="p-4">분반 관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {classList.map((item: ClassList) => (
+                  <tr
+                    className="border-b cursor-pointer hover:bg-gray-50"
+                    key={item.id}
+                    onClick={() =>
+                      router.push(`/professor/class/list/${item.id}`)
+                    }
+                  >
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.id}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.course.title}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.group_name}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.year}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.quarter}
+                    </td>
+
+                    <td className="flex items-center p-4 space-x-2 ">
+                      <RiUserAddLine
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/professor/class/enrolluser/${item.id}`);
+                        }}
+                      />
+                      <TbEdit
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/professor/class/edit/${item.id}`);
+                        }}
+                      />
+                      <FiTrash2
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
 
+        {/* Pagination */}
         <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={() => changePage(Math.max(startPage - pagesPerBlock, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300 disabled:opacity-50"
-            >
-              &lt;
-            </button>
-            <div className="flex space-x-1">
-              {pages.map((page) => (
-                <button
-                  key={page}
-                  onClick={() => changePage(page)}
-                  className={`px-3 py-1 rounded-xl ${
-                    page === currentPage
-                      ? 'bg-primary text-white hover:bg-primaryButtonHover'
-                      : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  {page}
-                </button>
+          {isLoading ? (
+            <div className="flex space-x-2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={index} animation="wave" width={40} height={30} />
               ))}
             </div>
-            <button
-              onClick={() =>
-                changePage(Math.min(startPage + pagesPerBlock, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300 disabled:opacity-50"
-            >
-              &gt;
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => changePageBlock(false)}
+                disabled={currentBlock === 1}
+                className={`px-3 py-1 rounded-xl ${
+                  currentBlock === 1
+                    ? 'bg-gray-200 opacity-50 '
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                &lt;
+              </button>
+              <div className="flex space-x-1 font-normal">
+                {Array.from(
+                  { length: endPage - startPage + 1 },
+                  (_, i) => startPage + i,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => changePage(page)}
+                    className={`px-3 py-1 rounded-xl transition-all ${
+                      page === currentPage
+                        ? 'bg-primary text-white hover:bg-primaryButtonHover'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => changePageBlock(true)}
+                disabled={endPage === totalPages}
+                className={`px-3 py-1 rounded-xl ${
+                  endPage === totalPages
+                    ? 'bg-gray-200 opacity-50'
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                &gt;
+              </button>
+            </div>
+          )}
         </section>
-
-        <Modal
-          title="분반 삭제 확인"
-          visible={isModalVisible}
-          onOk={handleDelete}
-          onCancel={handleCancel}
-          okText="삭제"
-          cancelText="취소"
-        >
-          <p>정말로 이 분반을 삭제하시겠습니까?</p>
-        </Modal>
       </div>
     </div>
   );

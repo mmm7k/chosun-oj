@@ -114,6 +114,21 @@ export default function SideNav() {
               >
                 <li
                   className={`transition mt-5 ${
+                    pathname === '/professor/class/courselist'
+                      ? 'text-primary hover:text-primaryHover'
+                      : 'text-secondary hover:text-secondaryHover'
+                  }`}
+                >
+                  <Link
+                    href="/professor/class/courselist"
+                    onClick={closeAllDropdowns}
+                  >
+                    개설 강의 목록
+                  </Link>
+                </li>
+
+                <li
+                  className={`transition mt-5 ${
                     pathname === '/professor/class/list'
                       ? 'text-primary hover:text-primaryHover'
                       : 'text-secondary hover:text-secondaryHover'
@@ -529,6 +544,23 @@ export default function SideNav() {
             </div>
             {isClassDropdownOpen && (
               <ul className="w-full space-y-2 bg-white">
+                <Link
+                  href="/professor/class/courselist"
+                  onClick={() => {
+                    setMenuOpen(!menuOpen);
+                    closeAllDropdowns();
+                  }}
+                >
+                  <li
+                    className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
+                      pathname === '/professor/class/courselist' &&
+                      'text-primary font-semibold'
+                    }`}
+                  >
+                    개설 강의 목록
+                  </li>
+                </Link>
+
                 <Link
                   href="/professor/class/list"
                   onClick={() => {
