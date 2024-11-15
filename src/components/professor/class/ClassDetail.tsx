@@ -45,7 +45,7 @@ export default function ClassDetail() {
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
-            <span>강의 코드:</span>
+            <span>과목 코드:</span>
             <span>{classData.course?.code}</span>
           </div>
 

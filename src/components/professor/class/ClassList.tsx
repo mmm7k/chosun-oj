@@ -129,7 +129,7 @@ export default function ClassList() {
             >
               <thead>
                 <tr className="border-b-2">
-                  <th className="p-4">id</th>
+                  <th className="p-4">과목코드</th>
                   <th className="p-4">강의명</th>
                   <th className="p-4">분반명</th>
                   <th className="p-4">년도</th>
@@ -147,7 +147,7 @@ export default function ClassList() {
                     }
                   >
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                      {item.id}
+                      {item.course.code}
                     </td>
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                       {item.course.title}
