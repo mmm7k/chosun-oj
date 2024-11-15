@@ -35,23 +35,23 @@ export default function ContestList() {
   }, [currentPage, router, refetch]);
 
   const contestList = contestListData?.data?.data || [];
-  const totalPages = contestListData?.data?.count
-    ? Math.ceil(contestListData.data.count / 10)
+  const totalPages = contestListData?.data?.total_count
+    ? Math.ceil(contestListData.data.total_count / 15)
     : 1;
 
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
+
+  const changePage = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const changePageBlock = (isNext: boolean) => {
     const newPage = isNext
       ? Math.min(endPage + 1, totalPages)
       : Math.max(startPage - pagesPerBlock, 1);
     changePage(newPage);
-  };
-
-  const changePage = (page: number) => {
-    setCurrentPage(page);
-    router.push(`/admin/contest/list?page=${page}`);
   };
 
   const handleDelete = (id: number) => {
