@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx';
 import * as Yup from 'yup';
 import { UploadOutlined } from '@ant-design/icons';
 import { PiExclamationMarkFill } from 'react-icons/pi';
-import { enrollUsers } from '@/services/accountAdmin/enrollUser';
+import { enrollUsers } from '@/services/accountAdmin/enrollUsers';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';

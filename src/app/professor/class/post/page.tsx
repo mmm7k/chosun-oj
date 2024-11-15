@@ -1,6 +1,6 @@
 'use client';
 
-import { enrollClass } from '@/services/classProfessor/enrollClass';
+import { postClass } from '@/services/classProfessor/postClass';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,7 @@ import { Select } from 'antd';
 
 const { Option } = Select;
 
-export default function EnrollClass() {
+export default function PostClass() {
   const router = useRouter();
   const validationSchema = Yup.object().shape({
     group_name: Yup.string().required('분반 이름을 입력해주세요.'),
@@ -32,7 +32,7 @@ export default function EnrollClass() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data) => enrollClass(data),
+    mutationFn: (data) => postClass(data),
     onSuccess: () => {
       alert('분반 개설이 완료되었습니다.');
       router.push('/professor/class/list');

@@ -6,6 +6,7 @@ import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { RiArrowDropDownLine, RiArrowDropUpLine } from 'react-icons/ri';
+
 import 'highlight.js/styles/github.css';
 
 const { Option } = Select;
@@ -23,7 +24,11 @@ export default function SubmissionList() {
     courseParam,
   );
 
-  const courses = ['C', 'C++', 'Python'];
+  const courses = [
+    '기초프로그래밍 중간고사',
+    '심화프로그래밍 중간고사',
+    '알고리즘 대회',
+  ];
 
   const generateRandomIP = () =>
     `${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(
@@ -45,10 +50,6 @@ let t = s.split(" ");
 return Math.min(...t) + " " + Math.max(...t);
 }`,
   }));
-
-  // useEffect(() => {
-  //   hljs.highlightAll();
-  // }, [openSubmissionId]);
 
   const itemsPerPage = 15;
   const pagesPerBlock = 5;

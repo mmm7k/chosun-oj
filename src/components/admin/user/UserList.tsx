@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getAllUser } from '@/services/accountAdmin/getAllUser';
 import { TbEdit } from 'react-icons/tb';
-import Link from 'next/link';
 import Skeleton from '@mui/material/Skeleton';
 import { deleteUser } from '@/services/accountAdmin/deleteUser';
 import { Modal, message } from 'antd';

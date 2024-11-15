@@ -17,7 +17,6 @@ export default function SideNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [isClassDropdownOpen, setIsClassDropdownOpen] = useState(false);
-  const [isStudentDropdownOpen, setIsStudentDropdownOpen] = useState(false);
   const [isProblemsDropdownOpen, setIsProblemsDropdownOpen] = useState(false);
   const [isAssignmentDropdownOpen, setIsAssignmentDropdownOpen] =
     useState(false);
@@ -28,7 +27,6 @@ export default function SideNav() {
 
   const closeAllDropdowns = () => {
     setIsClassDropdownOpen(false);
-    setIsStudentDropdownOpen(false);
     setIsProblemsDropdownOpen(false);
     setIsAssignmentDropdownOpen(false);
     setIsAnnouncementDropdownOpen(false);
@@ -158,61 +156,6 @@ export default function SideNav() {
               </ul>
             </div>
 
-            {/* 학생 드롭다운 */}
-            <div>
-              <div
-                className={`flex justify-between cursor-pointer items-center ${
-                  pathname.startsWith('/professor/student')
-                    ? 'text-primary hover:text-primaryHover'
-                    : 'text-secondary hover:text-secondaryHover'
-                }`}
-                onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
-              >
-                <div className="flex items-center transition">
-                  <PiStudent className="mr-2 text-xl" />
-                  <span>학생</span>
-                </div>
-                {isStudentDropdownOpen ? (
-                  <RiArrowDropUpLine className="text-3xl" />
-                ) : (
-                  <RiArrowDropDownLine className="text-3xl" />
-                )}
-              </div>
-              <ul
-                className={`list-disc overflow-hidden transition-all duration-500 ease-in-out pl-8 space-y-4 ${
-                  isStudentDropdownOpen ? 'max-h-40' : 'max-h-0'
-                }`}
-              >
-                <li
-                  className={`transition mt-5 ${
-                    pathname === '/professor/student/list'
-                      ? 'text-primary hover:text-primaryHover'
-                      : 'text-secondary hover:text-secondaryHover'
-                  }`}
-                >
-                  <Link
-                    href="/professor/student/list"
-                    onClick={closeAllDropdowns}
-                  >
-                    학생 목록
-                  </Link>
-                </li>
-                <li
-                  className={`transition mt-5 ${
-                    pathname === '/professor/student/enroll'
-                      ? 'text-primary hover:text-primaryHover'
-                      : 'text-secondary hover:text-secondaryHover'
-                  }`}
-                >
-                  <Link
-                    href="/professor/student/enroll"
-                    onClick={closeAllDropdowns}
-                  >
-                    학생 등록
-                  </Link>
-                </li>
-              </ul>
-            </div>
             {/* 문제 드롭다운 */}
             <div>
               <div
@@ -384,13 +327,13 @@ export default function SideNav() {
                 </li>
                 <li
                   className={`transition ${
-                    pathname === '/professor/contest/enroll'
+                    pathname === '/professor/contest/post'
                       ? 'text-primary hover:text-primaryHover'
                       : 'text-secondary hover:text-secondaryHover'
                   }`}
                 >
                   <Link
-                    href="/professor/contest/enroll"
+                    href="/professor/contest/post"
                     onClick={closeAllDropdowns}
                   >
                     대회 등록
@@ -597,63 +540,6 @@ export default function SideNav() {
             )}
           </div>
 
-          {/* 학생 드롭다운 */}
-          <div className="w-full">
-            <div
-              className={`flex justify-center cursor-pointer items-center px-5 py-3 hover:bg-gray-100 ${
-                pathname.startsWith('/professor/student') &&
-                'text-primary font-semibold'
-              }`}
-              onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
-            >
-              <span className="flex items-center">
-                <PiStudent className="mr-2 text-xl" />
-                학생
-              </span>
-              {isStudentDropdownOpen ? (
-                <RiArrowDropUpLine className="text-3xl" />
-              ) : (
-                <RiArrowDropDownLine className="text-3xl" />
-              )}
-            </div>
-            {isStudentDropdownOpen && (
-              <ul className="w-full space-y-2 bg-white">
-                <Link
-                  href="/professor/student/list"
-                  onClick={() => {
-                    setMenuOpen(!menuOpen);
-                    closeAllDropdowns();
-                  }}
-                >
-                  <li
-                    className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/professor/student/list' &&
-                      'text-primary font-semibold'
-                    }`}
-                  >
-                    학생 목록
-                  </li>
-                </Link>
-                <Link
-                  href="/professor/student/enroll"
-                  onClick={() => {
-                    setMenuOpen(!menuOpen);
-                    closeAllDropdowns();
-                  }}
-                >
-                  <li
-                    className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/professor/student/enroll' &&
-                      'text-primary font-semibold'
-                    }`}
-                  >
-                    학생 등록
-                  </li>
-                </Link>
-              </ul>
-            )}
-          </div>
-
           {/* 문제 드롭다운 */}
           <div className="w-full">
             <div
@@ -826,7 +712,7 @@ export default function SideNav() {
                   </li>
                 </Link>
                 <Link
-                  href="/professor/contest/enroll"
+                  href="/professor/contest/post"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -834,7 +720,7 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/professor/contest/enroll' &&
+                      pathname === '/professor/contest/post' &&
                       'text-primary font-semibold'
                     }`}
                   >

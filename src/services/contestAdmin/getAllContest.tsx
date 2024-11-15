@@ -1,8 +1,8 @@
 import api from '../api';
 
-export const enrollClass = async (data: any) => {
+export const getAllContest = async (page: number) => {
   try {
-    const response = await api.post('/admin/group/', data);
+    const response = await api.get(`/admin/contest?page=${page}`);
     return response.data;
   } catch (error: any) {
     alert(error.response?.data?.message);

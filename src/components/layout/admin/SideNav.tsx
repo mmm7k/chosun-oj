@@ -274,15 +274,12 @@ export default function SideNav() {
                 </li>
                 <li
                   className={`transition ${
-                    pathname === '/admin/contest/enroll'
+                    pathname === '/admin/contest/post'
                       ? 'text-white underline decoration-dotted'
                       : 'text-white'
                   }`}
                 >
-                  <Link
-                    href="/admin/contest/enroll"
-                    onClick={closeAllDropdowns}
-                  >
+                  <Link href="/admin/contest/post" onClick={closeAllDropdowns}>
                     대회 등록
                   </Link>
                 </li>
@@ -607,7 +604,7 @@ export default function SideNav() {
                   </li>
                 </Link>
                 <Link
-                  href="/admin/contest/enroll"
+                  href="/admin/contest/post"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -615,7 +612,7 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/admin/contest/enroll' &&
+                      pathname === '/admin/contest/post' &&
                       'text-primary font-semibold'
                     }`}
                   >
