@@ -141,13 +141,13 @@ export default function SideNav() {
                 </li>
                 <li
                   className={`transition mt-5 ${
-                    pathname === '/professor/class/enroll'
+                    pathname === '/professor/class/post'
                       ? 'text-primary hover:text-primaryHover'
                       : 'text-secondary hover:text-secondaryHover'
                   }`}
                 >
                   <Link
-                    href="/professor/class/enroll"
+                    href="/professor/class/post"
                     onClick={closeAllDropdowns}
                   >
                     분반 개설
@@ -521,7 +521,7 @@ export default function SideNav() {
                   </li>
                 </Link>
                 <Link
-                  href="/professor/class/enroll"
+                  href="/professor/class/post"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -529,7 +529,7 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/professor/class/enroll' &&
+                      pathname === '/professor/class/post' &&
                       'text-primary font-semibold'
                     }`}
                   >
