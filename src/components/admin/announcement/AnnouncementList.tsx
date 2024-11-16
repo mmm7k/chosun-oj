@@ -72,7 +72,7 @@ export default function AnnouncementList() {
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
         message.error(

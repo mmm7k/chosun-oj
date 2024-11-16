@@ -5,7 +5,7 @@ import { FiTrash2 } from 'react-icons/fi';
 import { IoAlertCircleOutline, IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
 import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
@@ -55,15 +55,21 @@ export default function ClassList() {
     router.push(`/professor/class/list?page=${page}`);
   };
 
-  const formattedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
-  };
+  const deleteClassMutation = useMutation({
+    mutationFn: (id: number) => deleteClass(id),
+    onSuccess: () => {
+      message.success('분반이 성공적으로 삭제되었습니다.');
+      refetch();
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
 
   const handleDelete = (id: number) => {
     Modal.confirm({
@@ -72,10 +78,8 @@ export default function ClassList() {
       okText: '삭제',
       okType: 'danger',
       cancelText: '취소',
-      onOk: async () => {
-        await deleteClass(id);
-        message.success('분반이 성공적으로 삭제되었습니다.');
-        refetch();
+      onOk: () => {
+        deleteClassMutation.mutate(id);
       },
     });
   };

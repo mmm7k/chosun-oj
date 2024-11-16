@@ -8,7 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
-import { Select } from 'antd';
+import { message, Select } from 'antd';
 
 const { Option } = Select;
 
@@ -61,15 +61,15 @@ export default function ClassEdit() {
   const mutation = useMutation({
     mutationFn: (data: any) => editClass(classId, data),
     onSuccess: () => {
-      alert('분반 수정이 완료되었습니다.');
+      message.success('분반이 성공적으로 수정되었습니다.');
       router.push('/professor/class/list');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(error.response?.data?.message);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

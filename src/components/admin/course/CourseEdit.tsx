@@ -4,6 +4,7 @@ import { editCourse } from '@/services/courseAdmin/editCourse';
 import { getCourse } from '@/services/courseAdmin/getCourse';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { message } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -49,15 +50,15 @@ export default function CourseEdit() {
   const mutation = useMutation({
     mutationFn: (data: any) => editCourse(courseId, data),
     onSuccess: () => {
-      alert('강의 수정이 완료되었습니다.');
+      message.success('강의가 성공적으로 수정되었습니다.');
       router.push('/admin/course/list');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(error.response?.data?.message);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

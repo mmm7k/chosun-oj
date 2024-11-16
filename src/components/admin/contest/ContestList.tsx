@@ -5,7 +5,7 @@ import { FiTrash2 } from 'react-icons/fi';
 import { IoAlertCircleOutline, IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
 import { RiUserAddLine } from 'react-icons/ri';
@@ -54,6 +54,22 @@ export default function ContestList() {
     changePage(newPage);
   };
 
+  const deleteContestMutation = useMutation({
+    mutationFn: (id: number) => deleteContest(id),
+    onSuccess: () => {
+      message.success('대회가 성공적으로 삭제되었습니다.');
+      refetch();
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
+
   const handleDelete = (id: number) => {
     Modal.confirm({
       title: '정말 삭제하시겠습니까?',
@@ -61,10 +77,8 @@ export default function ContestList() {
       okText: '삭제',
       okType: 'danger',
       cancelText: '취소',
-      onOk: async () => {
-        await deleteContest(id);
-        message.success('대회가 성공적으로 삭제되었습니다.');
-        refetch();
+      onOk: () => {
+        deleteContestMutation.mutate(id); // 뮤테이션 실행
       },
     });
   };
@@ -121,7 +135,6 @@ export default function ContestList() {
                   <th className="p-4">id</th>
                   <th className="p-4">대회명</th>
                   <th className="p-4">대회생성</th>
-
                   <th className="p-4">대회 관리</th>
                 </tr>
               </thead>
@@ -154,7 +167,6 @@ export default function ContestList() {
                           );
                         }}
                       />
-
                       <MdOutlineLibraryAdd
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {

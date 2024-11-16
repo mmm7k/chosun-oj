@@ -86,15 +86,15 @@ export default function UserEnroll() {
   const mutation = useMutation({
     mutationFn: () => enrollUsers(selectedUsers),
     onSuccess: () => {
-      alert('유저 등록이 완료되었습니다.');
+      message.success('유저가 성공적으로 등록되었습니다.');
       setSelectedUsers([]); // 등록 후 초기화
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(error.response?.data?.message);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

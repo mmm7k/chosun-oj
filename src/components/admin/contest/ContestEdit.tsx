@@ -2,7 +2,7 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Checkbox } from 'antd';
+import { Checkbox, message } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
@@ -87,16 +87,15 @@ export default function ContestEdit() {
   const mutation = useMutation({
     mutationFn: (data) => editContest(contestId, data),
     onSuccess: () => {
-      alert('대회 수정이 완료되었습니다.');
+      message.success('대회가 성공적으로 수정되었습니다.');
       router.push('/admin/contest/list');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

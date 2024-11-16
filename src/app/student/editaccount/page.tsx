@@ -2,6 +2,7 @@
 
 import { getMyInformation, modifyInfo } from '@/services/accountUser/profile';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -39,6 +40,7 @@ export default function EditAccount() {
   const mutation = useMutation({
     mutationFn: modifyInfo,
     onSuccess: () => {
+      message.success('회원 정보가 성공적으로 수정되었습니다.');
       router.push('/student');
     },
     onError: (error: any) => {

@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
-import { Select } from 'antd';
+import { message, Select } from 'antd';
 
 const { Option } = Select;
 
@@ -34,16 +34,15 @@ export default function PostClass() {
   const mutation = useMutation({
     mutationFn: (data) => postClass(data),
     onSuccess: () => {
-      alert('분반 개설이 완료되었습니다.');
+      message.success('분반이 성공적으로 개설되었습니다.');
       router.push('/professor/class/list');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

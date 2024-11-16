@@ -5,7 +5,7 @@ import { FiTrash2 } from 'react-icons/fi';
 import { IoAlertCircleOutline, IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
 import { RiUserAddLine } from 'react-icons/ri';
@@ -54,6 +54,22 @@ export default function ContestList() {
     changePage(newPage);
   };
 
+  const deleteContestMutation = useMutation({
+    mutationFn: (id: number) => deleteContest(id),
+    onSuccess: () => {
+      message.success('대회가 성공적으로 삭제되었습니다.');
+      refetch();
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
+
   const handleDelete = (id: number) => {
     Modal.confirm({
       title: '정말 삭제하시겠습니까?',
@@ -61,13 +77,12 @@ export default function ContestList() {
       okText: '삭제',
       okType: 'danger',
       cancelText: '취소',
-      onOk: async () => {
-        await deleteContest(id);
-        message.success('대회가 성공적으로 삭제되었습니다.');
-        refetch();
+      onOk: () => {
+        deleteContestMutation.mutate(id);
       },
     });
   };
+
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">

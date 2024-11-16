@@ -45,18 +45,17 @@ export default function EnrollContestAnnouncementPage() {
   const mutation = useMutation({
     mutationFn: (data) => postContestAnnouncement(contestId, data),
     onSuccess: () => {
-      alert('공지 등록이 완료되었습니다.');
+      message.success('공지가 성공적으로 등록되었습니다.');
       queryClient.invalidateQueries({
         queryKey: ['contestAnnouncementsListData', contestId],
       });
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message);
       }
     },
   });

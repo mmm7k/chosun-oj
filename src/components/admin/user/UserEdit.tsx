@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getModifyUser } from '@/services/accountAdmin/getModifyUser';
 import { editUsers } from '@/services/accountAdmin/editUser';
+import { message } from 'antd';
 
 export default function UserEdit() {
   const router = useRouter();
@@ -88,15 +89,15 @@ export default function UserEdit() {
         major: data.major || null, // 비어 있을 때 null로 전송
       }),
     onSuccess: () => {
-      alert('유저 수정이 완료되었습니다.');
+      message.success('유저 정보가 성공적으로 수정되었습니다.');
       router.push('/admin/user/list');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(error.response?.data?.message);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

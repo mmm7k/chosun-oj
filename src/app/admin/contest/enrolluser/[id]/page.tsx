@@ -156,7 +156,7 @@ export default function UserEnroll() {
     },
 
     onSuccess: () => {
-      alert('유저 등록이 완료되었습니다.');
+      message.success('유저 등록이 완료되었습니다.');
       setSelectedStudents([]);
       queryClient.invalidateQueries({
         queryKey: ['contestUsersListData', contestId],
@@ -164,10 +164,10 @@ export default function UserEnroll() {
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(error.response?.data?.message);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });
@@ -221,12 +221,11 @@ export default function UserEnroll() {
       message.success('유저 삭제가 완료되었습니다.');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        message.error(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

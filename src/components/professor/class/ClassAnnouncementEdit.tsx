@@ -4,7 +4,7 @@ import { editClassAnnouncement } from '@/services/classannouncementAdmin/editCla
 import { getClassAnnouncement } from '@/services/classannouncementAdmin/getClassAnnouncement';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Checkbox } from 'antd';
+import { Checkbox, message } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -56,15 +56,15 @@ export default function ClassAnnouncementEdit() {
     mutationFn: (data: any) =>
       editClassAnnouncement(classId, announcementId, data),
     onSuccess: () => {
-      alert('공지 수정이 완료되었습니다.');
+      message.success('공지가 성공적으로 수정되었습니다.');
       router.push('/professor/class/enrollannouncement/' + classId);
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(error.response?.data?.message);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });

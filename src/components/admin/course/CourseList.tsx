@@ -70,7 +70,7 @@ export default function CourseList() {
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
-        alert(error.response?.data?.message);
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
         message.error(
@@ -88,7 +88,7 @@ export default function CourseList() {
       okType: 'danger',
       cancelText: '취소',
       onOk: () => {
-        deleteMutation.mutate(id); // 삭제 뮤테이션 호출
+        deleteMutation.mutate(id);
       },
     });
   };

@@ -5,7 +5,6 @@ export const getMyProfile = async () => {
     const response = await api.get('/account/profile/');
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -15,7 +14,6 @@ export const getMyInformation = async () => {
     const response = await api.get('/account/profile/modify');
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -23,7 +21,6 @@ export const getMyInformation = async () => {
 export const modifyInfo = async (payload: ModifyInfoPayload) => {
   try {
     const response = await api.patch('/account/profile/modify', payload);
-    alert('정보가 수정되었습니다.');
     return response.data;
   } catch (error: any) {
     throw error;

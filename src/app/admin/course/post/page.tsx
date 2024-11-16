@@ -3,6 +3,7 @@
 import { postCourse } from '@/services/courseAdmin/postCourse';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
+import { message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
@@ -26,16 +27,15 @@ export default function PostCourse() {
   const mutation = useMutation({
     mutationFn: (data) => postCourse(data),
     onSuccess: () => {
-      alert('강의 개설이 완료되었습니다.');
+      message.success('강의가 성공적으로 등록되었습니다.');
       router.push('/admin/course/list');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message);
       }
     },
   });

@@ -85,19 +85,18 @@ export default function ProblemEnroll() {
       return enrollProblemsContest(contestId, payload);
     },
     onSuccess: () => {
-      alert('문제 등록이 완료되었습니다.');
+      message.success('문제 등록이 완료되었습니다.');
       setSelectedProblems([]);
       queryClient.invalidateQueries({
         queryKey: ['contestProblemsListData', contestId],
       });
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });
@@ -143,12 +142,11 @@ export default function ProblemEnroll() {
       message.success('문제 삭제가 완료되었습니다.');
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
-        message.error(message || '오류가 발생했습니다.');
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
   });
@@ -163,15 +161,7 @@ export default function ProblemEnroll() {
       okText: '삭제',
       okType: 'danger',
       cancelText: '취소',
-      onOk: async () => {
-        try {
-          await deleteMutation.mutateAsync(idsToDelete);
-        } catch (error: any) {
-          message.error(
-            error.response?.data?.message || '오류가 발생했습니다.',
-          );
-        }
-      },
+      onOk: () => deleteMutation.mutate(idsToDelete),
     });
   };
 
