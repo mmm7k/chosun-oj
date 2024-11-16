@@ -1,6 +1,6 @@
 'use client';
 
-import { Checkbox } from 'antd';
+import { Checkbox, message, Modal } from 'antd';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -136,11 +136,11 @@ export default function ProblemEnroll() {
       return deleteProblemsContest(contestId, payload);
     },
     onSuccess: () => {
-      alert('문제 삭제가 완료되었습니다.');
-      setDeleteSelectedProblems([]);
+      setDeleteSelectedProblems([]); // 선택된 문제 목록 초기화
       queryClient.invalidateQueries({
         queryKey: ['contestProblemsListData', contestId],
       });
+      message.success('문제 삭제가 완료되었습니다.');
     },
     onError: (error: any) => {
       const message = error.response?.data?.message;
@@ -148,7 +148,7 @@ export default function ProblemEnroll() {
         alert(message);
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        message.error(message || '오류가 발생했습니다.');
       }
     },
   });
@@ -157,12 +157,26 @@ export default function ProblemEnroll() {
     const idsToDelete = deleteSelectedProblems.map(
       (problem) => problem.problem.id,
     );
-
-    deleteMutation.mutate(idsToDelete);
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: `선택된 ${idsToDelete.length}개의 문제를 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: async () => {
+        try {
+          await deleteMutation.mutateAsync(idsToDelete);
+        } catch (error: any) {
+          message.error(
+            error.response?.data?.message || '오류가 발생했습니다.',
+          );
+        }
+      },
+    });
   };
 
   return (
-    <div className="flex min-h-screen p-8">
+    <div className="flex flex-col  min-h-screen p-8 space-y-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col sm:flex-row items-center px-16">
           <h1 className="text-lg">대회 문제 관리</h1>
@@ -223,11 +237,11 @@ export default function ProblemEnroll() {
             문제 등록
           </button>
         </div>
+      </div>
 
-        <hr className="mt-5 border-t-2 border-gray-200" />
-
+      <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-          <span className="text-sm">현재 등록된 문제 목록</span>
+          <span className="text-lg px-6">등록된 문제 목록</span>
           <div className="overflow-auto max-h-80 border my-5">
             <table className="table-auto w-full text-left text-sm">
               <thead>
@@ -281,48 +295,47 @@ export default function ProblemEnroll() {
               </tbody>
             </table>
           </div>
-
-          {deleteSelectedProblems.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm">선택된 문제(삭제):</h3>
-              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
-                {deleteSelectedProblems.map((problem: Problem) => (
-                  <div
-                    key={problem.problem.id}
-                    className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+        </div>
+        {deleteSelectedProblems.length > 0 && (
+          <div className="px-10 mt-4">
+            <h3 className="mb-2 text-sm">선택된 문제(삭제):</h3>
+            <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
+              {deleteSelectedProblems.map((problem: Problem) => (
+                <div
+                  key={problem.problem.id}
+                  className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+                >
+                  <span className="mr-2">
+                    {problem.problem.id} - {problem.problem.title}
+                  </span>
+                  <button
+                    className="text-red-500"
+                    onClick={() =>
+                      setDeleteSelectedProblems((prev) =>
+                        prev.filter((p) => p.id !== problem.id),
+                      )
+                    }
                   >
-                    <span className="mr-2">
-                      {problem.problem.id} - {problem.problem.title}
-                    </span>
-                    <button
-                      className="text-red-500"
-                      onClick={() =>
-                        setDeleteSelectedProblems((prev) =>
-                          prev.filter((p) => p.id !== problem.id),
-                        )
-                      }
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    &times;
+                  </button>
+                </div>
+              ))}
             </div>
-          )}
-
-          <div className="flex items-center justify-end w-full">
-            <button
-              onClick={handleDeleteSubmit}
-              className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
-                deleteSelectedProblems.length > 0
-                  ? 'bg-primary hover:bg-primaryButtonHover'
-                  : 'bg-gray-300 cursor-not-allowed'
-              }`}
-              disabled={deleteSelectedProblems.length === 0}
-            >
-              문제 삭제
-            </button>
           </div>
+        )}
+
+        <div className="flex items-center justify-end w-full px-10 mt-8">
+          <button
+            onClick={handleDeleteSubmit}
+            className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
+              deleteSelectedProblems.length > 0
+                ? 'bg-primary hover:bg-primaryButtonHover'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
+            disabled={deleteSelectedProblems.length === 0}
+          >
+            문제 삭제
+          </button>
         </div>
       </div>
 

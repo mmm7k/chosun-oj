@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
-import { IoSearchSharp } from 'react-icons/io5';
+import { IoAlertCircleOutline, IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TbEdit } from 'react-icons/tb';
 import { useQuery } from '@tanstack/react-query';
@@ -145,6 +145,16 @@ export default function ContestList() {
                     </td>
 
                     <td className="flex items-center p-4 space-x-2 ">
+                      <IoAlertCircleOutline
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(
+                            `/admin/contest/enrollannouncement/${item.id}`,
+                          );
+                        }}
+                      />
+
                       <MdOutlineLibraryAdd
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {

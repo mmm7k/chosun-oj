@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import { getAllUser } from '@/services/accountAdmin/getAllUser';
-import { enrollUsersClass } from '@/services/classProfessor/enrollUsersClass';
+import { enrollUsersClass } from '@/services/classAdmin/enrollUsersClass';
 import Skeleton from '@mui/material/Skeleton';
 
 interface FormData {

@@ -1,7 +1,7 @@
 'use client';
 
-import { editClass } from '@/services/classProfessor/editClass';
-import { getClass } from '@/services/classProfessor/getClass';
+import { editClass } from '@/services/classAdmin/editClass';
+import { getClass } from '@/services/classAdmin/getClass';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';

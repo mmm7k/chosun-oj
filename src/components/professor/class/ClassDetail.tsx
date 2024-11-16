@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
-import { getClass } from '@/services/classProfessor/getClass';
+import { getClass } from '@/services/classAdmin/getClass';
 
 export default function ClassDetail() {
   const pathname = usePathname();
@@ -67,6 +67,11 @@ export default function ClassDetail() {
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>분반 설명:</span>
             <span>{classData.short_description}</span>
+          </div>
+
+          <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
+            <span>분반 개설자:</span>
+            <span>{classData.created_by?.name}</span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">

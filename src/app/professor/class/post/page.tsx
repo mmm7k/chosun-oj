@@ -1,6 +1,6 @@
 'use client';
 
-import { postClass } from '@/services/classProfessor/postClass';
+import { postClass } from '@/services/classAdmin/postClass';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';

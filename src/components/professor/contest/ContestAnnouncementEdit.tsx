@@ -1,27 +1,41 @@
 'use client';
 
-import { postAnnouncement } from '@/services/announcementAdmin/postAnnouncement';
+import { editAnnouncement } from '@/services/announcementAdmin/editAnnouncement';
+import { getAnnouncement } from '@/services/announcementAdmin/getAnnouncement';
+import { editContestAnnouncement } from '@/services/contestannouncementAdmin/editContestAnnouncement';
+import { getContestAnnouncement } from '@/services/contestannouncementAdmin/getContestAnnouncement';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Checkbox } from 'antd';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 
-export default function AnnouncementPost() {
+export default function ContestAnnouncementEdit() {
+  const pathname = usePathname();
   const router = useRouter();
+  // URL의 마지막 숫자 추출
+  const announcementId = Number(pathname.split('/').pop());
+  const contestId = Number(pathname.split('/')[4]);
+
+  const { data: announcementModifyInformation } = useQuery({
+    queryKey: ['announcementModifyInformation', contestId, announcementId],
+    queryFn: () => getContestAnnouncement(contestId, announcementId),
+    enabled: !!announcementId, // announcementId가 존재할 때만 쿼리 실행
+  });
+
   const validationSchema = Yup.object().shape({
     title: Yup.string().required('공지 제목을 입력해주세요.'),
     content: Yup.string().required('공지 내용을 입력해주세요.'),
     visible: Yup.boolean(),
   });
   const [isVisible, setIsVisible] = useState<boolean>(true);
-
   const {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -30,19 +44,29 @@ export default function AnnouncementPost() {
     },
   });
 
+  useEffect(() => {
+    if (announcementModifyInformation) {
+      reset({
+        title: announcementModifyInformation.data.title,
+        content: announcementModifyInformation.data.content,
+        visible: announcementModifyInformation.data.visible,
+      });
+    }
+  }, [announcementModifyInformation, reset]);
+
   const mutation = useMutation({
-    mutationFn: (data) => postAnnouncement(data),
+    mutationFn: (data: any) =>
+      editContestAnnouncement(contestId, announcementId, data),
     onSuccess: () => {
-      alert('공지 등록이 완료되었습니다.');
-      router.push('/admin/announcement/list');
+      alert('공지 수정이 완료되었습니다.');
+      router.push('/professor/contest/enrollannouncement/' + contestId);
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message;
-      if (message === '로그인이 필요합니다.') {
-        alert(message);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
         router.push('/');
       } else {
-        alert(message || '오류가 발생했습니다.');
+        alert(error.response?.data?.message);
       }
     },
   });
@@ -61,7 +85,7 @@ export default function AnnouncementPost() {
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <form onSubmit={handleSubmit(onSubmit)}>
           <section className="flex items-center justify-between px-16">
-            <h1 className="mb-3 text-lg md:mb-0">공지 등록</h1>
+            <h1 className="text-lg">대회 공지 수정</h1>
           </section>
           <hr className="mt-5 border-t-2 border-gray-200" />
           <section className="flex flex-col text-sm">

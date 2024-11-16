@@ -4,6 +4,9 @@ interface ClassData {
     code: number;
     title: string;
   };
+  created_by: {
+    name: string;
+  };
   group_name: string;
   description: string;
   short_description: string;
