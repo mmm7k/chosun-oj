@@ -199,7 +199,7 @@ export default function UserEnroll() {
       queryKey: ['contestUsersListData', contestId],
       queryFn: () => getUsersContest(contestId),
     });
-  const enrolledStudents = enrolledStudentsData?.data || [];
+  const enrolledStudents = enrolledStudentsData?.data?.data || [];
   const handleUserDeleteSelection = (student: Student) => {
     setDeleteSelectedStudents((prev) =>
       prev.some((s) => s.student_number === student.student_number)

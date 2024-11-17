@@ -79,7 +79,7 @@ export default function EnrollContestAnnouncementPage() {
       queryFn: () => getAllContestAnnouncement(contestId),
     });
 
-  const announcements = announcementsListData?.data || [];
+  const announcements = announcementsListData?.data?.data || [];
 
   const deleteMutation = useMutation({
     mutationFn: (announcementId: number) =>

@@ -119,7 +119,7 @@ export default function ProblemEnroll() {
       queryFn: () => getProblemsContest(contestId),
     });
 
-  const enrolledProblems = enrolledProblemsData?.data || [];
+  const enrolledProblems = enrolledProblemsData?.data?.data || [];
 
   const handleProblemDeleteSelection = (problem: Problem) => {
     setDeleteSelectedProblems((prev) =>
