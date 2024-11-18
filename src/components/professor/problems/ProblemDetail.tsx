@@ -4,8 +4,14 @@ import { usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getProblem } from '@/services/problemAdmin/getProblem';
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
-import { Viewer } from '@toast-ui/react-editor';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+const Viewer = dynamic(
+  () => import('@toast-ui/react-editor').then((mod) => mod.Viewer),
+  {
+    ssr: false,
+  },
+);
 
 export default function ProblemDetail() {
   const pathname = usePathname();

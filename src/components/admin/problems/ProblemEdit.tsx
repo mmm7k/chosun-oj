@@ -7,11 +7,17 @@ import { Checkbox, message, Select, Spin } from 'antd';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
-import { Editor } from '@toast-ui/react-editor';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { getProblem } from '@/services/problemAdmin/getProblem';
 import { editProblem } from '@/services/problemAdmin/editProblem';
+import dynamic from 'next/dynamic';
+const Editor = dynamic(
+  () => import('@toast-ui/react-editor').then((mod) => mod.Editor),
+  {
+    ssr: false,
+  },
+);
 
 const { Option } = Select;
 
@@ -28,7 +34,7 @@ export default function ProblemPost() {
   });
   const [isEditorReady, setIsEditorReady] = useState(false);
   const [markdownContent, setMarkdownContent] = useState('');
-  const editorRef = useRef<Editor | null>(null);
+  const editorRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEditorChange = () => {

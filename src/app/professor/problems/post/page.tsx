@@ -4,19 +4,25 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Checkbox, message, Select, Spin } from 'antd';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
 import { postProblem } from '@/services/problemAdmin/postProblem';
-import { Editor } from '@toast-ui/react-editor';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+const Editor = dynamic(
+  () => import('@toast-ui/react-editor').then((mod) => mod.Editor),
+  {
+    ssr: false,
+  },
+);
 
 const { Option } = Select;
 
 export default function ProblemPost() {
   const [markdownContent, setMarkdownContent] = useState('');
-  const editorRef = useRef<Editor | null>(null);
+  const editorRef = useRef<any>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
