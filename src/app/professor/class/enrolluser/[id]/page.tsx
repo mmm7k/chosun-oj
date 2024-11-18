@@ -202,6 +202,7 @@ export default function UserEnroll() {
       queryFn: () => getUsersClass(classId),
     });
   const enrolledStudents = enrolledStudentsData?.data?.data || [];
+
   const handleUserDeleteSelection = (student: Student) => {
     setDeleteSelectedStudents((prev) =>
       prev.some((s) => s.student_number === student.student_number)

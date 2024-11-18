@@ -7,17 +7,28 @@ import { Checkbox, message, Select, Spin } from 'antd';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
-import { postProblem } from '@/services/problemAdmin/postProblem';
 import { Editor } from '@toast-ui/react-editor';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'next/navigation';
+import { getProblem } from '@/services/problemAdmin/getProblem';
+import { editProblem } from '@/services/problemAdmin/editProblem';
 
 const { Option } = Select;
 
 export default function ProblemPost() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  // URL의 마지막 숫자 추출
+  const problemId = Number(pathname.split('/').pop());
+  const { data: problemModifyInformation } = useQuery({
+    queryKey: ['problemModifyInformation', problemId],
+    queryFn: () => getProblem(problemId),
+    enabled: !!problemId,
+  });
+  const [isEditorReady, setIsEditorReady] = useState(false);
   const [markdownContent, setMarkdownContent] = useState('');
   const editorRef = useRef<Editor | null>(null);
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEditorChange = () => {
@@ -66,6 +77,7 @@ export default function ProblemPost() {
   const {
     register,
     handleSubmit,
+    reset,
     control,
     formState: { errors },
   } = useForm({
@@ -82,15 +94,37 @@ export default function ProblemPost() {
     },
   });
 
+  useEffect(() => {
+    if (problemModifyInformation?.data) {
+      reset({
+        _id: problemModifyInformation.data._id,
+        title: problemModifyInformation.data.title,
+        score: problemModifyInformation.data.test_case_score[0].score,
+        time_limit: problemModifyInformation.data.time_limit,
+        memory_limit: problemModifyInformation.data.memory_limit,
+        languages: problemModifyInformation.data.languages,
+        is_public: problemModifyInformation.data.is_public,
+        is_visible: problemModifyInformation.data.is_visible,
+        difficulty: problemModifyInformation.data.difficulty,
+        tags: problemModifyInformation.data.tags,
+      });
+      setMarkdownContent(problemModifyInformation.data.description || '');
+      setIsEditorReady(true);
+    }
+  }, [problemModifyInformation, reset]);
+
   const mutation = useMutation({
-    mutationFn: (data: any) => postProblem(data),
+    mutationFn: (data: any) => editProblem(problemId, data),
     onMutate: () => {
       setIsLoading(true);
     },
     onSuccess: () => {
-      message.success('문제가 성공적으로 등록되었습니다.');
+      message.success('문제가 성공적으로 수정되었습니다.');
       setIsLoading(false);
-      router.push('/professor/problems/list');
+      queryClient.invalidateQueries({
+        queryKey: ['problemModifyInformation', problemId],
+      });
+      router.push('/admin/problems/list');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
@@ -143,6 +177,9 @@ export default function ProblemPost() {
     mutation.mutate(formattedData); // Mutation 실행
   };
 
+  if (!isEditorReady) {
+    return null;
+  }
   return (
     <>
       {/* 뮤테이션 Loading UI */}
@@ -154,7 +191,7 @@ export default function ProblemPost() {
       <div className="flex min-h-screen p-8">
         <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
           <section className="relative flex items-center justify-between px-16 ">
-            <h1 className="text-lg">문제 등록</h1>
+            <h1 className="text-lg">문제 수정</h1>
           </section>
           <hr className="mt-5 border-t-2 border-gray-200" />
 
@@ -174,10 +211,7 @@ export default function ProblemPost() {
                   placeholder="문제코드를 입력해주세요"
                 />
               </div>
-              {/* <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>&nbsp; URL에서 사용되는 문제에 대한 고유한 코드.</span>
-            </span> */}
+
               {errors._id && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors._id.message}
@@ -212,18 +246,10 @@ export default function ProblemPost() {
                 <label htmlFor="markdown-editor">문제 본문: </label>
 
                 <div className="mt-6">
-                  {/* <MdEditor
-                  id="markdown-editor"
-                  value={markdownText}
-                  style={{ height: '25rem' }}
-                  renderHTML={(text) => mdParser.render(text)}
-                  onChange={handleEditorChange}
-                /> */}
-
                   <Suspense>
                     <Editor
                       ref={editorRef}
-                      initialValue=" "
+                      initialValue={markdownContent || ' '}
                       previewStyle="vertical"
                       height="25rem"
                       initialEditType="markdown"
@@ -483,13 +509,13 @@ export default function ProblemPost() {
                 </p>
               )}
             </div>
-            {/* 등록 버튼 */}
+            {/* 수정 버튼 */}
             <div className="flex justify-end w-full px-10 mt-8">
               <button
                 className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
                 type="submit"
               >
-                문제 등록
+                문제 수정
               </button>
             </div>
           </form>

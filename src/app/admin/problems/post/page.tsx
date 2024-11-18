@@ -1,57 +1,29 @@
 'use client';
 
-import { Checkbox, Select } from 'antd';
-import { SetStateAction, useRef, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { Checkbox, message, Select, Spin } from 'antd';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import MdEditor from 'react-markdown-editor-lite';
-import MarkdownIt from 'markdown-it';
-import 'react-markdown-editor-lite/lib/index.css';
-// import { Editor } from '@toast-ui/react-editor';
 import '@toast-ui/editor/toastui-editor.css';
-import dynamic from 'next/dynamic';
-const Editor = dynamic(
-  () => import('@toast-ui/react-editor').then((mod) => mod.Editor),
-  {
-    ssr: false,
-  },
-);
+import { postProblem } from '@/services/problemAdmin/postProblem';
+import { Editor } from '@toast-ui/react-editor';
+import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 const { Option } = Select;
-const mdParser = new MarkdownIt();
 
 export default function ProblemPost() {
-  const [isDisclose, setIsDisclose] = useState(false);
-  const [isManage, setIsManage] = useState(false);
-  const [isMarkdownAccess, setIsMarkdownAccess] = useState(false);
-  const [postDate, setPostDate] = useState(new Date());
-  const [selectedOrganizations, setSelectedOrganizations] = useState([]);
-  const [selectedTag, setSelectedTag] = useState([]);
-  const [selectedVisibility, setSelectedVisibility] = useState('');
-  const [markdownText, setMarkdownText] = useState('');
-  const [isJavaChecked, setIsJavaChecked] = useState(false);
-  const [isCppChecked, setIsCppChecked] = useState(false);
-  const [isCChecked, setIsCChecked] = useState(false);
-  const [isPythonChecked, setIsPythonChecked] = useState(false);
-  const [isContestCkecked, setIsContestChecked] = useState(false);
+  const [markdownContent, setMarkdownContent] = useState('');
+  const editorRef = useRef<Editor | null>(null);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const editorRef = useRef<typeof Editor | null>(null);
-  const handleOrganizationChange = (value: SetStateAction<never[]>) => {
-    setSelectedOrganizations(value);
-  };
-
-  const handleTagChange = (value: SetStateAction<never[]>) => {
-    setSelectedTag(value);
-  };
-
-  const handleVisibilityChange = (value: string) => {
-    setSelectedVisibility(value);
-  };
   const handleEditorChange = () => {
     if (editorRef.current) {
-      const markdown = (editorRef.current as any).getInstance().getMarkdown();
-      setMarkdownText(markdown);
+      const content = editorRef.current?.getInstance().getMarkdown();
+      setMarkdownContent(content);
     }
   };
 
@@ -78,340 +50,451 @@ export default function ProblemPost() {
     '백트래킹',
   ];
 
+  const schema = Yup.object().shape({
+    _id: Yup.string().required('문제 코드는 필수 입력입니다.'),
+    title: Yup.string().required('문제 이름은 필수 입력입니다.'),
+    score: Yup.number().required('점수는 필수 입력입니다.'),
+    time_limit: Yup.number().required('시간 제한은 필수 입력입니다.'),
+    memory_limit: Yup.number().required('메모리 제한은 필수 입력입니다.'),
+    languages: Yup.array().min(1, '최소 한 개의 언어를 선택해야 합니다.'),
+    is_public: Yup.boolean().required(),
+    is_visible: Yup.boolean().required(),
+    difficulty: Yup.string().required('난이도를 선택하세요.'),
+    tags: Yup.array().min(1, '최소 한 개의 태그를 선택하세요.'),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      score: 1,
+      time_limit: 1000,
+      memory_limit: 256,
+      languages: [],
+      is_public: false,
+      is_visible: true,
+      difficulty: 'Low',
+      tags: [],
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: (data: any) => postProblem(data),
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSuccess: () => {
+      message.success('문제가 성공적으로 등록되었습니다.');
+      setIsLoading(false);
+      router.push('/admin/problems/list');
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    const formattedData = {
+      _id: data._id,
+      title: data.title,
+      description: markdownContent,
+      input_description: '',
+      output_description: '',
+      samples: [],
+      test_case_id: 'test',
+      test_case_score: [
+        {
+          score: data.score,
+          input_name: '1.in',
+          output_name: '1.out',
+        },
+      ],
+      time_limit: data.time_limit,
+      memory_limit: data.memory_limit,
+      languages: data.languages,
+      template: {},
+      io_mode: {
+        io_mode: 'Standard IO',
+        input: 'input.txt',
+        output: 'output.txt',
+      },
+      spj: false,
+      spj_language: null,
+      spj_code: null,
+      spj_compile_ok: false,
+      is_public: data.is_public,
+      is_visible: data.is_visible,
+      difficulty: data.difficulty,
+      tags: data.tags,
+      hint: '',
+      source: '',
+      share_submission: false,
+    };
+
+    mutation.mutate(formattedData); // Mutation 실행
+  };
+
   return (
-    <div className="flex min-h-screen p-8">
-      <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <section className="relative flex items-center justify-between px-16 ">
-          <h1 className="text-lg">문제 등록</h1>
-        </section>
-        <hr className="mt-5 border-t-2 border-gray-200" />
-        <section className="flex flex-col text-sm ">
-          {/* 문제 코드 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="problem-code">문제 코드:</label>
-              <input
-                className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                id="problem-code"
-                type="text"
-                placeholder="문제코드를 입력해주세요"
-              />
-            </div>
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+    <>
+      {/* 뮤테이션 Loading UI */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10">
+          <Spin size="large" />
+        </div>
+      )}
+      <div className="flex min-h-screen p-8">
+        <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
+          <section className="relative flex items-center justify-between px-16 ">
+            <h1 className="text-lg">문제 등록</h1>
+          </section>
+          <hr className="mt-5 border-t-2 border-gray-200" />
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col text-sm"
+          >
+            {/* 문제 코드 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="problem-code">문제 코드:</label>
+                <input
+                  {...register('_id')}
+                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  id="problem-code"
+                  type="text"
+                  placeholder="문제코드를 입력해주세요"
+                />
+              </div>
+              {/* <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
               <PiExclamationMarkFill className="text-lg" />
               <span>&nbsp; URL에서 사용되는 문제에 대한 고유한 코드.</span>
-            </span>
-          </div>
-          {/* 문제 이름 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="problem-name">문제 이름:</label>
-              <input
-                className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                id="problem-name"
-                type="text"
-                placeholder="문제이름을 입력해주세요"
-              />
+            </span> */}
+              {errors._id && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors._id.message}
+                </p>
+              )}
             </div>
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>&nbsp; 문제 목록에 표시된 문제의 전체 이름입니다.</span>
-            </span>
-          </div>
-          {/* 공개 여부 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div>
-              <label htmlFor="disclose-checkbox" className="mr-2">
-                공개:
-              </label>
-              <Checkbox
-                id="disclose-checkbox"
-                checked={isDisclose}
-                onChange={(e) => setIsContestChecked(e.target.checked)}
-              />
-            </div>
-          </div>
-          {/* 대회,과제 용 여부 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div>
-              <label htmlFor="manage-checkbox" className="mr-2">
-                대회, 과제 출제:
-              </label>
-              <Checkbox
-                id="contest-checkbox"
-                checked={isManage}
-                onChange={(e) => setIsManage(e.target.checked)}
-              />
-            </div>
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>
-                &nbsp; 체크 시 대회 또는 과제 문제로 등록할 수 있습니다.
+            {/* 문제 이름 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="problem-name">문제 이름:</label>
+                <input
+                  {...register('title')}
+                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  id="problem-name"
+                  type="text"
+                  placeholder="문제이름을 입력해주세요"
+                />
+              </div>
+              <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+                <PiExclamationMarkFill className="text-lg" />
+                <span>&nbsp; 문제 목록에 표시된 문제의 이름입니다.</span>
               </span>
-            </span>
-          </div>
+              {errors.title && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.title.message}
+                </p>
+              )}
+            </div>
+            {/* 마크다운 에디터 */}
+            <div className="flex flex-col justify-center px-10 py-7  border-b-[1.5px] border-gray-200 ">
+              <div>
+                <label htmlFor="markdown-editor">문제 본문: </label>
 
-          {/* 수동 관리 여부 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div>
-              <label htmlFor="manage-checkbox" className="mr-2">
-                수동 관리:
-              </label>
-              <Checkbox
-                id="manage-checkbox"
-                checked={isManage}
-                onChange={(e) => setIsManage(e.target.checked)}
-              />
-            </div>
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>&nbsp; 심사위원의 데이터 관리 허용 여부.</span>
-            </span>
-          </div>
-          {/* 게시 날짜 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="post-date">게시 날짜: </label>
-              <DatePicker
-                id="post-date"
-                selected={postDate}
-                onChange={(date) => date && setPostDate(date)}
-                showTimeSelect
-                dateFormat="Pp"
-                timeIntervals={1}
-                minDate={new Date()}
-                className="cursor-pointer ml-2 w-auto h-8 rounded-lg border-[1px] border-gray-200 pl-4 focus:ring-1 focus:ring-gray-200 focus:outline-none"
-              />
-            </div>
-          </div>
-          {/* 조직 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="organization-select" className="mr-3">
-                조직:{' '}
-              </label>
-              <Select
-                id="organization-select"
-                mode="multiple"
-                placeholder="조직을 선택하세요."
-                value={selectedOrganizations}
-                onChange={handleOrganizationChange}
-                className="w-[60%] sm:w-[20%] h-8"
-                allowClear
-              >
-                <Option value="java">Java</Option>
-                <Option value="c++">C++</Option>
-                <Option value="c">C</Option>
-              </Select>
-            </div>
-          </div>
-          {/* 제출 소스 가시성 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="visibility-select" className="mr-3">
-                제출 소스 가시성:{' '}
-              </label>
-              <Select
-                id="visibility-select"
-                placeholder="제출 소스 가시성을 선택하세요."
-                value={selectedVisibility}
-                onChange={handleVisibilityChange}
-                className="w-[60%] sm:w-[20%] h-8"
-                allowClear
-              >
-                <Option value="전역 설정 따르기">전역 설정 따르기</Option>
-                <Option value="항상 보이기">항상 보이기</Option>
-                <Option value="문제가 해결됐을 경우 보이기">
-                  문제가 해결됐을 경우 보이기
-                </Option>
-                <Option value="자신의 제출물만">자신의 제출물만</Option>
-              </Select>
-            </div>
-          </div>
-          {/* 전체 마크다운 액세스 허용 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div>
-              <label htmlFor="markdown-access-checkbox" className="mr-2">
-                전체 마크다운 액세스 허용:{' '}
-              </label>
-              <Checkbox
-                id="markdown-access-checkbox"
-                checked={isMarkdownAccess}
-                onChange={(e) => setIsMarkdownAccess(e.target.checked)}
-              />
-            </div>
-          </div>
-          {/* 마크다운 에디터 */}
-          <div className="flex flex-col justify-center px-10 py-7  border-b-[1.5px] border-gray-200 ">
-            <div>
-              <label htmlFor="markdown-editor">문제 본문: </label>
-
-              <div className="mt-6">
-                {/* <MdEditor
+                <div className="mt-6">
+                  {/* <MdEditor
                   id="markdown-editor"
                   value={markdownText}
                   style={{ height: '25rem' }}
                   renderHTML={(text) => mdParser.render(text)}
                   onChange={handleEditorChange}
                 /> */}
-                {typeof window !== 'undefined' && (
-                  <Editor
-                    ref={editorRef}
-                    initialValue=" "
-                    previewStyle="vertical"
-                    height="25rem"
-                    initialEditType="markdown"
-                    useCommandShortcut={false}
-                    hideModeSwitch={true}
-                    onChange={handleEditorChange}
-                  />
-                )}
+
+                  <Suspense>
+                    <Editor
+                      ref={editorRef}
+                      initialValue=" "
+                      previewStyle="vertical"
+                      height="25rem"
+                      initialEditType="markdown"
+                      useCommandShortcut={false}
+                      hideModeSwitch={true}
+                      onChange={handleEditorChange}
+                    />
+                  </Suspense>
+                </div>
               </div>
             </div>
-          </div>
-          {/* 문제 유형 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="problem-type-select" className="mr-3">
-                문제 유형:
-              </label>
-              <Select
-                id="problem-type-select"
-                mode="multiple"
-                placeholder="문제 유형을 선택하세요."
-                value={selectedOrganizations}
-                onChange={handleOrganizationChange}
-                className="w-[60%] sm:w-[20%] h-8"
-              >
-                <Option value="java">Java</Option>
-                <Option value="c++">C++</Option>
-                <Option value="c">C</Option>
-              </Select>
+
+            {/* 점수 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="score-input">점수: </label>
+                <input
+                  {...register('score')}
+                  id="score-input"
+                  className="ml-3 w-[10%] sm:w-[5%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-[0.4rem] sm:pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  type="number"
+                />
+              </div>
+              {errors.score && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.score.message}
+                </p>
+              )}
             </div>
-          </div>
-          {/* 문제 태그 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="problem-tag-select" className="mr-3">
-                문제 태그:
-              </label>
-              <Select
-                id="problem-tag-select"
-                mode="multiple"
-                placeholder="문제 태그를 선택하세요."
-                value={selectedTag}
-                onChange={handleTagChange}
-                className="w-[60%] overflow-hidden sm:min-w-[20%] sm:w-auto h-8"
-                allowClear
-              >
-                {problemTags.map((tag) => (
-                  <Option key={tag} value={tag}>
-                    {tag}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-          </div>
-          {/* 점수 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="score-input">점수: </label>
-              <input
-                id="score-input"
-                className="ml-3 w-[10%] sm:w-[5%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-[0.4rem] sm:pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                type="number"
-                min={1}
-                max={100}
-              />
-            </div>
-          </div>
-          {/* 시간 제한 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="time-limit-input">시간 제한:</label>
-              <input
-                id="time-limit-input"
-                className="ml-3 w-[10%] sm:w-[5%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-[0.4rem] sm:pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                type="number"
-                min={1}
-                max={1}
-              />
-            </div>
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>
-                &nbsp; 이 문제의 시간 제한(초)입니다. 소수 자릿수 초(예: 1.5)가
-                지원됩니다.
+            {/* 시간 제한 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="time-limit-input">시간 제한:</label>
+                <input
+                  {...register('time_limit')}
+                  id="time-limit-input"
+                  className="ml-3 w-[10%] sm:w-[5%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-[0.4rem] sm:pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  type="number"
+                />
+              </div>
+              <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+                <PiExclamationMarkFill className="text-lg" />
+                <span>&nbsp; 이 문제의 시간 제한입니다. 단위는 ms 입니다.</span>
               </span>
-            </span>
-          </div>
-          {/* 메모리 제한 */}
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div className="flex items-center">
-              <label htmlFor="memory-limit-input">메모리 제한:</label>
-              <input
-                id="memory-limit-input"
-                className="ml-3 w-[10%] sm:w-[5%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                type="number"
-                min={1}
-                max={262144}
-              />
+              {errors.time_limit && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.time_limit.message}
+                </p>
+              )}
             </div>
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>
-                &nbsp; 이 문제에 대한 메모리 제한(KB)입니다(예: 256mb =
-                262144KB).
+            {/* 메모리 제한 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="memory-limit-input">메모리 제한:</label>
+                <input
+                  {...register('memory_limit')}
+                  id="memory-limit-input"
+                  className="ml-3 w-[10%] sm:w-[5%] h-8 rounded-lg  border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  type="number"
+                />
+              </div>
+              <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+                <PiExclamationMarkFill className="text-lg" />
+                <span>
+                  &nbsp; 이 문제에 대한 메모리 제한입니다. 단위는 mb 입니다.
+                </span>
               </span>
-            </span>
-          </div>
-          {/* 언어 */}
-          <div className="flex items-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-            <div>
-              <span className="mr-5">언어:</span>
-              <label htmlFor="java-checkbox" className="mr-2">
-                Java
+              {errors.memory_limit && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.memory_limit.message}
+                </p>
+              )}
+            </div>
+            {/* 언어 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="problem-type-language" className="mr-3">
+                  언어:
+                </label>
+                <Controller
+                  name="languages"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center">
+                      <Checkbox
+                        checked={field.value?.includes('C') || false}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.checked
+                              ? [...(field.value || []), 'C']
+                              : (field.value || []).filter(
+                                  (lang: string) => lang !== 'C',
+                                ),
+                          )
+                        }
+                      >
+                        C
+                      </Checkbox>
+
+                      <Checkbox
+                        checked={field.value?.includes('C++') || false}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.checked
+                              ? [...(field.value || []), 'C++']
+                              : (field.value || []).filter(
+                                  (lang: string) => lang !== 'C++',
+                                ),
+                          )
+                        }
+                      >
+                        C++
+                      </Checkbox>
+                      <Checkbox
+                        checked={field.value?.includes('Java') || false}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.checked
+                              ? [...(field.value || []), 'Java']
+                              : (field.value || []).filter(
+                                  (lang: string) => lang !== 'Java',
+                                ),
+                          )
+                        }
+                      >
+                        Java
+                      </Checkbox>
+
+                      <Checkbox
+                        checked={field.value?.includes('Python3') || false}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.checked
+                              ? [...(field.value || []), 'Python3']
+                              : (field.value || []).filter(
+                                  (lang: string) => lang !== 'Python3',
+                                ),
+                          )
+                        }
+                      >
+                        Python3
+                      </Checkbox>
+                    </div>
+                  )}
+                />
+              </div>
+              {errors.languages && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.languages.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <label htmlFor="problem-type-visible" className="mr-3">
+                공개 여부:
               </label>
-              <Checkbox
-                id="java-checkbox"
-                checked={isJavaChecked}
-                onChange={(e) => setIsJavaChecked(e.target.checked)}
+              <Controller
+                name="is_visible"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value || false}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  ></Checkbox>
+                )}
               />
             </div>
 
-            <label htmlFor="c++-checkbox" className="ml-4 mr-2">
-              C++
-            </label>
-            <Checkbox
-              id="c++-checkbox"
-              checked={isCppChecked}
-              onChange={(e) => setIsCppChecked(e.target.checked)}
-            />
-            <label htmlFor="c-checkbox" className="ml-4 mr-2">
-              C
-            </label>
-            <Checkbox
-              id="c-checkbox"
-              checked={isCChecked}
-              onChange={(e) => setIsCChecked(e.target.checked)}
-            />
-            <label htmlFor="python-checkbox" className="ml-4 mr-2">
-              Python
-            </label>
-            <Checkbox
-              id="python-checkbox"
-              checked={isPythonChecked}
-              onChange={(e) => setIsPythonChecked(e.target.checked)}
-            />
-          </div>
-          {/* 등록 버튼 */}
-          <div className="flex justify-end w-full px-10 mt-8">
-            <button className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover">
-              문제 등록
-            </button>
-          </div>
-        </section>
+            {/* 대회/과제 여부 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="problem-type-public" className="mr-3">
+                  대회/과제 출제 여부:
+                </label>
+                <Controller
+                  name="is_public"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      checked={field.value || false}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                    ></Checkbox>
+                  )}
+                />
+              </div>
+              {errors.is_public && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.is_public.message}
+                </p>
+              )}
+              <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+                <PiExclamationMarkFill className="text-lg" />
+                <span>
+                  &nbsp; 대회 과제로 출제할 경우 체크해주세요. 체크 시 문제는
+                  비공개로 설정됩니다.
+                </span>
+              </span>
+            </div>
+            {/* 문제 난이도 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="problem-type-select" className="mr-3">
+                  문제 난이도:
+                </label>
+                <Controller
+                  name="difficulty"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="문제 난이도를 선택하세요."
+                      className="w-[60%] sm:w-[20%] h-8"
+                    >
+                      <Option value="Low">Low</Option>
+                      <Option value="Mid">Mid</Option>
+                      <Option value="High">High</Option>
+                    </Select>
+                  )}
+                />
+              </div>
+              {errors.difficulty && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.difficulty.message}
+                </p>
+              )}
+            </div>
+            {/* 문제 태그 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="problem-tag-select" className="mr-3">
+                  문제 태그:
+                </label>
+                <Controller
+                  name="tags"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      mode="multiple"
+                      placeholder="문제 태그를 선택하세요."
+                      className="w-[60%] overflow-hidden sm:min-w-[20%] sm:w-auto h-8"
+                      allowClear
+                    >
+                      {problemTags.map((tag) => (
+                        <Option key={tag} value={tag}>
+                          {tag}
+                        </Option>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </div>
+              {errors.tags && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.tags.message}
+                </p>
+              )}
+            </div>
+            {/* 등록 버튼 */}
+            <div className="flex justify-end w-full px-10 mt-8">
+              <button
+                className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+                type="submit"
+              >
+                문제 등록
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

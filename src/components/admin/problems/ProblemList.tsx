@@ -1,179 +1,238 @@
 'use client';
 
-import { Modal } from 'antd';
 import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
-import { TbEdit } from 'react-icons/tb';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { TbEdit } from 'react-icons/tb';
+import Skeleton from '@mui/material/Skeleton';
+import { Modal, message } from 'antd';
+import { getAllProblem } from '@/services/problemAdmin/getAllProblem';
+import { deleteProblem } from '@/services/problemAdmin/deleteProblem';
 
 export default function ProblemList() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
-
-  const pageParam = searchParams.get('page') || '1';
-  const [currentPage, setCurrentPage] = useState<number>(parseInt(pageParam));
-
-  const updateQueryParams = (page: number) => {
-    const query = new URLSearchParams();
-    query.set('page', page.toString());
-    router.push(`/professor/problems/list?${query.toString()}`);
-  };
-
-  const list = Array.from({ length: 60 }, (_, i) => ({
-    id: i + 1,
-    name: `피라미드 별찍기${i + 1}`,
-    registrationTime: `2024-9-2 16:19:${i + 1}`,
-  }));
-
-  const itemsPerPage = 15;
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
 
-  const currentItems = list.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const {
+    data: problemListData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ['problemListData', currentPage],
+    queryFn: () => getAllProblem(currentPage),
+  });
 
-  const totalPages = Math.ceil(list.length / itemsPerPage);
+  useEffect(() => {
+    router.push(`/admin/problems/list?page=${currentPage}`);
+    refetch();
+  }, [currentPage, router, refetch]);
+
+  const problemList = problemListData?.data?.data || [];
+  const totalPages = problemListData?.data?.total_count
+    ? Math.ceil(problemListData.data.total_count / 15)
+    : 1;
+
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
-  const pages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i,
-  );
 
   const changePage = (page: number) => {
     setCurrentPage(page);
-    updateQueryParams(page);
   };
 
-  useEffect(() => {
-    setCurrentPage(parseInt(pageParam));
-  }, [pageParam]);
-
-  const showDeleteModal = (id: number) => {
-    setDeleteItemId(id);
-    setIsModalVisible(true);
+  const changePageBlock = (isNext: boolean) => {
+    const newPage = isNext
+      ? Math.min(endPage + 1, totalPages)
+      : Math.max(startPage - pagesPerBlock, 1);
+    changePage(newPage);
   };
 
-  const handleDelete = () => {
-    if (deleteItemId !== null) {
-      console.log(`Delete item with ID: ${deleteItemId}`);
-    }
-    setIsModalVisible(false);
-    setDeleteItemId(null);
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteProblem(id),
+    onSuccess: () => {
+      message.success('문제가 성공적으로 삭제되었습니다.');
+      refetch();
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
+        router.push('/');
+      } else {
+        message.error(
+          error.response?.data?.message || '삭제 중 오류가 발생했습니다.',
+        );
+      }
+    },
+  });
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setDeleteItemId(null);
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: '이 작업은 되돌릴 수 없습니다.',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: () => {
+        deleteMutation.mutate(id); // 삭제 뮤테이션 호출
+      },
+    });
   };
-
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
-          <h1 className="mb-3 text-lg md:mb-0">전체 문제 목록</h1>
-          <div className="flex items-center">
-            <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
-              <IoSearchSharp className="mr-2 text-lg text-gray-500" />
-              <input
-                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
-                type="text"
-                placeholder="문제를 검색해보세요"
-              />
-            </div>
+          <h1 className="mb-3 text-lg md:mb-0">문제 목록</h1>
+          <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
+            <IoSearchSharp className="mr-2 text-lg text-gray-500" />
+            <input
+              className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
+              type="text"
+              placeholder="문제 이름으로 검색해보세요"
+            />
           </div>
         </section>
+
         <hr className="mt-5 border-t-2 border-gray-200" />
 
         <section className="px-3 overflow-x-auto sm:px-16">
-          <table className="w-full text-sm text-left border-b-2 table-auto">
-            <thead>
-              <tr className="border-b-2">
-                <th className="p-4 ">ID</th>
-                <th className="p-4 ">문제 이름</th>
-                <th className="p-4 ">문제 등록 시간</th>
-                <th className="p-4 ">문제 관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b cursor-pointer hover:bg-gray-100"
-                >
-                  <td className="p-4 text-xs sm:text-sm">{item.id}</td>
-                  <td className="p-4 text-xs sm:text-sm">{item.name}</td>
-                  <td className="p-4 text-xs sm:text-sm">
-                    {item.registrationTime}
-                  </td>
-                  <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                    <TbEdit className="text-lg cursor-pointer lg:text-xl" />
-
-                    <FiTrash2
-                      className="text-lg cursor-pointer lg:text-xl"
-                      onClick={() => showDeleteModal(item.id)}
-                    />
-                  </td>
+          {isLoading ? (
+            <table className="w-full text-sm text-left border-b-2 table-auto">
+              <thead>
+                <tr>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <th key={index} className="p-4">
+                      <Skeleton animation="wave" width="100%" height={30} />
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {Array.from({ length: 15 }).map((_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Array.from({ length: 5 }).map((_, colIndex) => (
+                      <td key={colIndex} className="p-4">
+                        <Skeleton animation="wave" width="100%" height={20} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <table
+              className="w-full text-sm text-left border-b-2 table-auto"
+              style={{ tableLayout: 'fixed' }}
+            >
+              <thead>
+                <tr className="border-b-2">
+                  <th className="p-4">제목</th>
+                  <th className="p-4">공개여부</th>
+                  <th className="p-4">문제타입</th>
+                  <th className="p-4">출제자</th>
+                  <th className="p-4">문제 관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {problemList.map((item: ProblemList) => (
+                  <tr
+                    className="border-b cursor-pointer hover:bg-gray-50"
+                    key={item.id}
+                    onClick={() =>
+                      router.push(`/admin/problems/list/${item.id}`)
+                    }
+                  >
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.title}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.is_visible ? '공개' : '비공개'}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.is_public ? '대회/과제' : '공통'}
+                    </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.created_by.name}
+                    </td>
+                    <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
+                      <TbEdit
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/problems/edit/${item.id}`);
+                        }}
+                      />
+                      <FiTrash2
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </section>
 
         <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
-          <div className="flex items-center space-x-1">
-            <button
-              onClick={() => changePage(Math.max(startPage - pagesPerBlock, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300"
-            >
-              &lt;
-            </button>
-
-            <div className="flex space-x-1 font-normal">
-              {pages.map((page) => (
-                <button
-                  key={page}
-                  onClick={() => changePage(page)}
-                  className={`px-3 py-1 rounded-xl ${
-                    page === currentPage
-                      ? 'bg-primary text-white hover:bg-primaryButtonHover'
-                      : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  {page}
-                </button>
+          {isLoading ? (
+            <div className="flex space-x-2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={index} animation="wave" width={40} height={30} />
               ))}
             </div>
-
-            <button
-              onClick={() =>
-                changePage(Math.min(startPage + pagesPerBlock, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 rounded-xl hover:bg-gray-300"
-            >
-              &gt;
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => changePageBlock(false)}
+                disabled={currentBlock === 1}
+                className={`px-3 py-1 rounded-xl ${
+                  currentBlock === 1
+                    ? 'bg-gray-200 opacity-50 '
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                &lt;
+              </button>
+              <div className="flex space-x-1 font-normal">
+                {Array.from(
+                  { length: endPage - startPage + 1 },
+                  (_, i) => startPage + i,
+                ).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => changePage(page)}
+                    className={`px-3 py-1 rounded-xl transition-all ${
+                      page === currentPage
+                        ? 'bg-primary text-white hover:bg-primaryButtonHover'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => changePageBlock(true)}
+                disabled={endPage === totalPages}
+                className={`px-3 py-1 rounded-xl ${
+                  endPage === totalPages
+                    ? 'bg-gray-200 opacity-50'
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                &gt;
+              </button>
+            </div>
+          )}
         </section>
-
-        <Modal
-          title="문제 삭제 확인"
-          visible={isModalVisible}
-          onOk={handleDelete}
-          onCancel={handleCancel}
-          okText="삭제"
-          cancelText="취소"
-        >
-          <p>정말로 이 문제를 삭제하시겠습니까?</p>
-        </Modal>
       </div>
     </div>
   );
