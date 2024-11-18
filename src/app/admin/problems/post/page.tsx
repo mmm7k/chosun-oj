@@ -22,7 +22,10 @@ export default function ProblemPost() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    // 클라이언트 환경인지 확인
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      setIsClient(true);
+    }
   }, []);
 
   const handleEditorChange = () => {

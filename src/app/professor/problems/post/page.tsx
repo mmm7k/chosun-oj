@@ -22,7 +22,9 @@ export default function ProblemPost() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      setIsClient(true);
+    }
   }, []);
 
   const handleEditorChange = () => {
