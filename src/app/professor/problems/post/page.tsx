@@ -187,10 +187,6 @@ export default function ProblemPost() {
                   placeholder="문제코드를 입력해주세요"
                 />
               </div>
-              {/* <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>&nbsp; URL에서 사용되는 문제에 대한 고유한 코드.</span>
-            </span> */}
               {errors._id && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors._id.message}
@@ -233,18 +229,18 @@ export default function ProblemPost() {
                   onChange={handleEditorChange}
                 /> */}
 
-                  <Suspense>
-                    <Editor
-                      ref={editorRef}
-                      initialValue=" "
-                      previewStyle="vertical"
-                      height="25rem"
-                      initialEditType="markdown"
-                      useCommandShortcut={false}
-                      hideModeSwitch={true}
-                      onChange={handleEditorChange}
-                    />
-                  </Suspense>
+                  {/* <Suspense> */}
+                  <Editor
+                    ref={editorRef}
+                    initialValue=" "
+                    previewStyle="vertical"
+                    height="25rem"
+                    initialEditType="markdown"
+                    useCommandShortcut={false}
+                    hideModeSwitch={true}
+                    onChange={handleEditorChange}
+                  />
+                  {/* </Suspense> */}
                 </div>
               </div>
             </div>
