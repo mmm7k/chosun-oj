@@ -11,6 +11,10 @@ import { postProblem } from '@/services/problemAdmin/postProblem';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Editor } from '@toast-ui/react-editor';
+import dynamic from 'next/dynamic';
+const EditorComponent = dynamic(() => import('@/components/commons/Editor'), {
+  ssr: false,
+});
 
 const { Option } = Select;
 
@@ -19,11 +23,11 @@ export default function ProblemPost() {
   const editorRef = useRef<Editor | null>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  // const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // useEffect(() => {
+  //   setIsClient(true);
+  // }, []);
 
   const handleEditorChange = () => {
     if (editorRef.current) {
@@ -149,9 +153,9 @@ export default function ProblemPost() {
     mutation.mutate(formattedData); // Mutation 실행
   };
 
-  if (!isClient) {
-    return null;
-  }
+  // if (!isClient) {
+  //   return null;
+  // }
 
   return (
     <>
@@ -230,9 +234,19 @@ export default function ProblemPost() {
                   onChange={handleEditorChange}
                 /> */}
 
-                  <Editor
+                  {/* <Editor
                     ref={editorRef}
                     initialValue=" "
+                    previewStyle="vertical"
+                    height="25rem"
+                    initialEditType="markdown"
+                    useCommandShortcut={false}
+                    hideModeSwitch={true}
+                    onChange={handleEditorChange}
+                  /> */}
+                  <EditorComponent
+                    ref={editorRef}
+                    initialValue=""
                     previewStyle="vertical"
                     height="25rem"
                     initialEditType="markdown"
