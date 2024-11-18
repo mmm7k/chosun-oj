@@ -233,20 +233,20 @@ export default function ProblemPost() {
                   onChange={handleEditorChange}
                 /> */}
 
-                  {/* <Suspense> */}
                   {isClient && (
-                    <Editor
-                      ref={editorRef}
-                      initialValue=" "
-                      previewStyle="vertical"
-                      height="25rem"
-                      initialEditType="markdown"
-                      useCommandShortcut={false}
-                      hideModeSwitch={true}
-                      onChange={handleEditorChange}
-                    />
+                    <Suspense>
+                      <Editor
+                        ref={editorRef}
+                        initialValue=" "
+                        previewStyle="vertical"
+                        height="25rem"
+                        initialEditType="markdown"
+                        useCommandShortcut={false}
+                        hideModeSwitch={true}
+                        onChange={handleEditorChange}
+                      />
+                    </Suspense>
                   )}
-                  {/* </Suspense> */}
                 </div>
               </div>
             </div>
