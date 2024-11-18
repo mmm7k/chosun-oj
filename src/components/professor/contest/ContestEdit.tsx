@@ -18,8 +18,8 @@ export default function ContestEdit() {
   // URL의 마지막 숫자 추출
   const contestId = Number(pathname.split('/').pop());
 
-  const { data: contestModifyInformation } = useQuery({
-    queryKey: ['contestModifyInformation', contestId],
+  const { data: contestInformation, refetch } = useQuery({
+    queryKey: ['contestInformation', contestId],
     queryFn: () => getContest(contestId),
     enabled: !!contestId,
   });
@@ -34,7 +34,9 @@ export default function ContestEdit() {
       .min(Yup.ref('startDateTime'), '종료 날짜는 시작 날짜 이후여야 합니다.')
       .required('종료 날짜 시간을 선택해주세요.')
       .nullable(),
-    password: Yup.string().max(32, '비밀번호는 최대 32자까지 가능합니다.'),
+    password: Yup.string()
+      .max(32, '비밀번호는 최대 32자까지 가능합니다.')
+      .nullable(),
     isVisible: Yup.boolean(),
     allowedIpRanges: Yup.string()
       .matches(
@@ -68,26 +70,27 @@ export default function ContestEdit() {
   });
 
   useEffect(() => {
-    if (contestModifyInformation) {
-      setStartDateTime(new Date(contestModifyInformation.data.start_time));
-      setEndDateTime(new Date(contestModifyInformation.data.end_time));
-      setAllowedIpRanges(contestModifyInformation.data.allowed_ip_ranges[0]);
+    if (contestInformation) {
+      setStartDateTime(new Date(contestInformation.data.start_time));
+      setEndDateTime(new Date(contestInformation.data.end_time));
+      setAllowedIpRanges(contestInformation.data.allowed_ip_ranges[0]);
       reset({
-        title: contestModifyInformation.data.title,
-        description: contestModifyInformation.data.description,
-        startDateTime: new Date(contestModifyInformation.data.start_time),
-        endDateTime: new Date(contestModifyInformation.data.end_time),
-        password: contestModifyInformation.data.password,
-        isVisible: contestModifyInformation.data.visible,
-        allowedIpRanges: contestModifyInformation.data.allowed_ip_ranges[0],
+        title: contestInformation.data.title,
+        description: contestInformation.data.description,
+        startDateTime: new Date(contestInformation.data.start_time),
+        endDateTime: new Date(contestInformation.data.end_time),
+        password: contestInformation.data.password,
+        isVisible: contestInformation.data.visible,
+        allowedIpRanges: contestInformation.data.allowed_ip_ranges[0],
       });
     }
-  }, [contestModifyInformation, reset]);
+  }, [contestInformation, reset]);
 
   const mutation = useMutation({
     mutationFn: (data) => editContest(contestId, data),
     onSuccess: () => {
       message.success('대회가 성공적으로 수정되었습니다.');
+      refetch();
       router.push('/professor/contest/list');
     },
     onError: (error: any) => {

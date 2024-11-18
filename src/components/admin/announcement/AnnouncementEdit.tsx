@@ -16,8 +16,8 @@ export default function AnnouncementEdit() {
   // URL의 마지막 숫자 추출
   const announcementId = Number(pathname.split('/').pop());
 
-  const { data: announcementModifyInformation } = useQuery({
-    queryKey: ['announcementModifyInformation', announcementId],
+  const { data: announcementInformation, refetch } = useQuery({
+    queryKey: ['announcementInformation', announcementId],
     queryFn: () => getAnnouncement(announcementId),
     enabled: !!announcementId, // announcementId가 존재할 때만 쿼리 실행
   });
@@ -42,19 +42,20 @@ export default function AnnouncementEdit() {
   });
 
   useEffect(() => {
-    if (announcementModifyInformation) {
+    if (announcementInformation) {
       reset({
-        title: announcementModifyInformation.data.title,
-        content: announcementModifyInformation.data.content,
-        visible: announcementModifyInformation.data.visible,
+        title: announcementInformation.data.title,
+        content: announcementInformation.data.content,
+        visible: announcementInformation.data.visible,
       });
     }
-  }, [announcementModifyInformation, reset]);
+  }, [announcementInformation, reset]);
 
   const mutation = useMutation({
     mutationFn: (data: any) => editAnnouncement(announcementId, data),
     onSuccess: () => {
       message.success('공지가 성공적으로 수정되었습니다.');
+      refetch();
       router.push('/admin/announcement/list');
     },
     onError: (error: any) => {

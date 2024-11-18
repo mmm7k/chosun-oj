@@ -7,17 +7,11 @@ import { Checkbox, message, Select, Spin } from 'antd';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
+import { Editor } from '@toast-ui/react-editor';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { getProblem } from '@/services/problemAdmin/getProblem';
 import { editProblem } from '@/services/problemAdmin/editProblem';
-import dynamic from 'next/dynamic';
-const Editor = dynamic(
-  () => import('@toast-ui/react-editor').then((mod) => mod.Editor),
-  {
-    ssr: false,
-  },
-);
 
 const { Option } = Select;
 
@@ -27,14 +21,14 @@ export default function ProblemPost() {
   const queryClient = useQueryClient();
   // URL의 마지막 숫자 추출
   const problemId = Number(pathname.split('/').pop());
-  const { data: problemModifyInformation } = useQuery({
-    queryKey: ['problemModifyInformation', problemId],
+  const { data: problemInformation, refetch } = useQuery({
+    queryKey: ['problemInformation', problemId],
     queryFn: () => getProblem(problemId),
     enabled: !!problemId,
   });
   const [isEditorReady, setIsEditorReady] = useState(false);
   const [markdownContent, setMarkdownContent] = useState('');
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<Editor | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEditorChange = () => {
@@ -101,23 +95,23 @@ export default function ProblemPost() {
   });
 
   useEffect(() => {
-    if (problemModifyInformation?.data) {
+    if (problemInformation?.data) {
       reset({
-        _id: problemModifyInformation.data._id,
-        title: problemModifyInformation.data.title,
-        score: problemModifyInformation.data.test_case_score[0].score,
-        time_limit: problemModifyInformation.data.time_limit,
-        memory_limit: problemModifyInformation.data.memory_limit,
-        languages: problemModifyInformation.data.languages,
-        is_public: problemModifyInformation.data.is_public,
-        is_visible: problemModifyInformation.data.is_visible,
-        difficulty: problemModifyInformation.data.difficulty,
-        tags: problemModifyInformation.data.tags,
+        _id: problemInformation.data._id,
+        title: problemInformation.data.title,
+        score: problemInformation.data.test_case_score[0].score,
+        time_limit: problemInformation.data.time_limit,
+        memory_limit: problemInformation.data.memory_limit,
+        languages: problemInformation.data.languages,
+        is_public: problemInformation.data.is_public,
+        is_visible: problemInformation.data.is_visible,
+        difficulty: problemInformation.data.difficulty,
+        tags: problemInformation.data.tags,
       });
-      setMarkdownContent(problemModifyInformation.data.description || '');
+      setMarkdownContent(problemInformation.data.description || '');
       setIsEditorReady(true);
     }
-  }, [problemModifyInformation, reset]);
+  }, [problemInformation, reset]);
 
   const mutation = useMutation({
     mutationFn: (data: any) => editProblem(problemId, data),
@@ -127,9 +121,7 @@ export default function ProblemPost() {
     onSuccess: () => {
       message.success('문제가 성공적으로 수정되었습니다.');
       setIsLoading(false);
-      queryClient.invalidateQueries({
-        queryKey: ['problemModifyInformation', problemId],
-      });
+      refetch();
       router.push('/admin/problems/list');
     },
     onError: (error: any) => {
@@ -146,7 +138,7 @@ export default function ProblemPost() {
     const formattedData = {
       _id: data._id,
       title: data.title,
-      description: markdownContent,
+      description: markdownContent || '내용이 없습니다.',
       input_description: '',
       output_description: '',
       samples: [],

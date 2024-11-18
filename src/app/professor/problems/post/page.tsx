@@ -4,19 +4,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Checkbox, message, Select, Spin } from 'antd';
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
 import { postProblem } from '@/services/problemAdmin/postProblem';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-const Editor = dynamic(
-  () => import('@toast-ui/react-editor').then((mod) => mod.Editor),
-  {
-    ssr: false,
-  },
-);
+import { Editor } from '@toast-ui/react-editor';
 
 const { Option } = Select;
 
@@ -25,6 +19,11 @@ export default function ProblemPost() {
   const editorRef = useRef<any>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleEditorChange = () => {
     if (editorRef.current) {
@@ -100,9 +99,11 @@ export default function ProblemPost() {
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
+        setIsLoading(false);
         message.error('로그인이 필요합니다.');
         router.push('/');
       } else {
+        setIsLoading(false);
         message.error(error.response?.data?.message || '오류가 발생했습니다.');
       }
     },
@@ -112,7 +113,7 @@ export default function ProblemPost() {
     const formattedData = {
       _id: data._id,
       title: data.title,
-      description: markdownContent,
+      description: markdownContent || '내용이 없습니다.',
       input_description: '',
       output_description: '',
       samples: [],
@@ -148,6 +149,10 @@ export default function ProblemPost() {
 
     mutation.mutate(formattedData); // Mutation 실행
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <>

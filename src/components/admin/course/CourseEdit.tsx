@@ -16,8 +16,8 @@ export default function CourseEdit() {
   // URL의 마지막 숫자 추출
   const courseId = Number(pathname.split('/').pop());
 
-  const { data: courseModifyInformation } = useQuery({
-    queryKey: ['courseModifyInformation', courseId],
+  const { data: courseInformation, refetch } = useQuery({
+    queryKey: ['courseInformation', courseId],
     queryFn: () => getCourse(courseId),
     enabled: !!courseId, // courseId가 존재할 때만 쿼리 실행
   });
@@ -38,19 +38,20 @@ export default function CourseEdit() {
   });
 
   useEffect(() => {
-    if (courseModifyInformation) {
+    if (courseInformation) {
       reset({
-        title: courseModifyInformation.data.title,
-        code: courseModifyInformation.data.code,
-        description: courseModifyInformation.data.description,
+        title: courseInformation.data.title,
+        code: courseInformation.data.code,
+        description: courseInformation.data.description,
       });
     }
-  }, [courseModifyInformation, reset]);
+  }, [courseInformation, reset]);
 
   const mutation = useMutation({
     mutationFn: (data: any) => editCourse(courseId, data),
     onSuccess: () => {
       message.success('강의가 성공적으로 수정되었습니다.');
+      refetch();
       router.push('/admin/course/list');
     },
     onError: (error: any) => {

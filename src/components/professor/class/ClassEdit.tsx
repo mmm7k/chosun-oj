@@ -18,8 +18,8 @@ export default function ClassEdit() {
   // URL의 마지막 숫자 추출
   const classId = Number(pathname.split('/').pop());
 
-  const { data: classModifyInformation } = useQuery({
-    queryKey: ['classModifyInformation', classId],
+  const { data: classInformation, refetch } = useQuery({
+    queryKey: ['classInformation', classId],
     queryFn: () => getClass(classId),
     enabled: !!classId, // classId가 존재할 때만 쿼리 실행
   });
@@ -45,23 +45,24 @@ export default function ClassEdit() {
   });
 
   useEffect(() => {
-    if (classModifyInformation) {
+    if (classInformation) {
       reset({
-        group_name: classModifyInformation.data.group_name,
-        description: classModifyInformation.data.description,
-        short_description: classModifyInformation.data.short_description,
-        course: classModifyInformation.data.course?.code,
-        year: classModifyInformation.data.year,
-        quarter: classModifyInformation.data.quarter,
-        language: classModifyInformation.data.language,
+        group_name: classInformation.data.group_name,
+        description: classInformation.data.description,
+        short_description: classInformation.data.short_description,
+        course: classInformation.data.course?.code,
+        year: classInformation.data.year,
+        quarter: classInformation.data.quarter,
+        language: classInformation.data.language,
       });
     }
-  }, [classModifyInformation, reset]);
+  }, [classInformation, reset]);
 
   const mutation = useMutation({
     mutationFn: (data: any) => editClass(classId, data),
     onSuccess: () => {
       message.success('분반이 성공적으로 수정되었습니다.');
+      refetch();
       router.push('/professor/class/list');
     },
     onError: (error: any) => {
@@ -196,7 +197,7 @@ export default function ClassEdit() {
                   {...register('quarter')}
                   className="ml-3 w-[60%] sm:w-[30%] "
                   placeholder="학기를 선택해주세요"
-                  value={classModifyInformation?.data.quarter}
+                  value={classInformation?.data.quarter}
                   onChange={(value) => setValue('quarter', value)}
                 >
                   <Option value="1학기">1학기</Option>
@@ -219,7 +220,7 @@ export default function ClassEdit() {
                 <Select
                   {...register('language')}
                   className="ml-3 w-[60%] sm:w-[30%] "
-                  value={classModifyInformation?.data.language}
+                  value={classInformation?.data.language}
                   placeholder="언어를 선택해주세요"
                   onChange={(value) => setValue('language', value)}
                 >
