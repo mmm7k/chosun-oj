@@ -8,7 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import Skeleton from '@mui/material/Skeleton';
 import { getAllProblem } from '@/services/problemAdmin/getAllProblem';
-import { enrollProblemsContest } from '@/services/contestAdmin/enrollUsersContest';
+import { enrollProblemsContest } from '@/services/contestAdmin/enrollProblemsContest';
 import { getProblemsContest } from '@/services/contestAdmin/getProblemsContest';
 import { deleteProblemsContest } from '@/services/contestAdmin/deleteProblemsContest';
 

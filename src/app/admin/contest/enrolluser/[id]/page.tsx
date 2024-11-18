@@ -13,12 +13,10 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import { getAllUser } from '@/services/accountAdmin/getAllUser';
-
 import Skeleton from '@mui/material/Skeleton';
-
 import { getUsersContest } from '@/services/contestAdmin/getUsersContest';
 import { deleteUsersContest } from '@/services/contestAdmin/deleteUsersContest';
-import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest copy';
+import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest';
 
 interface FormData {
   student_number: string;

@@ -15,7 +15,7 @@ import { IoSearchSharp } from 'react-icons/io5';
 import Skeleton from '@mui/material/Skeleton';
 import { getUsersContest } from '@/services/contestAdmin/getUsersContest';
 import { deleteUsersContest } from '@/services/contestAdmin/deleteUsersContest';
-import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest copy';
+import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest';
 import { getAllUser } from '@/services/accountAdmin/getAllUser';
 
 interface FormData {

@@ -1,8 +1,8 @@
 import api from '../api';
 
-export const enrollProblemsContest = async (id: number, payload: any) => {
+export const enrollUsersContest = async (id: number, payload: any) => {
   try {
-    const response = await api.post(`/admin/contest/${id}/problem`, payload);
+    const response = await api.post(`/admin/contest/${id}/user/`, payload);
     return response.data;
   } catch (error: any) {
     throw error;

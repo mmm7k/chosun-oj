@@ -1,6 +1,6 @@
 'use client';
 
-import { Upload, Button, message, Checkbox } from 'antd';
+import { Upload, Button, message, Checkbox, Modal } from 'antd';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as XLSX from 'xlsx';
@@ -10,11 +10,17 @@ import { PiExclamationMarkFill } from 'react-icons/pi';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import { getAllUser } from '@/services/accountAdmin/getAllUser';
-import { enrollUsersClass } from '@/services/classAdmin/enrollUsersClass';
+
 import Skeleton from '@mui/material/Skeleton';
+import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest';
+import { getUsersContest } from '@/services/contestAdmin/getUsersContest';
+import { deleteUsersContest } from '@/services/contestAdmin/deleteUsersContest';
+import { enrollUsersClass } from '@/services/classAdmin/enrollUsersClass';
+import { getUsersClass } from '@/services/classAdmin/getUsersClass';
+import { deleteUsersClass } from '@/services/classAdmin/deleteUsersContest';
 
 interface FormData {
   student_number: string;
@@ -23,6 +29,7 @@ interface FormData {
 
 export default function UserEnroll() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isStudentModalOpen, setIsStudentModalOpen] = useState<boolean>(false);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
   const [deleteSelectedStudents, setDeleteSelectedStudents] = useState<
@@ -142,13 +149,20 @@ export default function UserEnroll() {
   const mutation = useMutation({
     mutationFn: () => {
       const payload = {
-        users: selectedStudents.map((student) => student.student_number),
+        data: selectedStudents.map((student) => [
+          student.name,
+          student.student_number,
+        ]),
       };
       return enrollUsersClass(classId, payload);
     },
+
     onSuccess: () => {
-      message.success('유저가 성공적으로 등록되었습니다.');
+      message.success('유저 등록이 완료되었습니다.');
       setSelectedStudents([]);
+      queryClient.invalidateQueries({
+        queryKey: ['classUsersListData', classId],
+      });
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
@@ -182,15 +196,12 @@ export default function UserEnroll() {
     );
   };
 
-  ///////////등록된 유저 샘플
-  // 임의의 학생 리스트
-  const enrolledstudents = Array.from({ length: 50 }, (_, i) => ({
-    id: i + 1,
-    student_number: `202147${i + 1}`,
-    name: `학생${i + 1}`,
-  }));
-
-  // 유저 선택 핸들러
+  const { data: enrolledStudentsData, isLoading: enrolledStudentsIsLoading } =
+    useQuery({
+      queryKey: ['classUsersListData', classId],
+      queryFn: () => getUsersClass(classId),
+    });
+  const enrolledStudents = enrolledStudentsData?.data?.data || [];
   const handleUserDeleteSelection = (student: Student) => {
     setDeleteSelectedStudents((prev) =>
       prev.some((s) => s.student_number === student.student_number)
@@ -199,14 +210,43 @@ export default function UserEnroll() {
     );
   };
 
-  // 삭제 버튼 클릭
-  const handleDeleteSubmit = () => {
-    // 삭제 성공 후 초기화
-    setDeleteSelectedStudents([]);
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (ids: number[]) => {
+      const payload = { ids };
+      return deleteUsersClass(classId, payload);
+    },
+    onSuccess: () => {
+      setDeleteSelectedStudents([]); // 선택된 유저 초기화
+      queryClient.invalidateQueries({
+        queryKey: ['classUsersListData', classId],
+      });
+      message.success('유저 삭제가 완료되었습니다.');
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
 
+  const handleDeleteSubmit = () => {
+    const idsToDelete = deleteSelectedStudents.map((user) => user.id);
+
+    // 삭제 확인 모달
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: `선택된 ${idsToDelete.length}명의 유저를 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: () => deleteMutation.mutate(idsToDelete),
+    });
+  };
   return (
-    <div className="flex min-h-screen p-8">
+    <div className="flex flex-col min-h-screen p-8 space-y-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col sm:flex-row items-center justify-between px-16">
           <h1 className="text-lg">분반 유저 관리</h1>
@@ -214,7 +254,7 @@ export default function UserEnroll() {
           <div className="space-x-2 flex items-center">
             <button
               onClick={() => setIsStudentModalOpen(true)}
-              className="py-1.5 w-36 text-sm font-normal text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all"
+              className="py-1.5 w-36 text-sm font-normal text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all"
             >
               학생 검색 및 목록
             </button>
@@ -339,11 +379,11 @@ export default function UserEnroll() {
             유저 등록
           </button>
         </div>
+      </div>
 
-        <hr className="mt-5 border-t-2 border-gray-200" />
-
-        <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
-          <span className="text-sm">현재 등록된 유저 목록</span>
+      <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
+        <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+          <span className="text-lg px-6">등록된 유저 목록</span>
           <div className="overflow-auto max-h-80 border my-5">
             <table className="table-auto w-full text-left text-sm">
               <thead>
@@ -355,30 +395,45 @@ export default function UserEnroll() {
                 </tr>
               </thead>
               <tbody>
-                {enrolledstudents.length === 0 ? (
+                {enrolledStudentsIsLoading ? (
+                  Array.from({ length: 4 }).map((_, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {Array.from({ length: 3 }).map((_, colIndex) => (
+                        <td key={colIndex} className="p-4">
+                          <Skeleton animation="wave" width="100%" height={20} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : (enrolledStudents?.length || 0) === 0 ? (
                   <tr>
                     <td colSpan={4} className="text-center text-gray-500 py-4">
                       등록된 유저가 없습니다.
                     </td>
                   </tr>
                 ) : (
-                  enrolledstudents.map((student) => (
+                  enrolledStudents.map((student: any) => (
                     <tr
-                      key={student.id}
+                      key={student.user.id}
                       className="hover:bg-gray-50"
-                      onClick={() => handleUserDeleteSelection(student)}
+                      onClick={() => handleUserDeleteSelection(student.user)}
                     >
-                      <td className="px-4 py-2 border-b">{student.id}</td>
+                      <td className="px-4 py-2 border-b">{student.user.id}</td>
                       <td className="px-4 py-2 border-b">
-                        {student.student_number}
+                        {student.user.student_number}
                       </td>
-                      <td className="px-4 py-2 border-b">{student.name}</td>
+                      <td className="px-4 py-2 border-b">
+                        {student.user.name}
+                      </td>
                       <td className="px-4 py-2 border-b text-center">
                         <Checkbox
                           checked={deleteSelectedStudents.some(
-                            (s) => s.student_number === student.student_number,
+                            (s) =>
+                              s.student_number === student.user.student_number,
                           )}
-                          onChange={() => handleUserDeleteSelection(student)}
+                          onChange={() =>
+                            handleUserDeleteSelection(student.user)
+                          }
                         />
                       </td>
                     </tr>
@@ -387,57 +442,58 @@ export default function UserEnroll() {
               </tbody>
             </table>
           </div>
-
-          {deleteSelectedStudents.length > 0 && (
-            <div>
-              <h3 className="mb-2 text-sm">선택된 유저(삭제):</h3>
-              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
-                {deleteSelectedStudents.map((user) => (
-                  <div
-                    key={user.student_number}
-                    className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+        </div>
+        {deleteSelectedStudents.length > 0 && (
+          <div className="px-10 mt-4">
+            <h3 className="mb-2 text-sm">선택된 유저(삭제):</h3>
+            <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
+              {deleteSelectedStudents.map((user) => (
+                <div
+                  key={user.student_number}
+                  className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+                >
+                  <span className="mr-2">
+                    {user.student_number} - {user.name}
+                  </span>
+                  <button
+                    className="text-red-500"
+                    onClick={() =>
+                      setDeleteSelectedStudents((prev) =>
+                        prev.filter(
+                          (s) => s.student_number !== user.student_number,
+                        ),
+                      )
+                    }
                   >
-                    <span className="mr-2">
-                      {user.student_number} - {user.name}
-                    </span>
-                    <button
-                      className="text-red-500"
-                      onClick={() =>
-                        setDeleteSelectedStudents((prev) =>
-                          prev.filter(
-                            (s) => s.student_number !== user.student_number,
-                          ),
-                        )
-                      }
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    &times;
+                  </button>
+                </div>
+              ))}
             </div>
-          )}
-
-          <div className="flex items-center justify-end w-full ">
-            <button
-              onClick={() => onSubmit()}
-              className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
-                deleteSelectedStudents.length > 0
-                  ? 'bg-primary hover:bg-primaryButtonHover'
-                  : 'bg-gray-300 cursor-not-allowed'
-              }`}
-              disabled={deleteSelectedStudents.length === 0}
-            >
-              유저 삭제
-            </button>
           </div>
+        )}
+
+        <div className="flex items-center justify-end w-full px-10 mt-8">
+          <button
+            onClick={handleDeleteSubmit}
+            className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
+              deleteSelectedStudents.length > 0
+                ? 'bg-primary hover:bg-primaryButtonHover'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
+            disabled={deleteSelectedStudents.length === 0}
+          >
+            유저 삭제
+          </button>
         </div>
       </div>
 
       {isStudentModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-semibold text-gray-700"
-          onClick={() => setIsStudentModalOpen(false)}
+          onClick={() => {
+            setIsStudentModalOpen(false);
+          }}
         >
           <div
             className="bg-white rounded-lg w-[80%] sm:w-[50%] h-[90vh] p-8 overflow-hidden flex flex-col relative"
@@ -446,7 +502,9 @@ export default function UserEnroll() {
             <h2 className="text-lg mb-4">학생 검색 및 목록</h2>
             <button
               className="absolute right-10 top-7 text-xl"
-              onClick={() => setIsStudentModalOpen(false)}
+              onClick={() => {
+                setIsStudentModalOpen(false);
+              }}
             >
               x
             </button>
