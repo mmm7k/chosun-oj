@@ -11,6 +11,11 @@ import { postProblem } from '@/services/problemAdmin/postProblem';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Editor } from '@toast-ui/react-editor';
+import dynamic from 'next/dynamic';
+const EditorComponent = dynamic(
+  () => import('@/components/professor/problems/Editor'),
+  { ssr: false },
+);
 
 const { Option } = Select;
 
@@ -22,9 +27,7 @@ export default function ProblemPost() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      setIsClient(true);
-    }
+    setIsClient(true);
   }, []);
 
   const handleEditorChange = () => {
@@ -187,6 +190,10 @@ export default function ProblemPost() {
                   placeholder="문제코드를 입력해주세요"
                 />
               </div>
+              {/* <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+              <PiExclamationMarkFill className="text-lg" />
+              <span>&nbsp; URL에서 사용되는 문제에 대한 고유한 코드.</span>
+            </span> */}
               {errors._id && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors._id.message}
@@ -229,20 +236,26 @@ export default function ProblemPost() {
                   onChange={handleEditorChange}
                 /> */}
 
-                  {/* <Suspense> */}
-                  {isClient && (
-                    <Editor
-                      ref={editorRef}
-                      initialValue=" "
-                      previewStyle="vertical"
-                      height="25rem"
-                      initialEditType="markdown"
-                      useCommandShortcut={false}
-                      hideModeSwitch={true}
-                      onChange={handleEditorChange}
-                    />
-                  )}
-                  {/* </Suspense> */}
+                  {/* <Editor
+                    ref={editorRef}
+                    initialValue=" "
+                    previewStyle="vertical"
+                    height="25rem"
+                    initialEditType="markdown"
+                    useCommandShortcut={false}
+                    hideModeSwitch={true}
+                    onChange={handleEditorChange}
+                  /> */}
+                  <EditorComponent
+                    ref={editorRef}
+                    initialValue=""
+                    previewStyle="vertical"
+                    height="25rem"
+                    initialEditType="markdown"
+                    useCommandShortcut={false}
+                    hideModeSwitch={true}
+                    onChange={handleEditorChange}
+                  />
                 </div>
               </div>
             </div>

@@ -22,10 +22,7 @@ export default function ProblemPost() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // 클라이언트 환경인지 확인
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      setIsClient(true);
-    }
+    setIsClient(true);
   }, []);
 
   const handleEditorChange = () => {
@@ -233,20 +230,16 @@ export default function ProblemPost() {
                   onChange={handleEditorChange}
                 /> */}
 
-                  {isClient && (
-                    <Suspense>
-                      <Editor
-                        ref={editorRef}
-                        initialValue=" "
-                        previewStyle="vertical"
-                        height="25rem"
-                        initialEditType="markdown"
-                        useCommandShortcut={false}
-                        hideModeSwitch={true}
-                        onChange={handleEditorChange}
-                      />
-                    </Suspense>
-                  )}
+                  <Editor
+                    ref={editorRef}
+                    initialValue=" "
+                    previewStyle="vertical"
+                    height="25rem"
+                    initialEditType="markdown"
+                    useCommandShortcut={false}
+                    hideModeSwitch={true}
+                    onChange={handleEditorChange}
+                  />
                 </div>
               </div>
             </div>
