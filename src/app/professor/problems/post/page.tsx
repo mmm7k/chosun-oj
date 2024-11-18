@@ -12,10 +12,9 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Editor } from '@toast-ui/react-editor';
 import dynamic from 'next/dynamic';
-const EditorComponent = dynamic(
-  () => import('@/components/professor/problems/Editor'),
-  { ssr: false },
-);
+const EditorComponent = dynamic(() => import('@/components/commons/Editor'), {
+  ssr: false,
+});
 
 const { Option } = Select;
 
@@ -24,11 +23,11 @@ export default function ProblemPost() {
   const editorRef = useRef<any>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  // const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // useEffect(() => {
+  //   setIsClient(true);
+  // }, []);
 
   const handleEditorChange = () => {
     if (editorRef.current) {
@@ -155,9 +154,9 @@ export default function ProblemPost() {
     mutation.mutate(formattedData); // Mutation 실행
   };
 
-  if (!isClient) {
-    return null;
-  }
+  // if (!isClient) {
+  //   return null;
+  // }
 
   return (
     <>
