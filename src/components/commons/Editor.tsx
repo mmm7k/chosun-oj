@@ -1,9 +1,10 @@
 'use client';
 
-import React, { forwardRef } from 'react';
-import { Editor as TuiEditor } from '@toast-ui/react-editor';
+import { Editor } from '@toast-ui/react-editor';
+import '@toast-ui/editor/dist/toastui-editor.css';
 
 interface EditorComponentProps {
+  editorRef: React.RefObject<Editor>;
   initialValue: string;
   previewStyle: 'vertical' | 'tab';
   height: string;
@@ -13,33 +14,28 @@ interface EditorComponentProps {
   onChange: () => void;
 }
 
-const EditorComponent = forwardRef<TuiEditor, EditorComponentProps>(
-  (
-    {
-      initialValue,
-      previewStyle,
-      height,
-      initialEditType,
-      useCommandShortcut,
-      hideModeSwitch,
-      onChange,
-    },
-    ref,
-  ) => {
-    return (
-      <TuiEditor
-        ref={ref}
-        initialValue={initialValue}
-        previewStyle={previewStyle}
-        height={height}
-        initialEditType={initialEditType}
-        useCommandShortcut={useCommandShortcut}
-        hideModeSwitch={hideModeSwitch}
-        onChange={onChange}
-      />
-    );
-  },
-);
+const EditorComponent = ({
+  editorRef,
+  initialValue,
+  previewStyle,
+  height,
+  initialEditType,
+  useCommandShortcut,
+  hideModeSwitch,
+  onChange,
+}: EditorComponentProps) => {
+  return (
+    <Editor
+      ref={editorRef}
+      initialValue={initialValue}
+      previewStyle={previewStyle}
+      height={height}
+      initialEditType={initialEditType}
+      useCommandShortcut={useCommandShortcut}
+      hideModeSwitch={hideModeSwitch}
+      onChange={onChange}
+    />
+  );
+};
 
-EditorComponent.displayName = 'EditorComponent';
 export default EditorComponent;

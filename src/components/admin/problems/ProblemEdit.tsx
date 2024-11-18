@@ -18,7 +18,6 @@ const { Option } = Select;
 export default function ProblemPost() {
   const pathname = usePathname();
   const router = useRouter();
-  const queryClient = useQueryClient();
   // URL의 마지막 숫자 추출
   const problemId = Number(pathname.split('/').pop());
   const { data: problemInformation, refetch } = useQuery({

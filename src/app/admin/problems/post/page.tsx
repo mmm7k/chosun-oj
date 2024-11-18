@@ -23,11 +23,6 @@ export default function ProblemPost() {
   const editorRef = useRef<Editor | null>(null);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  // const [isClient, setIsClient] = useState(false);
-
-  // useEffect(() => {
-  //   setIsClient(true);
-  // }, []);
 
   const handleEditorChange = () => {
     if (editorRef.current) {
@@ -153,10 +148,6 @@ export default function ProblemPost() {
     mutation.mutate(formattedData); // Mutation 실행
   };
 
-  // if (!isClient) {
-  //   return null;
-  // }
-
   return (
     <>
       {/* 뮤테이션 Loading UI */}
@@ -188,10 +179,7 @@ export default function ProblemPost() {
                   placeholder="문제코드를 입력해주세요"
                 />
               </div>
-              {/* <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>&nbsp; URL에서 사용되는 문제에 대한 고유한 코드.</span>
-            </span> */}
+
               {errors._id && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors._id.message}
@@ -245,8 +233,8 @@ export default function ProblemPost() {
                     onChange={handleEditorChange}
                   /> */}
                   <EditorComponent
-                    ref={editorRef}
-                    initialValue=""
+                    editorRef={editorRef}
+                    initialValue=" "
                     previewStyle="vertical"
                     height="25rem"
                     initialEditType="markdown"
