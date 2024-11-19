@@ -300,7 +300,7 @@ export default function Signup() {
               </button>
             </form>
             <Link
-              href="/"
+              href="/login"
               className="w-3/4 py-2 md:py-5 lg:py-2 rounded-md bg-secondaryButton border-[1px] border-secondaryButtonBorder text-secondary flex items-center justify-center cursor-pointer hover:bg-secondaryButtonHover transition"
             >
               이전으로

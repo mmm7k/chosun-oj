@@ -15,10 +15,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    document.cookie = 'sessionid=; Max-Age=0';
-    document.cookie = 'csrftoken=; Max-Age=0';
-  }, []);
+  //   useEffect(() => {
+  //     document.cookie = 'sessionid=; Max-Age=0';
+  //     document.cookie = 'csrftoken=; Max-Age=0';
+  //   }, []);
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('아이디를 입력해주세요'),

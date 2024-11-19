@@ -26,6 +26,7 @@ export default function RootLayout({
         />
         <meta name="robots" content="noindex, nofollow" />
       </head>
+
       <body className={notoSansKr.className}>{children}</body>
     </html>
   );
