@@ -61,7 +61,7 @@ export default function UserEnroll() {
   });
 
   const updateUrlAndPage = (page: number) => {
-    window.history.pushState(
+    window.history.replaceState(
       null,
       '',
       `/professor/contest/enrolluser/${contestId}?page=${page}`,
@@ -230,8 +230,6 @@ export default function UserEnroll() {
 
   const handleDeleteSubmit = () => {
     const idsToDelete = deleteSelectedStudents.map((user) => user.id);
-
-    // 삭제 확인 모달
     Modal.confirm({
       title: '정말 삭제하시겠습니까?',
       content: `선택된 ${idsToDelete.length}명의 유저를 삭제합니다. 이 작업은 되돌릴 수 없습니다.`,
@@ -242,6 +240,11 @@ export default function UserEnroll() {
     });
   };
 
+  const closeModal = () => {
+    setIsStudentModalOpen(false);
+    const newUrl = `/professor/contest/enrolluser/${contestId}`;
+    window.history.replaceState(null, '', newUrl);
+  };
   return (
     <div className="flex flex-col min-h-screen p-8 space-y-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
@@ -488,7 +491,7 @@ export default function UserEnroll() {
       {isStudentModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-semibold text-gray-700"
-          onClick={() => setIsStudentModalOpen(false)}
+          onClick={closeModal}
         >
           <div
             className="bg-white rounded-lg w-[80%] sm:w-[50%] h-[90vh] p-8 overflow-hidden flex flex-col relative"
@@ -497,7 +500,7 @@ export default function UserEnroll() {
             <h2 className="text-lg mb-4">학생 검색 및 목록</h2>
             <button
               className="absolute right-10 top-7 text-xl"
-              onClick={() => setIsStudentModalOpen(false)}
+              onClick={closeModal}
             >
               x
             </button>

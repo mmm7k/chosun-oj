@@ -1,4 +1,4 @@
-import SubmissionList from '@/components/professor/assignment/SubmissionLIst';
+import SubmissionList from '@/components/professor/contest/SubmissionLIst';
 import { Suspense } from 'react';
 
 export default function Submission() {

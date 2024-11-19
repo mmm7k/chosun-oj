@@ -257,13 +257,13 @@ export default function SideNav() {
                 </li>
                 <li
                   className={`transition ${
-                    pathname === '/professor/assignment/enroll'
+                    pathname === '/professor/assignment/post'
                       ? 'text-primary hover:text-primaryHover'
                       : 'text-secondary hover:text-secondaryHover'
                   }`}
                 >
                   <Link
-                    href="/professor/assignment/enroll"
+                    href="/professor/assignment/post"
                     onClick={closeAllDropdowns}
                   >
                     과제 등록
@@ -358,7 +358,7 @@ export default function SideNav() {
               </ul>
             </div>
             {/* 공지 드롭다운 */}
-            <div>
+            {/* <div>
               <div
                 className={`flex justify-between cursor-pointer items-center ${
                   pathname.startsWith('/professor/announcement')
@@ -428,7 +428,7 @@ export default function SideNav() {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </section>
           <section className="space-y-4">
             <Link
@@ -646,7 +646,7 @@ export default function SideNav() {
                   </li>
                 </Link>
                 <Link
-                  href="/professor/assignment/enroll"
+                  href="/professor/assignment/post"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -654,7 +654,7 @@ export default function SideNav() {
                 >
                   <li
                     className={`w-full flex justify-center items-center py-2 hover:bg-gray-100 ${
-                      pathname === '/professor/assignment/enroll' &&
+                      pathname === '/professor/assignment/post' &&
                       'text-primary font-semibold'
                     }`}
                   >
@@ -757,7 +757,7 @@ export default function SideNav() {
           </div>
 
           {/* 공지 드롭다운 */}
-          <div className="w-full">
+          {/* <div className="w-full">
             <div
               className={`flex justify-center cursor-pointer items-center px-5 py-3 hover:bg-gray-100 ${
                 pathname.startsWith('/professor/announcement') &&
@@ -830,7 +830,7 @@ export default function SideNav() {
                 </Link>
               </ul>
             )}
-          </div>
+          </div> */}
           <Link
             href={'/student'}
             className="flex items-center justify-center w-full py-4 hover:bg-gray-100"

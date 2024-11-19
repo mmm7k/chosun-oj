@@ -1,7 +1,7 @@
-import AssignmentList from '@/components/professor/assignment/AssignmentLIst';
+import AssignmentList from '@/components/professor/assignment/AssignmentList';
 import { Suspense } from 'react';
 
-export default function List() {
+export default function AssignmentListPage() {
   return (
     <Suspense>
       <AssignmentList />

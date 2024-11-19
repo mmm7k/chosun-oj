@@ -8,9 +8,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import Skeleton from '@mui/material/Skeleton';
 import { getAllProblem } from '@/services/problemAdmin/getAllProblem';
-import { enrollProblemsContest } from '@/services/contestAdmin/enrollProblemsContest';
-import { getProblemsContest } from '@/services/contestAdmin/getProblemsContest';
-import { deleteProblemsContest } from '@/services/contestAdmin/deleteProblemsContest';
+import { enrollProblemsAssignment } from '@/services/assignmentAdmin/enrollProblemsContest';
+import { getProblemsAssignment } from '@/services/assignmentAdmin/getProblemsAssignment';
+import { deleteProblemsAssignment } from '@/services/assignmentAdmin/deleteProblemsAssignment';
 
 export default function ProblemEnroll() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function ProblemEnroll() {
   >([]);
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const contestId = Number(pathname.split('/').pop());
+  const assignmentId = Number(pathname.split('/').pop());
   const initialPage = Number(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
@@ -52,7 +52,7 @@ export default function ProblemEnroll() {
     window.history.replaceState(
       null,
       '',
-      `/professor/contest/enrollproblem/${contestId}?page=${page}`,
+      `/professor/assignment/enrollproblem/${assignmentId}?page=${page}`,
     );
     setCurrentPage(page);
   };
@@ -82,13 +82,13 @@ export default function ProblemEnroll() {
       const payload = {
         ids: selectedProblems.map((problem) => problem.id),
       };
-      return enrollProblemsContest(contestId, payload);
+      return enrollProblemsAssignment(assignmentId, payload);
     },
     onSuccess: () => {
       message.success('문제 등록이 완료되었습니다.');
       setSelectedProblems([]);
       queryClient.invalidateQueries({
-        queryKey: ['contestProblemsListData', contestId],
+        queryKey: ['assignmentProblemsListData', assignmentId],
       });
     },
     onError: (error: any) => {
@@ -115,8 +115,8 @@ export default function ProblemEnroll() {
 
   const { data: enrolledProblemsData, isLoading: enrolledProblemsIsLoading } =
     useQuery({
-      queryKey: ['contestProblemsListData', contestId],
-      queryFn: () => getProblemsContest(contestId),
+      queryKey: ['assignmentProblemsListData', assignmentId],
+      queryFn: () => getProblemsAssignment(assignmentId),
     });
 
   const enrolledProblems = enrolledProblemsData?.data?.data || [];
@@ -132,12 +132,12 @@ export default function ProblemEnroll() {
   const deleteMutation = useMutation({
     mutationFn: (ids: number[]) => {
       const payload = { ids };
-      return deleteProblemsContest(contestId, payload);
+      return deleteProblemsAssignment(assignmentId, payload);
     },
     onSuccess: () => {
       setDeleteSelectedProblems([]); // 선택된 문제 목록 초기화
       queryClient.invalidateQueries({
-        queryKey: ['contestProblemsListData', contestId],
+        queryKey: ['assignmentProblemsListData', assignmentId],
       });
       message.success('문제 삭제가 완료되었습니다.');
     },
@@ -167,7 +167,7 @@ export default function ProblemEnroll() {
 
   const closeModal = () => {
     setIsProblemModalOpen(false);
-    const newUrl = `/professor/contest/enrollproblem/${contestId}`;
+    const newUrl = `/professor/assignment/enrollproblem/${assignmentId}`;
     window.history.replaceState(null, '', newUrl);
   };
 
@@ -175,7 +175,7 @@ export default function ProblemEnroll() {
     <div className="flex flex-col  min-h-screen p-8 space-y-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col sm:flex-row items-center px-16">
-          <h1 className="text-lg">대회 문제 관리</h1>
+          <h1 className="text-lg">분반 문제 관리</h1>
         </section>
         <hr className="mt-5 border-t-2 border-gray-200" />
 

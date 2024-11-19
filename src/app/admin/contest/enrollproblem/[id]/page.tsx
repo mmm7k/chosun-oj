@@ -49,7 +49,7 @@ export default function ProblemEnroll() {
   });
 
   const updateUrlAndPage = (page: number) => {
-    window.history.pushState(
+    window.history.replaceState(
       null,
       '',
       `/admin/contest/enrollproblem/${contestId}?page=${page}`,
@@ -172,6 +172,12 @@ export default function ProblemEnroll() {
         }
       },
     });
+  };
+
+  const closeModal = () => {
+    setIsProblemModalOpen(false);
+    const newUrl = `/admin/contest/enrollproblem/${contestId}`;
+    window.history.replaceState(null, '', newUrl);
   };
 
   return (
