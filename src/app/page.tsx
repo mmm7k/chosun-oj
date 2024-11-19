@@ -44,7 +44,7 @@ export default function Home() {
       await login(username, password);
       router.push('/student');
     } catch (error: any) {
-      alert(error.response?.data?.msg);
+      alert(error.response?.data?.message);
     } finally {
       setIsLoading(false);
     }

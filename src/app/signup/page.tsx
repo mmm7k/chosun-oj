@@ -82,7 +82,9 @@ export default function Signup() {
       message.success('회원가입이 완료되었습니다.');
       router.push('/');
     } catch (error: any) {
-      message.error(error.response?.data?.msg || '회원가입에 실패했습니다.');
+      message.error(
+        error.response?.data?.message || '회원가입에 실패했습니다.',
+      );
     }
   };
 

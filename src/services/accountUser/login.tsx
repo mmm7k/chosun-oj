@@ -24,7 +24,6 @@ export const login = async (username: string, password: string) => {
       });
       return retryResponse.data;
     } catch (retryError: any) {
-      alert(retryError.response?.data?.message);
       throw retryError;
     }
   }
@@ -35,7 +34,6 @@ export const logout = async () => {
     const response = await api.get('/account/logout/');
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
