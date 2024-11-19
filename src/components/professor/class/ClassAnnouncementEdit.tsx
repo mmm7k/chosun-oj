@@ -83,7 +83,7 @@ export default function ClassAnnouncementEdit() {
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <form onSubmit={handleSubmit(onSubmit)}>
           <section className="flex items-center justify-between px-16">
-            <h1 className="text-lg">대회 공지 수정</h1>
+            <h1 className="text-lg">분반 공지 수정</h1>
           </section>
           <hr className="mt-5 border-t-2 border-gray-200" />
           <section className="flex flex-col text-sm">

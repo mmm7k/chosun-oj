@@ -30,8 +30,6 @@ export default function ProblemPost() {
     }
   };
 
-  console.log(editorRef);
-  console.log('aa');
   const problemTags = [
     '데이터 타입',
     '연산자',

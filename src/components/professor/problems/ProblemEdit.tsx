@@ -8,7 +8,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
 import { Editor } from '@toast-ui/react-editor';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { getProblem } from '@/services/problemAdmin/getProblem';
 import { editProblem } from '@/services/problemAdmin/editProblem';

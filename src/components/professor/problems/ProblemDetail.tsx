@@ -82,17 +82,17 @@ export default function ProblemDetail() {
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>시간 제한:</span>
-            <span>{problemData.time_limit}</span>
+            <span>{problemData.time_limit}ms</span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>메모리 제한:</span>
-            <span>{problemData.memory_limit}</span>
+            <span>{problemData.memory_limit}mb</span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>태그:</span>
-            <span>{problemData.tags}</span>
+            <span>{problemData.tags?.join(', ') || '태그 정보 없음'}</span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
@@ -102,21 +102,27 @@ export default function ProblemDetail() {
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>점수:</span>
-            <span>{problemData.test_case_score?.score}</span>
+            <span>
+              {problemData.test_case_score[0]?.score || '점수 정보 없음'}
+            </span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>언어:</span>
-            <span>{problemData.languages}</span>
+            <span>{problemData.languages?.join(', ') || '언어 정보 없음'}</span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>생성 시간:</span>
-            <span>{formattedDate(problemData.created_time)}</span>
+            <span>{formattedDate(problemData.create_time)}</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>마지막 수정 시간:</span>
-            <span>{formattedDate(problemData.last_update_time)}</span>
+            <span>
+              {problemData.last_update_time
+                ? formattedDate(problemData.last_update_time)
+                : formattedDate(problemData.create_time)}
+            </span>
           </div>
         </div>
       </div>

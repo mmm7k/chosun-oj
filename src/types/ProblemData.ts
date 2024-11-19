@@ -7,14 +7,12 @@ interface ProblemData {
   };
   is_visible: boolean;
   is_public: boolean;
-  created_time: string;
+  create_time: string;
   last_update_time: string;
   time_limit: number;
   memory_limit: number;
   tags: string[];
   difficulty: string;
-  test_case_score: {
-    score: number;
-  };
+  test_case_score: { score: number }[];
   languages: string[];
 }
