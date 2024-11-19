@@ -35,7 +35,7 @@ export default function ClassList() {
     refetch();
   }, [currentPage, router, refetch]);
 
-  const classList = classListData?.data?.results || [];
+  const classList = classListData?.data?.data || [];
   const totalPages = classListData?.data?.count
     ? Math.ceil(classListData.data.count / 10)
     : 1;

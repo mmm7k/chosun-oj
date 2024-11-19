@@ -40,7 +40,7 @@ export default function PostAssignment() {
     queryFn: () => getClassList(),
   });
 
-  const classList = classListData?.data?.results || [];
+  const classList = classListData?.data?.data || [];
   const {
     register,
     handleSubmit,

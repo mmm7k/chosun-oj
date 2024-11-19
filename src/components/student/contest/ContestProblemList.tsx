@@ -3,65 +3,50 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { getContestProblemListUser } from '@/services/contestUser/getContestProblemListUser';
 
-export default function ContestProblemList({ course }: { course: string }) {
+export default function ContestProblemList({
+  contestId,
+}: {
+  contestId: number;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  // 쿼리 파라미터에서 page 값 읽기
-  const pageParam = searchParams.get('page') || '1';
-
-  const [currentPage, setCurrentPage] = useState<number>(parseInt(pageParam));
-  const [problemList, setProblemList] = useState<any[]>([]);
-  const itemsPerPage = 12;
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
 
+  const { data: contestProblemListData, refetch } = useQuery({
+    queryKey: ['contestProblemListData'],
+    queryFn: () => getContestProblemListUser(currentPage, contestId),
+  });
+
   useEffect(() => {
-    const generateRandomList = () => {
-      return Array.from({ length: 60 }, (_, i) => {
-        const randomLevel = Math.floor(Math.random() * 3) + 1;
-        const randomSolved = Math.random() > 0.5 ? 'solved' : 'unsolved';
-        const randomSubmission = Math.floor(Math.random() * 100) + 1;
-        const randomAccuracy = Math.floor(Math.random() * 101);
+    router.push(`/student/contest/${contestId}?page=${currentPage}`);
+    refetch();
+  }, [currentPage, router, refetch]);
 
-        return {
-          id: i + 1,
-          name: `피라미드 별찍기${i + 1}`,
-          level: `Lv.${randomLevel}`,
-          solved: randomSolved,
-          submissionCount: randomSubmission,
-          accuracyRate: randomAccuracy,
-        };
-      });
-    };
+  const contestProblemList = contestProblemListData?.data?.data || [];
+  const totalPages = contestProblemListData?.data?.total_count
+    ? Math.ceil(contestProblemListData.data.total_count / 10)
+    : 1;
 
-    setProblemList(generateRandomList());
-  }, []);
-
-  const currentItems = problemList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  const totalPages = Math.ceil(problemList.length / itemsPerPage);
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
   const startPage = (currentBlock - 1) * pagesPerBlock + 1;
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
-  const pages = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i,
-  );
 
-  // 페이지 변경 시 쿼리 스트링으로 page 추가, course 유지
   const changePage = (page: number) => {
     setCurrentPage(page);
-    router.push(`/student/contest/${course}?page=${page}`);
   };
 
-  useEffect(() => {
-    // 쿼리 스트링에서 page 값이 바뀔 때 currentPage 업데이트
-    setCurrentPage(parseInt(pageParam));
-  }, [pageParam]);
+  const changePageBlock = (isNext: boolean) => {
+    const newPage = isNext
+      ? Math.min(endPage + 1, totalPages)
+      : Math.max(startPage - pagesPerBlock, 1);
+    changePage(newPage);
+  };
 
   return (
     <>
@@ -75,29 +60,38 @@ export default function ContestProblemList({ course }: { course: string }) {
             <span className="w-[10%]">제출</span>
             <span className="w-[10%]">정답률</span>
           </div>
-          {currentItems.map((item) => (
-            <Link href={`${pathname}/${item.id}`} key={item.id}>
+          {contestProblemList.map((problemItem: any) => (
+            <Link
+              href={`${pathname}/${problemItem.problem.id}`}
+              key={problemItem.problem.id}
+            >
               <div className="flex justify-between items-center text-sm py-5 px-5 border-b hover:bg-[#eeeff3] cursor-pointer ">
                 <span className="w-[10%] text-green-500 font-bold">
-                  {item.solved === 'solved' ? '✔' : ''}
+                  {/* {item.solved === 'solved' ? '✔' : ''} */}
                 </span>
-                <span className="w-[50%]">{item.name}</span>
+                <span className="w-[50%]">{problemItem.problem.title}</span>
                 <span
                   className={`w-[10%] font-semibold ${
-                    item.level === 'Lv.1'
+                    problemItem.problem.difficulty === 'Low'
                       ? 'text-green-400'
-                      : item.level === 'Lv.2'
+                      : problemItem.problem.difficulty === 'Middle'
                         ? 'text-sky-400'
                         : 'text-rose-400'
                   }`}
                 >
-                  {item.level}
+                  {problemItem.problem.difficulty === 'Low'
+                    ? 'Lv.1'
+                    : problemItem.problem.difficulty === 'Middle'
+                      ? 'Lv.2'
+                      : 'Lv.3'}
                 </span>
                 <span className="w-[10%] flex items-center">
-                  {item.submissionCount}명
+                  {problemItem.problem.submission_number}
                 </span>
                 <span className="w-[10%] flex items-center">
-                  {item.accuracyRate}%
+                  {problemItem.problem.submission_number > 0
+                    ? `${((problemItem.problem.accept_number / problemItem.problem.submission_number) * 100).toFixed(2)}%`
+                    : 'N/A'}
                 </span>
               </div>
             </Link>
@@ -106,22 +100,27 @@ export default function ContestProblemList({ course }: { course: string }) {
         {/* 페이지네이션 */}
         <div className="flex items-center justify-center mt-16 space-x-1">
           <button
-            onClick={() => changePage(Math.max(startPage - pagesPerBlock, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]"
+            onClick={() => changePageBlock(false)}
+            disabled={currentBlock === 1}
+            className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
+            ${currentBlock === 1 ? 'opacity-40' : ''}
+            `}
           >
             &lt;
           </button>
 
           <div className="flex space-x-1 font-normal">
-            {pages.map((page) => (
+            {Array.from(
+              { length: endPage - startPage + 1 },
+              (_, i) => startPage + i,
+            ).map((page) => (
               <button
                 key={page}
                 onClick={() => changePage(page)}
-                className={`shadow-md px-3 py-1 rounded-2xl ${
+                className={`px-3 py-1 rounded-xl transition-all ${
                   page === currentPage
                     ? 'bg-primary text-white hover:bg-primaryButtonHover'
-                    : 'bg-white hover:bg-[#eeeff3]'
+                    : 'bg-gray-200 hover:bg-gray-300'
                 }`}
               >
                 {page}
@@ -130,11 +129,11 @@ export default function ContestProblemList({ course }: { course: string }) {
           </div>
 
           <button
-            onClick={() =>
-              changePage(Math.min(startPage + pagesPerBlock, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]"
+            onClick={() => changePageBlock(true)}
+            disabled={endPage === totalPages}
+            className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
+          ${currentBlock === 1 ? 'opacity-40' : ''}
+          `}
           >
             &gt;
           </button>

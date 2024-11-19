@@ -6,6 +6,7 @@ import { getProblem } from '@/services/problemAdmin/getProblem';
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 import { Viewer } from '@toast-ui/react-editor';
 import { useEffect, useState } from 'react';
+import { formattedDate } from '@/utils/dateFormatter';
 
 export default function ProblemDetail() {
   const pathname = usePathname();
@@ -20,16 +21,6 @@ export default function ProblemDetail() {
 
   const problemData: ProblemData =
     problemInformation?.data || ({} as ProblemData);
-
-  const formattedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
-  };
 
   const [isViewerReady, setIsViewerReady] = useState(false);
 

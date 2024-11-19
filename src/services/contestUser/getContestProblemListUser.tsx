@@ -1,9 +1,9 @@
 import api from '../api';
 
-export const getAllContestAnnouncement = async (id: number) => {
+export const getContestProblemListUser = async (page: number, id: number) => {
   try {
     const response = await api.get(
-      `/admin/contest/${id}/announcement?page_size=all`,
+      `/contest/${id}/problem?${page}&page_size=15`,
     );
     return response.data;
   } catch (error: any) {

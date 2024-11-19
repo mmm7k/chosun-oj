@@ -10,6 +10,7 @@ import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
 import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
 import { deleteCourse } from '@/services/courseAdmin/deleteCourse';
+import { formattedDate } from '@/utils/dateFormatter';
 
 export default function CourseList() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function CourseList() {
     refetch();
   }, [currentPage, router, refetch]);
 
-  const courseList = courseListData?.data?.results || [];
+  const courseList = courseListData?.data?.data || [];
   const totalPages = courseListData?.data?.count
     ? Math.ceil(courseListData.data.count / 10)
     : 1;
@@ -50,16 +51,6 @@ export default function CourseList() {
   const changePage = (page: number) => {
     setCurrentPage(page);
     router.push(`/professor/class/courselist?page=${page}`);
-  };
-
-  const formattedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
   return (

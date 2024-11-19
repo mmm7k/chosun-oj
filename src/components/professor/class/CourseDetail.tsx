@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getCourse } from '@/services/courseAdmin/getCourse';
+import { formattedDate } from '@/utils/dateFormatter';
 
 export default function CourseDetail() {
   const pathname = usePathname();
@@ -17,16 +18,6 @@ export default function CourseDetail() {
   });
 
   const courseData: CourseData = courseInformation?.data || ({} as CourseData);
-
-  const formattedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
-  };
 
   return (
     <div className="flex min-h-screen p-8">

@@ -32,11 +32,14 @@ export default function EnrollClassAnnouncementPage() {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       visible: isVisible,
+      title: '',
+      content: '',
     },
   });
 
@@ -44,6 +47,7 @@ export default function EnrollClassAnnouncementPage() {
     mutationFn: (data) => postClassAnnouncement(classId, data),
     onSuccess: () => {
       message.success('공지가 성공적으로 등록되었습니다.');
+      reset();
       queryClient.invalidateQueries({
         queryKey: ['classAnnouncementsListData', classId],
       });
@@ -77,7 +81,7 @@ export default function EnrollClassAnnouncementPage() {
       queryFn: () => getAllClassAnnouncement(classId),
     });
 
-  const announcements = announcementsListData?.data.results || [];
+  const announcements = announcementsListData?.data?.data || [];
 
   const deleteMutation = useMutation({
     mutationFn: (announcementId: number) =>

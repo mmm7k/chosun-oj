@@ -49,7 +49,7 @@ export default function AssignmentEdit() {
     queryFn: () => getClassList(),
   });
 
-  const classList = classListData?.data?.results || [];
+  const classList = classListData?.data?.data || [];
   const {
     register,
     handleSubmit,

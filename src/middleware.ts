@@ -73,7 +73,9 @@ export async function middleware(req: NextRequest) {
 
   try {
     const response = await fetch(
-      'http://chosuncnl.shop:8000/api/v1/account/profile/',
+      // 'http://chosuncnl.shop:8000/api/v1/account/profile/',
+      'http://chosuncnl.shop:8000/api/v1/account/user/role_type',
+
       {
         method: 'GET',
         headers: {
@@ -95,7 +97,9 @@ export async function middleware(req: NextRequest) {
     }
 
     const userData = await response.json();
-    const role = userData.data.user.admin_type;
+    // const role = userData.data.user.admin_type;
+    const role = userData.data;
+
     console.log('유저 권한:', role);
 
     // /login 또는 /signup 접근 시, 로그인된 유저는 /student로 리다이렉트

@@ -34,11 +34,14 @@ export default function EnrollContestAnnouncementPage() {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       visible: isVisible,
+      title: '',
+      content: '',
     },
   });
 
@@ -46,6 +49,7 @@ export default function EnrollContestAnnouncementPage() {
     mutationFn: (data) => postContestAnnouncement(contestId, data),
     onSuccess: () => {
       message.success('공지가 성공적으로 등록되었습니다.');
+      reset();
       queryClient.invalidateQueries({
         queryKey: ['contestAnnouncementsListData', contestId],
       });

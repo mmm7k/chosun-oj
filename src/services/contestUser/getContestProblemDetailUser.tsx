@@ -1,12 +1,12 @@
 import api from '../api';
 
-export const getContestAnnouncement = async (
+export const getContestProblemDetailUser = async (
   contestId: number,
-  announcementId: number,
+  problemId: number,
 ) => {
   try {
     const response = await api.get(
-      `/admin/contest/${contestId}/announcement/${announcementId}`,
+      `/contest/${contestId}/problem/${problemId}`,
     );
     return response.data;
   } catch (error: any) {

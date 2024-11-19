@@ -12,6 +12,7 @@ import { RiUserAddLine } from 'react-icons/ri';
 import { MdOutlineLibraryAdd } from 'react-icons/md';
 import { getAllAnnouncement } from '@/services/announcementAdmin/getAllAnnouncement';
 import { deleteAnnouncement } from '@/services/announcementAdmin/deleteAnnouncement';
+import { formattedDate } from '@/utils/dateFormatter';
 
 export default function AnnouncementList() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function AnnouncementList() {
     refetch();
   }, [currentPage, router, refetch]);
 
-  const announcementList = announcementListData?.data?.results || [];
+  const announcementList = announcementListData?.data?.data || [];
   const totalPages = announcementListData?.data?.total_count
     ? Math.ceil(announcementListData.data.total_count / 10)
     : 1;
@@ -52,16 +53,6 @@ export default function AnnouncementList() {
       ? Math.min(endPage + 1, totalPages)
       : Math.max(startPage - pagesPerBlock, 1);
     changePage(newPage);
-  };
-
-  const formattedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
   const deleteMutation = useMutation({
