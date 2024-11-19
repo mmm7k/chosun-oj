@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { RiArrowDropDownLine, RiArrowDropUpLine } from 'react-icons/ri';
 import 'highlight.js/styles/github.css';
-import { layouts } from 'chart.js';
 
 const { Option } = Select;
 

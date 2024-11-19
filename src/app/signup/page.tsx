@@ -14,21 +14,20 @@ import {
 } from '@/services/accountUser/signup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { message } from 'antd';
 
 type CheckType = 'username' | 'email' | 'studentNumber';
 
 export default function Signup() {
   const router = useRouter();
-  const [isDuplicateChecked, setIsDuplicateChecked] = useState({
-    username: false,
-    email: false,
-    studentNumber: false,
-  });
-  const [duplicateMessages, setDuplicateMessages] = useState({
-    username: null,
-    email: null,
-    studentNumber: null,
-  });
+  const [isUsernameChecked, setIsUsernameChecked] = useState(false);
+  const [usernameMessage, setUsernameMessage] = useState('');
+
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
+
+  const [isStudentNumberChecked, setIsStudentNumberChecked] = useState(false);
+  const [studentNumberMessage, setStudentNumberMessage] = useState('');
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('아이디를 입력해주세요.'),
@@ -57,12 +56,17 @@ export default function Signup() {
   });
 
   const onSubmit = async (data: any) => {
-    if (
-      !isDuplicateChecked.username ||
-      !isDuplicateChecked.email ||
-      !isDuplicateChecked.studentNumber
-    ) {
-      alert('중복확인은 필수입니다.');
+    if (!isUsernameChecked) {
+      message.error('아이디 중복확인을 해주세요.');
+      return;
+    }
+    if (!isStudentNumberChecked) {
+      message.error('학번 중복확인을 해주세요.');
+      return;
+    }
+
+    if (!isEmailChecked) {
+      message.error('이메일 중복확인을 해주세요.');
       return;
     }
 
@@ -74,10 +78,11 @@ export default function Signup() {
 
     try {
       await registerUser(payload);
-      alert('회원가입이 완료되었습니다.');
+
+      message.success('회원가입이 완료되었습니다.');
       router.push('/');
     } catch (error: any) {
-      alert(error.response?.data?.msg);
+      message.error(error.response?.data?.msg || '회원가입에 실패했습니다.');
     }
   };
 
@@ -87,26 +92,36 @@ export default function Signup() {
       let response: any;
       if (type === 'username') {
         response = await checkUsername(value);
+        setIsUsernameChecked(true);
+        setUsernameMessage(response.message || '사용 가능한 아이디입니다.');
       } else if (type === 'email') {
         response = await checkEmail(value);
+        setIsEmailChecked(true);
+        setEmailMessage(response.message || '사용 가능한 이메일입니다.');
       } else if (type === 'studentNumber') {
         response = await checkStudentNumber(value);
+        setIsStudentNumberChecked(true);
+        setStudentNumberMessage(response.message || '사용 가능한 학번입니다.');
       }
-      // 중복이 아닌 경우
-      setIsDuplicateChecked((prev) => ({ ...prev, [type]: true }));
-      setDuplicateMessages((prev) => ({
-        ...prev,
-        [type]: response.msg,
-      }));
     } catch (error: any) {
-      setDuplicateMessages((prev) => ({
-        ...prev,
-        [type]: error.response?.data?.message || '오류가 발생했습니다.',
-      }));
-      setIsDuplicateChecked((prev) => ({ ...prev, [type]: false }));
+      if (type === 'username') {
+        setIsUsernameChecked(false);
+        setUsernameMessage(
+          error.response?.data?.message || '중복된 아이디입니다.',
+        );
+      } else if (type === 'email') {
+        setIsEmailChecked(false);
+        setEmailMessage(
+          error.response?.data?.message || '중복된 이메일입니다.',
+        );
+      } else if (type === 'studentNumber') {
+        setIsStudentNumberChecked(false);
+        setStudentNumberMessage(
+          error.response?.data?.message || '중복된 학번입니다.',
+        );
+      }
     }
   };
-
   return (
     <>
       <div className="w-screen h-[100dvh] flex ">
@@ -148,20 +163,16 @@ export default function Signup() {
                     중복확인
                   </button>
                 </div>
+                {usernameMessage && (
+                  <p
+                    className={`text-xs pl-2 ${isUsernameChecked ? 'text-blue-500' : 'text-red-500'}`}
+                  >
+                    {usernameMessage}
+                  </p>
+                )}
                 {errors.username && (
                   <p className="text-xs text-red-500 pl-2">
                     {errors.username.message}
-                  </p>
-                )}
-                {duplicateMessages.username && (
-                  <p
-                    className={`text-xs pl-2 ${
-                      duplicateMessages.username === '사용 가능한 아이디입니다.'
-                        ? 'text-blue-500'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {duplicateMessages.username}
                   </p>
                 )}
               </div>
@@ -215,21 +226,18 @@ export default function Signup() {
                     중복확인
                   </button>
                 </div>
+                {studentNumberMessage && (
+                  <p
+                    className={`text-xs pl-2 ${
+                      isStudentNumberChecked ? 'text-blue-500' : 'text-red-500'
+                    }`}
+                  >
+                    {studentNumberMessage}
+                  </p>
+                )}
                 {errors.studentNumber && (
                   <p className="text-xs text-red-500 pl-2">
                     {errors.studentNumber.message}
-                  </p>
-                )}
-                {duplicateMessages.studentNumber && (
-                  <p
-                    className={`text-xs pl-2 ${
-                      duplicateMessages.studentNumber ===
-                      '사용 가능한 학번입니다.'
-                        ? 'text-blue-500'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {duplicateMessages.studentNumber}
                   </p>
                 )}
               </div>
@@ -251,20 +259,18 @@ export default function Signup() {
                     중복확인
                   </button>
                 </div>
+                {emailMessage && (
+                  <p
+                    className={`text-xs pl-2 ${
+                      isEmailChecked ? 'text-blue-500' : 'text-red-500'
+                    }`}
+                  >
+                    {emailMessage}
+                  </p>
+                )}
                 {errors.email && (
                   <p className="text-xs text-red-500 pl-2">
                     {errors.email.message}
-                  </p>
-                )}
-                {duplicateMessages.email && (
-                  <p
-                    className={`text-xs pl-2 ${
-                      duplicateMessages.email === '사용 가능한 이메일입니다.'
-                        ? 'text-blue-500'
-                        : 'text-red-500'
-                    }`}
-                  >
-                    {duplicateMessages.email}
                   </p>
                 )}
               </div>

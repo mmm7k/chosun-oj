@@ -5,10 +5,8 @@ export const checkUsername = async (username: string) => {
     const response = await api.post('/account/check_username/', {
       username,
     });
-    console.log(response);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -18,7 +16,6 @@ export const checkEmail = async (email: string) => {
     const response = await api.post('/account/check_email/', { email });
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -30,7 +27,6 @@ export const checkStudentNumber = async (studentNumber: string) => {
     });
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
@@ -40,7 +36,6 @@ export const registerUser = async (data: any) => {
     const response = await api.post('/account/register/', data);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };
