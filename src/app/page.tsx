@@ -2,14 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { Checkbox } from 'antd';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Noto_Sans_KR } from 'next/font/google';
 import { login } from '@/services/accountUser/login';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';

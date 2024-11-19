@@ -21,7 +21,8 @@ export async function middleware(req: NextRequest) {
 
     if (!response.ok) {
       console.log(`유저 검증 실패: 상태 코드 ${response.status}`);
-      return NextResponse.redirect('http://chosuncnl.shop:4000');
+      // return NextResponse.redirect('http://chosuncnl.shop:4000');
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
     const userData = await response.json();
@@ -32,25 +33,29 @@ export async function middleware(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
     if (pathname.startsWith('/admin') && role !== 'Super Admin') {
-      return NextResponse.redirect('http://chosuncnl.shop:4000');
+      // return NextResponse.redirect('http://chosuncnl.shop:4000');
+      return NextResponse.redirect(new URL('/', req.url));
     }
     if (
       pathname.startsWith('/professor') &&
       !['Professor', 'Super Admin'].includes(role)
     ) {
-      return NextResponse.redirect('http://chosuncnl.shop:4000');
+      // return NextResponse.redirect('http://chosuncnl.shop:4000');
+      return NextResponse.redirect(new URL('/', req.url));
     }
     if (
       pathname.startsWith('/student') &&
       !['Regular User', 'Professor', 'Super Admin'].includes(role)
     ) {
-      return NextResponse.redirect('http://chosuncnl.shop:4000');
+      // return NextResponse.redirect('http://chosuncnl.shop:4000');
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
     console.log('유저 검증 성공');
   } catch (error) {
     console.error('API 요청 실패:', error);
-    return NextResponse.redirect('http://chosuncnl.shop:4000');
+    // return NextResponse.redirect('http://chosuncnl.shop:4000');
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   return NextResponse.next();
