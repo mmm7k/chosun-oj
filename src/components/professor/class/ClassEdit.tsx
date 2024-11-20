@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { message, Select } from 'antd';
 
@@ -39,6 +39,7 @@ export default function ClassEdit() {
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -193,18 +194,22 @@ export default function ClassEdit() {
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="quarter">학기:</label>
-                <Select
-                  {...register('quarter')}
-                  className="ml-3 w-[60%] sm:w-[30%] "
-                  placeholder="학기를 선택해주세요"
-                  value={classInformation?.data.quarter}
-                  onChange={(value) => setValue('quarter', value)}
-                >
-                  <Option value="1학기">1학기</Option>
-                  <Option value="2학기">2학기</Option>
-                  <Option value="동계계절학기">동계계절학기</Option>
-                  <Option value="하계계절학기">하계계절학기</Option>
-                </Select>
+                <Controller
+                  name="quarter"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      className="ml-3 w-[60%] sm:w-[30%] "
+                      placeholder="학기를 선택해주세요"
+                    >
+                      <Option value="1학기">1학기</Option>
+                      <Option value="2학기">2학기</Option>
+                      <Option value="동계계절학기">동계계절학기</Option>
+                      <Option value="하계계절학기">하계계절학기</Option>
+                    </Select>
+                  )}
+                />
               </div>
               {errors.quarter && (
                 <p className="text-xs text-red-500 mt-1">
@@ -217,18 +222,22 @@ export default function ClassEdit() {
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="language">언어:</label>
-                <Select
-                  {...register('language')}
-                  className="ml-3 w-[60%] sm:w-[30%] "
-                  value={classInformation?.data.language}
-                  placeholder="언어를 선택해주세요"
-                  onChange={(value) => setValue('language', value)}
-                >
-                  <Option value="C">C</Option>
-                  <Option value="C++">C++</Option>
-                  <Option value="Java">Java</Option>
-                  <Option value="Python">Python</Option>
-                </Select>
+                <Controller
+                  name="language"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      className="ml-3 w-[60%] sm:w-[30%] "
+                      placeholder="언어를 선택해주세요"
+                    >
+                      <Option value="C">C</Option>
+                      <Option value="C++">C++</Option>
+                      <Option value="Java">Java</Option>
+                      <Option value="Python">Python</Option>
+                    </Select>
+                  )}
+                />
               </div>
               {errors.language && (
                 <p className="text-xs text-red-500 mt-1">

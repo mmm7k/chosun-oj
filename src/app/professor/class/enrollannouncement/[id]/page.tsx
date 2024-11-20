@@ -217,18 +217,18 @@ export default function EnrollClassAnnouncementPage() {
                       className="hover:bg-gray-50"
                       onClick={() => {
                         router.push(
-                          `/professor/class/enrollannouncement/${classId}/${announcement.announcement.id}`,
+                          `/professor/class/enrollannouncement/${classId}/${announcement.id}`,
                         );
                       }}
                     >
                       <td className="px-4 py-2 border-b overflow-hidden text-ellipsis whitespace-nowrap">
-                        {announcement.announcement.title}
+                        {announcement.title}
                       </td>
                       <td className="px-4 py-2 border-b overflow-hidden text-ellipsis whitespace-nowrap">
-                        {announcement.announcement.content}
+                        {announcement.content}
                       </td>
                       <td className="px-4 py-2 border-b overflow-hidden text-ellipsis whitespace-nowrap">
-                        {announcement.announcement.visible ? '공개' : '비공개'}
+                        {announcement.visible ? '공개' : '비공개'}
                       </td>
                       <td className="px-4 py-2 border-b overflow-hidden text-ellipsis whitespace-nowrap  ">
                         <div className="flex items-center space-x-2">
@@ -237,7 +237,7 @@ export default function EnrollClassAnnouncementPage() {
                             onClick={(e) => {
                               e.stopPropagation();
                               router.push(
-                                `/professor/class/enrollannouncement/${classId}/edit/${announcement.announcement.id}`,
+                                `/professor/class/enrollannouncement/${classId}/edit/${announcement.id}`,
                               );
                             }}
                           />
@@ -246,7 +246,7 @@ export default function EnrollClassAnnouncementPage() {
                             className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDelete(announcement.announcement.id);
+                              handleDelete(announcement.id);
                             }}
                           />
                         </div>

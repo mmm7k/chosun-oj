@@ -1,21 +1,11 @@
 'use client';
 
 import { getRank } from '@/services/rankingUser/getRank';
+import { rankColor } from '@/utils/rankColor';
 import { useQuery } from '@tanstack/react-query';
 import { BiSolidAward } from 'react-icons/bi';
 
 export default function Ranking() {
-  // 티어 색상 결정 함수
-  const rankColor = (tier: string) => {
-    if (tier.startsWith('Ruby')) return '#FF1D74'; // 빨간색
-    if (tier.startsWith('Diamond')) return '#21BEFC'; // 청록색
-    if (tier.startsWith('Platinum')) return '#36E3AA'; // 플래티넘 은색
-    if (tier.startsWith('Gold')) return '#FFD700'; // 황금색
-    if (tier.startsWith('Silver')) return '#C0C0C0'; // 은색
-    if (tier.startsWith('Bronze')) return '#AD5600'; // 갈색
-    return '#2D2D2D'; // 청동색
-  };
-
   const { data: rankData } = useQuery({
     queryKey: ['rankData'],
     queryFn: () => getRank(),
@@ -48,27 +38,27 @@ export default function Ranking() {
           <div className="flex w-full mb-3 space-x-5 overflow-x-auto overflow-y-hidden text-sm text-gray-500">
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#FF1D74]" />
-              <span>Ruby 4000+</span>
+              <span>Ruby 3600+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#21BEFC]" />
-              <span>Diamond 3400+</span>
+              <span>Diamond 3000+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#36E3AA]" />
-              <span>Platinum 2800+</span>
+              <span>Platinum 2400+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#FFD700]" />
-              <span>Gold 2200+</span>
+              <span>Gold 2000+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#C0C0C0]" />
-              <span>Silver 1600+</span>
+              <span>Silver 1200+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#AD5600]" />
-              <span>Bronze 1000+</span>
+              <span>Bronze 600+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#2D2D2D]" />

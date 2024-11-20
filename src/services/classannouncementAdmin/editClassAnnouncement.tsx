@@ -7,7 +7,7 @@ export const editClassAnnouncement = async (
 ) => {
   try {
     const response = await api.patch(
-      `/admin/group/${classId}/announcement/${announcementId}/`,
+      `/admin/group/${classId}/announcement/${announcementId}`,
       payload,
     );
     return response.data;

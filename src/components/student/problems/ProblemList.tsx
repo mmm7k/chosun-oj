@@ -184,7 +184,7 @@ export default function ProblemList() {
               <Option value="3">Lv.3</Option>
             </Select>
           </div>
-          <div className="w-full h-9">
+          {/* <div className="w-full h-9">
             <Select
               id="submission-select"
               placeholder="제출 인원"
@@ -209,7 +209,7 @@ export default function ProblemList() {
               <Option value="ascending">정답률 오름차순</Option>
               <Option value="descending">정답률 내림차순</Option>
             </Select>
-          </div>
+          </div> */}
         </section>
         {/* 문제 목록 */}
         <div className="mt-5 text-sm text-gray-500 bg-white border shadow-md rounded-2xl">

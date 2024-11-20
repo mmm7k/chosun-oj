@@ -6,7 +6,7 @@ export const deleteClassAnnouncement = async (
 ) => {
   try {
     const response = await api.delete(
-      `/admin/group/${classId}/announcement/${announcementId}/`,
+      `/admin/group/${classId}/announcement/${announcementId}`,
     );
     return response.data;
   } catch (error: any) {

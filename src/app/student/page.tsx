@@ -23,9 +23,15 @@ import Image from 'next/image';
 import { FaUserGraduate } from 'react-icons/fa6';
 import { RiEdit2Line } from 'react-icons/ri';
 import Link from 'next/link';
-import { getMyInformation, getMyProfile } from '@/services/accountUser/profile';
+import {
+  getMyProfile,
+  getSolveGrass,
+  getSolveLevel,
+  getSolveTag,
+} from '@/services/accountUser/profile';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import { rankColor } from '@/utils/rankColor';
 
 ChartJS.register(
   ArcElement,
@@ -36,48 +42,18 @@ ChartJS.register(
 );
 
 export default function StudentMain() {
-  const [rank, setRank] = useState<string>('');
-
-  const { data: profile } = useQuery({
+  const { data: profileData } = useQuery({
     queryKey: ['profileData'],
     queryFn: getMyProfile,
   });
-  const profileData: ProfileData | null = profile?.data;
-  const userType = profileData?.user.admin_type;
+  const profile: ProfileData | null = profileData?.data;
+  const userType = profile?.user.admin_type;
   const matchingRole: { [key: string]: string } = {
     'Regular User': '학생',
     Professor: '교수',
     'Super Admin': '관리자',
   };
   const role = matchingRole[(userType as string) ?? ''];
-  useEffect(() => {
-    if (profileData) {
-      const calculateRank = () => {
-        const totalScore = profileData.total_score;
-        if (totalScore >= 150) return 'Challenger';
-        if (totalScore >= 125) return 'Grandmaster';
-        if (totalScore >= 100)
-          return `Diamond ${Math.ceil((125 - totalScore) / 5)}`;
-        if (totalScore >= 75)
-          return `Platinum ${Math.ceil((100 - totalScore) / 5)}`;
-        if (totalScore >= 50) return `Gold ${Math.ceil((75 - totalScore) / 5)}`;
-        if (totalScore >= 25)
-          return `Silver ${Math.ceil((50 - totalScore) / 5)}`;
-        return `Bronze ${Math.ceil((25 - totalScore) / 5)}`;
-      };
-      setRank(calculateRank());
-    }
-  }, [profileData]);
-
-  const rankColor = useMemo(() => {
-    if (rank.startsWith('Challenger')) return '#ff0000';
-    if (rank.startsWith('Grandmaster')) return '#ff4500';
-    if (rank.startsWith('Diamond')) return '#00ffff';
-    if (rank.startsWith('Platinum')) return '#00d9ff';
-    if (rank.startsWith('Gold')) return '#FFD700';
-    if (rank.startsWith('Silver')) return '#C0C0C0';
-    return '#cd7f32';
-  }, [rank]);
 
   // 배너 캐러셀 세팅
   const bannerSettings = {
@@ -106,6 +82,15 @@ export default function StudentMain() {
     fade: true,
     waitForAnimate: false,
   };
+
+  //잔디
+  const { data: solveGrassData } = useQuery({
+    queryKey: ['solveGrassData'],
+    queryFn: getSolveGrass,
+  });
+
+  const solveGrass = solveGrassData?.data || [];
+
   // 오늘 날짜 가져오기
   const today = new Date();
 
@@ -113,33 +98,75 @@ export default function StudentMain() {
   const startDate = new Date();
   startDate.setDate(today.getDate() - 90);
 
-  // heatmapData를 90일 전부터 오늘까지 생성
+  const solveGrassaMap = solveGrass.reduce(
+    (
+      map: { [x: string]: any },
+      item: { create_time: string | number; count: any },
+    ) => {
+      map[item.create_time] = item.count; // 날짜를 키로, count를 값으로 매핑
+      return map;
+    },
+    {} as Record<string, number>,
+  );
+
+  // 90일 데이터를 포함한 heatmapData 생성
   const heatmapData = Array.from({ length: 90 }, (_, i) => {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i); // startDate에서 i일 추가
+    const formattedDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+
     return {
-      date: currentDate.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 변환
-      count: Math.floor(Math.random() * 5), // 0에서 4 사이의 랜덤 값 생성
+      date: formattedDate,
+      count: solveGrassaMap[formattedDate] || 0, // API 데이터가 없으면 0으로 설정
     };
   });
 
-  //도넛 차트 데이터
-  const donutData = {
-    labels: ['Lv.1', 'Lv.2', 'Lv.3'],
-    datasets: [
-      {
-        label: '학생 수',
-        data: [17, 5, 13],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-      },
-    ],
-  };
+  //문제 해결 레벨
+  const { data: solveLevelData } = useQuery({
+    queryKey: ['solveLevelData'],
+    queryFn: getSolveLevel,
+  });
+
+  const levelData = solveLevelData?.data?.levels || { Low: 0, Mid: 0, High: 0 };
+
+  // 도넛 차트 데이터 생성
+  const donutData = useMemo(() => {
+    const data = [levelData.Low ?? 0, levelData.Mid ?? 0, levelData.High ?? 0];
+
+    // 모든 데이터가 0인지 확인
+    const isAllZero = data.every((value) => value === 0);
+
+    // 데이터가 모두 0인 경우 최소값 추가
+    const adjustedData = isAllZero ? data.map(() => 0.01) : data;
+
+    return {
+      labels: ['Lv.1', 'Lv.2', 'Lv.3'], // 항상 동일한 레이블 사용
+      datasets: [
+        {
+          label: '학생 수',
+          data: adjustedData, // 최소값이 적용된 데이터 사용
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+        },
+      ],
+    };
+  }, [levelData]);
 
   // 도넛 차트 옵션
   const donutOptions = {
     maintainAspectRatio: false,
     responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          // 툴팁에서 값이 0.01일 경우 "0"으로 표시
+          label: (tooltipItem: any) => {
+            const value = tooltipItem.raw;
+            return `${tooltipItem.label}: ${value <= 0.01 ? 0 : value}`;
+          },
+        },
+      },
+    },
   };
 
   // 전체 합계 계산
@@ -153,29 +180,82 @@ export default function StudentMain() {
     return ((value / total) * 100).toFixed(1); // 소수점 1자리까지 계산
   };
 
-  // 레이다 차트 데이터
-  const radarData = {
-    labels: [
-      'implementation',
-      'greedy',
-      'string',
-      'data_structures',
-      'graphs',
-      'dp',
-    ],
-    datasets: [
-      {
-        data: [15, 18, 4, 7, 8, 17],
-        fill: true,
-        backgroundColor: 'rgba(255,99,132,0.2)',
-        borderColor: 'rgba(255,99,132,1)',
-        pointBackgroundColor: 'rgba(255,99,132,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(255,99,132,1)',
-      },
-    ],
-  };
+  // 가장 많이 푼 레벨
+  const highestLevel = useMemo(() => {
+    const maxIndex = donutData.datasets[0].data.indexOf(
+      Math.max(...donutData.datasets[0].data),
+    );
+    return donutData.labels[maxIndex];
+  }, [donutData]);
+
+  // solveTagData를 기반으로 레이다 차트 데이터 생성
+  const { data: solveTagData } = useQuery({
+    queryKey: ['solveTagData'],
+    queryFn: getSolveTag,
+  });
+
+  // 전체 태그 리스트
+  const allTags = [
+    '변수',
+    '데이터 타입',
+    '연산자',
+    '조건문',
+    '반복문',
+    '배열',
+    '함수',
+    '포인터',
+    '문자열',
+    '구조체',
+    '버퍼',
+    '파일',
+    '클래스',
+    '정렬 알고리즘',
+    '탐색 알고리즘',
+    '동적 프로그래밍',
+    '탐욕 알고리즘',
+    '순회 알고리즘',
+    '분할 정복 알고리즘',
+    '백트래킹 알고리즘',
+  ];
+
+  // 태그 데이터를 매핑하고 기본값 처리
+  const tagDataMap = solveTagData?.data?.tags || {}; // 정확한 데이터 참조
+
+  // 모든 태그 데이터를 기반으로 기본값 포함 데이터 생성
+  const allTagData = allTags.map((tag) => ({
+    label: tag,
+    count: Number(tagDataMap[tag]) || 0, // 데이터가 없으면 0으로 처리
+  }));
+
+  // 상위 6개의 태그 데이터 추출
+  const top6Tags = useMemo(() => {
+    // 데이터 값을 기준으로 정렬하여 상위 6개 추출
+    return allTagData.sort((a, b) => b.count - a.count).slice(0, 6);
+  }, [allTagData]);
+
+  // 상위 3개의 태그 데이터 추출
+  const top3Tags = useMemo(() => top6Tags.slice(0, 3), [top6Tags]);
+
+  // 레이다 차트 데이터 생성
+  const radarData = useMemo(() => {
+    return {
+      labels: top6Tags.map((tag) => tag.label), // 상위 6개 태그의 이름만 추출
+      datasets: [
+        {
+          label: '알고리즘 분포',
+          data: top6Tags.map((tag) => tag.count), // 상위 6개 태그의 데이터만 추출
+          fill: true,
+          backgroundColor: 'rgba(255,99,132,0.2)',
+          borderColor: 'rgba(255,99,132,1)',
+          pointBackgroundColor: 'rgba(255,99,132,1)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(255,99,132,1)',
+        },
+      ],
+    };
+  }, [top6Tags]);
+
   // 레이다 차트 옵션
   const radarOptions = {
     maintainAspectRatio: false,
@@ -186,7 +266,7 @@ export default function StudentMain() {
           display: false,
         },
         suggestedMin: 0,
-        suggestedMax: 20,
+        suggestedMax: Math.max(...(radarData.datasets[0]?.data || []), 10),
         ticks: {
           display: false,
         },
@@ -194,40 +274,19 @@ export default function StudentMain() {
     },
   };
 
-  // 전체 합계 계산
-  const totalTag = radarData.datasets[0].data.reduce(
-    (acc, value) => acc + value,
-    0,
-  );
-
-  // 상위 3개의 태그와 데이터 가져오기
-  const topTags = useMemo(() => {
-    const tagData = radarData.labels.map((label, index) => ({
-      label,
-      count: radarData.datasets[0].data[index],
-    }));
-
-    // 데이터 값을 기준으로 정렬하여 상위 3개 추출
-    return tagData.sort((a, b) => b.count - a.count).slice(0, 3);
-  }, [radarData]);
-
   // 퍼센트 계산 함수
   const calculateTagPercentage = (value: number) => {
-    return ((value / totalTag) * 100).toFixed(1); // 소수점 1자리까지 계산
+    const total =
+      radarData.datasets[0]?.data.reduce((acc, val) => acc + val, 0) || 0;
+    return total === 0 ? '0.0' : ((value / total) * 100).toFixed(1); // 소수점 1자리까지 계산
   };
 
-  const highestLevel = useMemo(() => {
-    const maxIndex = donutData.datasets[0].data.indexOf(
-      Math.max(...donutData.datasets[0].data),
-    );
-    return donutData.labels[maxIndex];
-  }, [donutData]);
-
+  // 가장 많이 해결한 태그
   const mostSolvedTag = useMemo(() => {
-    const maxIndex = radarData.datasets[0].data.indexOf(
-      Math.max(...radarData.datasets[0].data),
+    const maxIndex = radarData.datasets[0]?.data.indexOf(
+      Math.max(...(radarData.datasets[0]?.data || [])),
     );
-    return radarData.labels[maxIndex];
+    return radarData.labels[maxIndex] || 'N/A'; // 데이터가 없을 경우 기본값 반환
   }, [radarData]);
 
   return (
@@ -329,17 +388,15 @@ export default function StudentMain() {
             <RiEdit2Line className="absolute right-4 top-4 text-2xl cursor-pointer" />
           </Link>
           <FaUserGraduate className="text-primary text-[4rem] mb-2" />
-          <span className="text-xl font-semibold">
-            {profileData?.user?.name}
-          </span>
+          <span className="text-xl font-semibold">{profile?.user?.name}</span>
           <span className="text-lg ">{role}</span>
           <div>
             <span className="font-semibold">Major : </span>
-            {profileData?.major ?? ''}
+            {profile?.major ?? ''}
           </div>
           <div>
             <span className="font-semibold">학번 : </span>
-            {profileData?.user?.student_number}
+            {profile?.user?.student_number}
           </div>
         </div>
         {/* 오른쪽 섹션 랭크,잔디 */}
@@ -348,17 +405,17 @@ export default function StudentMain() {
           <div className="flex flex-col items-center flex-1 sm:flex-row ">
             <BiSolidAward
               className={`text-[11rem] sm:text-[8rem]  lg:text-[9rem] xl:text-[10rem] 2xl:text-[11rem] animate-pulse mb-5 sm:mb-0`}
-              style={{ color: rankColor }}
+              style={{ color: rankColor(profile?.rank ?? '') }}
             />
             <div className="flex flex-col items-start justify-center mb-5 ml-0 space-y-3 text-gray-600 sm:ml-0 lg:ml-3 sm:mb-0">
               <span className="font-semibold lg:text-lg 2xl:text-xl">
                 <span>Rank : </span>
-                <span className="text-gray-900 ">{rank}</span>
+                <span className="text-gray-900 ">{profile?.rank}</span>
               </span>
               <div className="text-xs lg:text-base">
                 <span> 🏃‍♀️ Total Score: </span>
                 <span className="font-semibold text-gray-900">
-                  {profileData?.total_score}
+                  {profile?.total_score}
                 </span>
               </div>
               <div className="text-xs lg:text-base">
@@ -432,9 +489,16 @@ export default function StudentMain() {
             {/* Lv.1 */}
             <div className="flex justify-between pl-[5%] pr-[25%] relative">
               <span className="text-[#FF6384] font-semibold">Lv.1</span>
-              <span>{donutData.datasets[0].data[0]}</span>
+              <span>
+                {donutData.datasets[0].data[0] <= 0.01
+                  ? 0
+                  : donutData.datasets[0].data[0]}
+              </span>
               <span className="absolute right-0 text-gray-400">
-                {calculatePercentage(donutData.datasets[0].data[0])}%
+                {donutData.datasets[0].data[0] <= 0.01
+                  ? '0.0'
+                  : calculatePercentage(donutData.datasets[0].data[0])}
+                %
               </span>
             </div>
             <hr className="w-full my-2 border-gray-300 border-b-1" />
@@ -442,9 +506,16 @@ export default function StudentMain() {
             {/* Lv.2 */}
             <div className="flex justify-between pl-[5%] pr-[25%] relative">
               <span className="text-[#36A2EB] font-semibold">Lv.2</span>
-              <span>{donutData.datasets[0].data[1]}</span>
+              <span>
+                {donutData.datasets[0].data[1] <= 0.01
+                  ? 0
+                  : donutData.datasets[0].data[1]}
+              </span>
               <span className="absolute right-0 text-gray-400">
-                {calculatePercentage(donutData.datasets[0].data[1])}%
+                {donutData.datasets[0].data[1] <= 0.01
+                  ? '0.0'
+                  : calculatePercentage(donutData.datasets[0].data[1])}
+                %
               </span>
             </div>
             <hr className="w-full my-2 border-gray-300 border-b-1" />
@@ -452,9 +523,16 @@ export default function StudentMain() {
             {/* Lv.3 */}
             <div className="flex justify-between pl-[5%] pr-[25%] relative">
               <span className="text-[#FFCE56] font-semibold">Lv.3</span>
-              <span>{donutData.datasets[0].data[2]}</span>
+              <span>
+                {donutData.datasets[0].data[2] <= 0.01
+                  ? 0
+                  : donutData.datasets[0].data[2]}
+              </span>
               <span className="absolute right-0 text-gray-400">
-                {calculatePercentage(donutData.datasets[0].data[2])}%
+                {donutData.datasets[0].data[2] <= 0.01
+                  ? '0.0'
+                  : calculatePercentage(donutData.datasets[0].data[2])}
+                %
               </span>
             </div>
             <hr className="w-full my-2 border-gray-300 border-b-1" />
@@ -482,29 +560,29 @@ export default function StudentMain() {
 
             {/* 가장 많이 푼 #1 태그 */}
             <div className="flex justify-between pl-[5%] pr-[25%] relative">
-              <span className="text-secondary">#{topTags[0].label}</span>
-              <span>{topTags[0].count}</span>
+              <span className="text-secondary">#{top3Tags[0].label}</span>
+              <span>{top3Tags[0].count}</span>
               <span className="absolute right-0 text-gray-400">
-                {calculateTagPercentage(topTags[0].count)}%
+                {calculateTagPercentage(top3Tags[0].count)}%
               </span>
             </div>
             <hr className="w-full my-2 border-gray-300 border-b-1" />
 
             {/* 가장 많이 푼 #2 태그 */}
             <div className="flex justify-between pl-[5%] pr-[25%] relative">
-              <span className="text-secondary">#{topTags[1].label}</span>
-              <span>{topTags[1].count}</span>
+              <span className="text-secondary">#{top3Tags[1].label}</span>
+              <span>{top3Tags[1].count}</span>
               <span className="absolute right-0 text-gray-400">
-                {calculateTagPercentage(topTags[1].count)}%
+                {calculateTagPercentage(top3Tags[1].count)}%
               </span>
             </div>
             <hr className="w-full my-2 border-gray-300 border-b-1" />
             {/* 가장 많이 푼 #3 태그 */}
             <div className="flex justify-between pl-[5%] pr-[25%] relative">
-              <span className="text-secondary">#{topTags[2].label}</span>
-              <span>{topTags[2].count}</span>
+              <span className="text-secondary">#{top3Tags[2].label}</span>
+              <span>{top3Tags[2].count}</span>
               <span className="absolute right-0 text-gray-400">
-                {calculateTagPercentage(topTags[2].count)}%
+                {calculateTagPercentage(top3Tags[2].count)}%
               </span>
             </div>
             <hr className="w-full my-2 border-gray-300 border-b-1" />

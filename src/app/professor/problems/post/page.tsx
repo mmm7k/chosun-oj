@@ -31,6 +31,7 @@ export default function ProblemPost() {
   };
 
   const problemTags = [
+    '변수',
     '데이터 타입',
     '연산자',
     '조건문',
@@ -43,14 +44,13 @@ export default function ProblemPost() {
     '버퍼',
     '파일',
     '클래스',
-    '정렬',
-    '탐색',
-    '동적',
-    '그래프',
-    '탐욕',
-    '순회',
-    '분할 정복',
-    '백트래킹',
+    '정렬 알고리즘',
+    '탐색 알고리즘',
+    '동적 프로그래밍',
+    '탐욕 알고리즘',
+    '순회 알고리즘',
+    '분할 정복 알고리즘',
+    '백트래킹 알고리즘',
   ];
 
   const schema = Yup.object().shape({

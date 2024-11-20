@@ -11,4 +11,5 @@ interface ProfileData {
     name: string;
     admin_type: string;
   };
+  rank: string;
 }

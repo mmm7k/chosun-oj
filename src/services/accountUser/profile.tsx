@@ -26,3 +26,30 @@ export const modifyInfo = async (payload: ModifyInfoPayload) => {
     throw error;
   }
 };
+
+export const getSolveGrass = async () => {
+  try {
+    const response = await api.get('/account/profile/solve_grass');
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getSolveLevel = async () => {
+  try {
+    const response = await api.get('/account/profile/solve_level');
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getSolveTag = async () => {
+  try {
+    const response = await api.get('/account/profile/solve_tag');
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
