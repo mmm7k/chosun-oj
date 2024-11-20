@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import Image from 'next/image';
 import Split from 'react-split';
@@ -28,10 +28,10 @@ const codeTemplate = {
   java: `public class Solution {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`,
 };
 
-const languageMap = {
+const languageMap: { [key: string]: string } = {
   C: 'c',
   'C++': 'cpp',
-  Python: 'python',
+  Python3: 'python',
   Java: 'java',
 };
 
@@ -50,7 +50,7 @@ export default function Problem({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>('C');
-  const languageOptions = ['C', 'C++', 'Java', 'Python'];
+  const languageOptions = ['C', 'C++', 'Java', 'Python3'];
   // 제출내역 예시 코드
   const [isCodeVisible, setIsCodeVisible] = useState(false);
   const [isCodeVisible2, setIsCodeVisible2] = useState(false);
@@ -61,11 +61,16 @@ let t = s.split(" ");
 return Math.min(...t) + " " + Math.max(...t);
 }`;
 
-  const { data: contestProblemData } = useQuery({
+  console.log(code);
+  const { data: contestProblemData, isError } = useQuery({
     queryKey: ['contestProblemData', contestId, problemId],
     queryFn: () => getContestProblemDetailUser(contestId, problemId),
   });
 
+  if (isError) {
+    alert('문제를 불러오는 중 오류가 발생했습니다.');
+    router.push('/student');
+  }
   const problemData = contestProblemData?.data?.problem || {};
   const [isViewerReady, setIsViewerReady] = useState(false);
 
@@ -74,6 +79,10 @@ return Math.min(...t) + " " + Math.max(...t);
       setIsViewerReady(true);
     }
   }, [problemData.description]);
+  // 불러온 사용 언어에서 셀렉트 옵션 생성
+  const availableLanguages = useMemo(() => {
+    return problemData.languages || []; // problemData.languages 그대로 사용
+  }, [problemData.languages]);
 
   //코드실행
   const runcode = async () => {
@@ -87,7 +96,7 @@ return Math.min(...t) + " " + Math.max(...t);
       case 'C++':
         language = '54';
         break;
-      case 'Python':
+      case 'Python3':
         language = '71';
         break;
       case 'Java':
@@ -149,7 +158,7 @@ return Math.min(...t) + " " + Math.max(...t);
       case 'C++':
         setCode(codeTemplate.cpp);
         break;
-      case 'Python':
+      case 'Python3':
         setCode(codeTemplate.python);
         break;
       case 'Java':
@@ -169,7 +178,7 @@ return Math.min(...t) + " " + Math.max(...t);
       case 'C++':
         setCode(codeTemplate.cpp);
         break;
-      case 'Python':
+      case 'Python3':
         setCode(codeTemplate.python);
         break;
       case 'Java':
@@ -255,7 +264,12 @@ return Math.min(...t) + " " + Math.max(...t);
             onChange={handleLanguageChange}
             className="w-24"
           >
-            {languageOptions.map((language) => (
+            {/* {languageOptions.map((language) => (
+              <Option key={language} value={language}>
+                {language}
+              </Option>
+            ))} */}
+            {availableLanguages.map((language: string) => (
               <Option key={language} value={language}>
                 {language}
               </Option>
@@ -277,13 +291,16 @@ return Math.min(...t) + " " + Math.max(...t);
                 />
                 <hr className="border-[1px] border-gray-200" />
                 <h1 className="font-semibold">제한 사항</h1>
-                <p className="text-sm">
-                  메모리 제한: {problemData.memory_limit}mb
-                </p>
-                <p className="text-sm">시간 제한: {problemData.time_limit}ms</p>
-                <p className="text-sm">
-                  사용 언어: {problemData.languages.join(', ')}
-                </p>
+
+                <pre className="text-xs bg-gray-300 rounded-md p-3">
+                  <code>
+                    메모리 제한: {problemData.memory_limit}MB
+                    <br />
+                    시간 제한: {problemData.time_limit}ms
+                    <br />
+                    사용 언어: {problemData.languages.join(', ')}
+                  </code>
+                </pre>
               </div>
             ) : (
               <div className="w-full h-full p-3">

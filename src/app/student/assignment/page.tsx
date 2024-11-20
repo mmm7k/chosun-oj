@@ -5,7 +5,7 @@ import { AiOutlineCodeSandbox } from 'react-icons/ai';
 
 export default function AssignmentSelectClass() {
   return (
-    <div className="bg-[#f0f4fc]   font-semibold flex justify-center items-center py-[10dvh] md:py-[20dvh]  ">
+    <div className="bg-[#f0f4fc] min-h-screen  font-semibold flex justify-center items-center py-[10dvh] md:py-[20dvh]  ">
       <section className="flex flex-col md:flex-row justify-center md:space-x-16 space-y-14 md:space-y-0 mb-[4rem]">
         <Link href="/student/assignment/기초 프로그래밍?chapter=1">
           <div className="cursor-pointer bg-white shadow-xl rounded-3xl py-16 md:py-20 px-24 md:px-14 border-[3px] border-transparent hover:border-blue-400 transition-all">
