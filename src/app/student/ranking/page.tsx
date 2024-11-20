@@ -1,42 +1,27 @@
 'use client';
 
+import { getRank } from '@/services/rankingUser/getRank';
+import { useQuery } from '@tanstack/react-query';
 import { BiSolidAward } from 'react-icons/bi';
 
 export default function Ranking() {
-  // 포인트에 따른 티어 결정 함수
-  const getTier = (points: number) => {
-    if (points >= 5000) return 'Challenger';
-    if (points >= 4000) return 'Grandmaster';
-    if (points >= 3000) return `Diamond ${Math.ceil((4000 - points) / 500)}`;
-    if (points >= 2000) return `Platinum ${Math.ceil((3000 - points) / 500)}`;
-    if (points >= 1500) return 'Gold';
-    if (points >= 1000) return 'Silver';
-    return 'Bronze';
-  };
-
-  // 50명의 사용자 생성 및 누적 포인트 순으로 정렬
-  const users = Array.from({ length: 50 }, (_, i) => {
-    const points = Math.floor(Math.random() * 5000) + 1000; // 1000 ~ 6000 포인트 생성
-    const tier = getTier(points); // 포인트에 따라 티어 결정
-    return {
-      rank: i + 1,
-      tier,
-      username: `User_${i + 1}`,
-      points,
-    };
-  }).sort((a, b) => b.points - a.points); // 포인트 순으로 정렬 (내림차순)
-
   // 티어 색상 결정 함수
   const rankColor = (tier: string) => {
-    if (tier.startsWith('Challenger')) return '#ff0000'; // 빨간색
-    if (tier.startsWith('Grandmaster')) return '#ff4500'; // 주황색
-    if (tier.startsWith('Diamond')) return '#00ffff'; // 청록색
-    if (tier.startsWith('Platinum')) return '#00d9ff'; // 플래티넘 은색
+    if (tier.startsWith('Ruby')) return '#FF1D74'; // 빨간색
+    if (tier.startsWith('Diamond')) return '#21BEFC'; // 청록색
+    if (tier.startsWith('Platinum')) return '#36E3AA'; // 플래티넘 은색
     if (tier.startsWith('Gold')) return '#FFD700'; // 황금색
     if (tier.startsWith('Silver')) return '#C0C0C0'; // 은색
-    return '#cd7f32'; // 청동색
+    if (tier.startsWith('Bronze')) return '#AD5600'; // 갈색
+    return '#2D2D2D'; // 청동색
   };
 
+  const { data: rankData } = useQuery({
+    queryKey: ['rankData'],
+    queryFn: () => getRank(),
+  });
+
+  const ranking = rankData?.data || [];
   return (
     <>
       <section className="w-screen h-44 bg-gradient-to-r from-[#9face6] to-[#74ebd5]">
@@ -58,36 +43,36 @@ export default function Ranking() {
           </div>
         </div>
       </section>
-      <div className="bg-[#f0f4fc] w-full flex items-center justify-center">
+      <div className="bg-[#f0f4fc] min-h-screen w-full flex r justify-center">
         <div className="w-[90%] lg:w-[62%] pt-12 mb-44">
           <div className="flex w-full mb-3 space-x-5 overflow-x-auto overflow-y-hidden text-sm text-gray-500">
             <div className="flex items-center">
-              <BiSolidAward className="text-[1.5rem] text-[#ff0000]" />
-              <span>Challenger 5000+</span>
+              <BiSolidAward className="text-[1.5rem] text-[#FF1D74]" />
+              <span>Ruby 4000+</span>
             </div>
             <div className="flex items-center">
-              <BiSolidAward className="text-[1.5rem] text-[#ff4500]" />
-              <span>Grandmaster 4000+</span>
+              <BiSolidAward className="text-[1.5rem] text-[#21BEFC]" />
+              <span>Diamond 3400+</span>
             </div>
             <div className="flex items-center">
-              <BiSolidAward className="text-[1.5rem] text-[#00ffff]" />
-              <span>Diamond 3000+</span>
-            </div>
-            <div className="flex items-center">
-              <BiSolidAward className="text-[1.5rem] text-[#00d9ff]" />
-              <span>Platinum 2000+</span>
+              <BiSolidAward className="text-[1.5rem] text-[#36E3AA]" />
+              <span>Platinum 2800+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#FFD700]" />
-              <span>Gold 1500+</span>
+              <span>Gold 2200+</span>
             </div>
             <div className="flex items-center">
               <BiSolidAward className="text-[1.5rem] text-[#C0C0C0]" />
-              <span>Silver 1000+</span>
+              <span>Silver 1600+</span>
             </div>
             <div className="flex items-center">
-              <BiSolidAward className="text-[1.5rem] text-[#cd7f32]" />
-              <span>Bronze</span>
+              <BiSolidAward className="text-[1.5rem] text-[#AD5600]" />
+              <span>Bronze 1000+</span>
+            </div>
+            <div className="flex items-center">
+              <BiSolidAward className="text-[1.5rem] text-[#2D2D2D]" />
+              <span>Unranked</span>
             </div>
           </div>
           <table
@@ -111,11 +96,11 @@ export default function Ranking() {
               </tr>
             </thead>
             <tbody className="text-sm text-gray-500">
-              {users.map((user, index) => (
+              {ranking.map((user: RankingUser, index: number) => (
                 <tr key={user.username} className="shadow-sm hover:bg-gray-50">
                   <td
                     className="p-4 border-l-[5px] "
-                    style={{ borderColor: rankColor(user.tier) }}
+                    style={{ borderColor: rankColor(user.rank) }}
                   >
                     {index + 1}
                   </td>
@@ -123,13 +108,13 @@ export default function Ranking() {
                     <div className="flex items-center justify-center gap-2">
                       <BiSolidAward
                         className="text-[2rem]"
-                        style={{ color: rankColor(user.tier) }}
+                        style={{ color: rankColor(user.rank) }}
                       />
-                      <span>{user.tier}</span>
+                      <span>{user.rank}</span>
                     </div>
                   </td>
                   <td className="p-4">{user.username}</td>
-                  <td className="p-4">{user.points}</td>
+                  <td className="p-4">{user.total_score}</td>
                 </tr>
               ))}
             </tbody>

@@ -25,7 +25,7 @@ export default function Contest({ params }: { params: { contestid: string } }) {
           endDate={contest.end_time}
         />
       </Suspense>
-      <div className="bg-[#f0f4fc] w-full flex items-center justify-center">
+      <div className="bg-[#f0f4fc] min-h-screen w-full flex  justify-center">
         <div className="w-[90%] lg:w-[62%] pt-12 mb-44">
           <ContestAnnouncement contestId={contestId} />
           <ContestProblemList contestId={contestId} />
