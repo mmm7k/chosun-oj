@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { message, Select } from 'antd';
+import { getCourseList } from '@/services/classAdmin/getCourseList';
 
 const { Option } = Select;
 
@@ -24,11 +25,17 @@ export default function ClassEdit() {
     enabled: !!classId, // classId가 존재할 때만 쿼리 실행
   });
 
+  const { data: courseListData } = useQuery({
+    queryKey: ['courseListData'],
+    queryFn: () => getCourseList(),
+  });
+
+  const courseList = courseListData?.data?.data || [];
   const validationSchema = Yup.object().shape({
     group_name: Yup.string().required('분반 이름을 입력해주세요.'),
     description: Yup.string().required('분반 정보를 입력해주세요.'),
     short_description: Yup.string().required('분반 설명을 입력해주세요.'),
-    course: Yup.number().required('과목 코드를 입력해주세요.'),
+    course: Yup.number().required('강의 코드를 입력해주세요.'),
     year: Yup.number().required('개설년도를 입력해주세요.'),
     quarter: Yup.string().required('학기를 선택해주세요.'),
     language: Yup.string().required('분반에 사용될 언어를 선택해주세요.'),
@@ -146,19 +153,28 @@ export default function ClassEdit() {
               )}
             </div>
 
-            {/* 과목 코드 */}
+            {/* 강의*/}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="course-code">과목 코드:</label>
-                <input
-                  {...register('course')}
-                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                  id="course-code"
-                  type="number"
-                  placeholder="과목 코드를 입력해주세요"
-                  style={{
-                    MozAppearance: 'textfield',
-                  }}
+                <label htmlFor="course-code">강의:</label>
+                <Controller
+                  name="course"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      className="ml-3 w-[60%] sm:w-[30%] "
+                      placeholder="강의를 선택해주세요"
+                    >
+                      {courseList.map(
+                        (course: { code: number; title: string }) => (
+                          <Option key={course.code} value={course.code}>
+                            {course.code} - {course.title}
+                          </Option>
+                        ),
+                      )}
+                    </Select>
+                  )}
                 />
               </div>
               {errors.course && (

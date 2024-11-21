@@ -117,13 +117,7 @@ export default function ContestProblemList({
                       {problemItem.problem.submission_number}
                     </span>
                     <span className="w-[10%] flex items-center">
-                      {problemItem.problem.submission_number > 0
-                        ? `${(
-                            (problemItem.problem.accept_number /
-                              problemItem.problem.submission_number) *
-                            100
-                          ).toFixed(2)}%`
-                        : 'N/A'}
+                      {problemItem.problem.accuracy}%
                     </span>
                   </div>
                 </Link>

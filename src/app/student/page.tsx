@@ -112,7 +112,7 @@ export default function StudentMain() {
   // 90일 데이터를 포함한 heatmapData 생성
   const heatmapData = Array.from({ length: 90 }, (_, i) => {
     const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() + i); // startDate에서 i일 추가
+    currentDate.setDate(startDate.getDate() + i + 1); // startDate에서 i일 추가
     const formattedDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
 
     return {

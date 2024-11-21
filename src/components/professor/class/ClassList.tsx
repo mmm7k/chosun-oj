@@ -133,7 +133,7 @@ export default function ClassList() {
             >
               <thead>
                 <tr className="border-b-2">
-                  <th className="p-4">과목코드</th>
+                  <th className="p-4">강의코드</th>
                   <th className="p-4">강의명</th>
                   <th className="p-4">분반명</th>
                   <th className="p-4">년도</th>

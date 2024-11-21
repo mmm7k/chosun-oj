@@ -448,9 +448,9 @@ export default function ProblemPost() {
                       placeholder="문제 난이도를 선택하세요."
                       className="w-[60%] sm:w-[20%] h-8"
                     >
-                      <Option value="Low">Low</Option>
-                      <Option value="Mid">Mid</Option>
-                      <Option value="High">High</Option>
+                      <Option value="Low">Lv.1</Option>
+                      <Option value="Mid">Lv.2</Option>
+                      <Option value="High">Lv.3</Option>
                     </Select>
                   )}
                 />

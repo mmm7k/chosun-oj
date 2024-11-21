@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import Image from 'next/image';
 import Split from 'react-split';
-import { Spin } from 'antd';
+import { message, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import 'xterm/css/xterm.css';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -14,10 +14,12 @@ import 'highlight.js/styles/github.css';
 import { Select } from 'antd';
 import axios from 'axios';
 import { Buffer } from 'buffer';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getContestProblemDetailUser } from '@/services/contestUser/getContestProblemDetailUser';
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 import { Viewer } from '@toast-ui/react-editor';
+import { postSubmitProblem } from '@/services/problemUser/postSubmitProblem';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const { Option } = Select;
 
@@ -42,15 +44,18 @@ export default function Problem({
 }) {
   const contestId = parseInt(params.contestid);
   const problemId = parseInt(params.problemid);
-  const [code, setCode] = useState(codeTemplate.c);
+  const [code, setCode] = useState('언어를 선택해주세요.');
   const [output, setOutput] = useState('실행 결과가 표시됩니다.');
   const [isLoading, setIsLoading] = useState(false);
   const [isLeftVisible, setIsLeftVisible] = useState(true);
   const router = useRouter();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<string | null>('C');
-  const languageOptions = ['C', 'C++', 'Java', 'Python3'];
+  // const [selectedLanguage, setSelectedLanguage] = useState<string | null>('C');
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const [submitResult, setSubmitResult] = useState('');
+  // const languageOptions = ['C', 'C++', 'Java', 'Python3'];
   // 제출내역 예시 코드
   const [isCodeVisible, setIsCodeVisible] = useState(false);
   const [isCodeVisible2, setIsCodeVisible2] = useState(false);
@@ -61,7 +66,6 @@ let t = s.split(" ");
 return Math.min(...t) + " " + Math.max(...t);
 }`;
 
-  console.log(code);
   const { data: contestProblemData, isError } = useQuery({
     queryKey: ['contestProblemData', contestId, problemId],
     queryFn: () => getContestProblemDetailUser(contestId, problemId),
@@ -148,6 +152,45 @@ return Math.min(...t) + " " + Math.max(...t);
     }
   };
 
+  // 제출 서브미션
+  const mutation = useMutation({
+    mutationFn: (data: any) => postSubmitProblem(problemId, data),
+    onMutate: () => {
+      setIsSubmitLoading(true);
+    },
+    onSuccess: (data) => {
+      setSubmitResult(data?.data?.result === 0 ? '정답입니다.' : '오답입니다.');
+
+      setIsModalVisible(true); // 모달 열기
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        setIsLoading(false);
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        setIsLoading(false);
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+    onSettled: () => {
+      setIsSubmitLoading(false);
+    },
+  });
+
+  const onSubmit = () => {
+    if (!selectedLanguage) {
+      message.error('언어를 선택해주세요.');
+      return;
+    }
+
+    const formattedData = {
+      code: code,
+      language: selectedLanguage,
+    };
+
+    mutation.mutate(formattedData);
+  };
   // 언어 선택 핸들러 함수
   const handleLanguageChange = (value: string) => {
     setSelectedLanguage(value);
@@ -522,7 +565,7 @@ return Math.min(...t) + " " + Math.max(...t);
           </button>
           <button
             className="bg-[#002a87] text-white px-4 py-2 rounded-md hover:bg-[#00226e] transition"
-            onClick={toggleModal}
+            onClick={onSubmit}
           >
             제출 후 채점하기
           </button>
@@ -534,25 +577,35 @@ return Math.min(...t) + " " + Math.max(...t);
       {isModalVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* 배경 어둡게 만들기 */}
-          <div className="fixed inset-0 bg-black opacity-70"></div>
+          <div className="fixed inset-0 bg-black opacity-50"></div>
           {/* 모달 */}
           <div className="bg-white p-8 rounded-md shadow-lg z-50 w-[24rem] mx-auto">
-            <h1 className="mb-8 text-xl font-semibold ">정답입니다!</h1>
+            <div className="text-gray-800 mb-8 font-semibold">
+              {submitResult}
+            </div>
             <div className="flex justify-end gap-4">
               <button
-                className="px-4 py-2 mt-4 text-white transition bg-gray-300 rounded-md hover:bg-gray-400"
+                className="px-4 py-2 mt-4 text-white transition bg-gray-400 rounded-md hover:bg-gray-500"
                 onClick={toggleModal} // 모달 닫기
               >
                 닫기
               </button>
               <button
-                className="px-4 py-2 mt-4 text-white transition bg-blue-500 rounded-md hover:bg-blue-600"
+                className="px-4 py-2 mt-4 text-white transition bg-primary rounded-md hover:bg-primaryButtonHover"
                 onClick={handleBack} // 뒤로가기
               >
                 문제 목록으로 돌아가기
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {isSubmitLoading && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          style={{ color: 'white' }}
+        >
+          <CircularProgress color="inherit" />
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Checkbox, message, Select, Spin } from 'antd';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
 import { postProblem } from '@/services/problemAdmin/postProblem';
@@ -30,7 +30,6 @@ export default function ProblemPost() {
       setMarkdownContent(content);
     }
   };
-  console.log(markdownContent);
   const problemTags = [
     '변수',
     '데이터 타입',
@@ -449,9 +448,9 @@ export default function ProblemPost() {
                       placeholder="문제 난이도를 선택하세요."
                       className="w-[60%] sm:w-[20%] h-8"
                     >
-                      <Option value="Low">Low</Option>
-                      <Option value="Mid">Mid</Option>
-                      <Option value="High">High</Option>
+                      <Option value="Low">Lv.1</Option>
+                      <Option value="Mid">Lv.2</Option>
+                      <Option value="High">Lv.3</Option>
                     </Select>
                   )}
                 />

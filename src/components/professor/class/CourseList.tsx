@@ -104,7 +104,7 @@ export default function CourseList() {
               <thead>
                 <tr className="border-b-2">
                   <th className="p-4">id</th>
-                  <th className="p-4">과목코드</th>
+                  <th className="p-4">강의코드</th>
                   <th className="p-4">강의명</th>
                   <th className="p-4">생성시간</th>
                 </tr>

@@ -23,7 +23,7 @@ export default function CourseEdit() {
   });
 
   const validationSchema = Yup.object().shape({
-    code: Yup.number().required('과목코드를 입력해주세요.'),
+    code: Yup.number().required('강의 코드를 입력해주세요.'),
     title: Yup.string().required('강의명을 입력해주세요.'),
     description: Yup.string().required('강의 설명을 입력해주세요.'),
   });
@@ -114,16 +114,16 @@ export default function CourseEdit() {
                 </p>
               )}
             </div>
-            {/* 과목 코드 */}
+            {/* 강의 코드 */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="course-code">과목 코드:</label>
+                <label htmlFor="course-code">강의 코드:</label>
                 <input
                   {...register('code')}
                   className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
                   id="course-code"
                   type="number"
-                  placeholder="과목 코드를 입력해주세요"
+                  placeholder="강의 코드를 입력해주세요"
                   style={{
                     MozAppearance: 'textfield',
                   }}

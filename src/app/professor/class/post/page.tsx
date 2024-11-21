@@ -4,10 +4,10 @@ import { postClass } from '@/services/classAdmin/postClass';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { message, Select } from 'antd';
-import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
+
 import { getCourseList } from '@/services/classAdmin/getCourseList';
 
 const { Option } = Select;
@@ -18,8 +18,10 @@ export default function PostClass() {
     group_name: Yup.string().required('분반 이름을 입력해주세요.'),
     description: Yup.string().required('분반 정보를 입력해주세요.'),
     short_description: Yup.string().required('분반 설명을 입력해주세요.'),
-    course: Yup.number().required('과목코드를 입력해주세요.'),
-    year: Yup.number().required('개설년도를 입력해주세요.'),
+    course: Yup.number().required('강의코드를 입력해주세요.'),
+    year: Yup.number()
+      .required('개설년도를 입력해주세요.')
+      .max(3000, '잘못된 년도입니다.'),
     quarter: Yup.string().required('학기를 선택해주세요.'),
     language: Yup.string().required('분반에 사용될 언어를 선택해주세요.'),
   });
@@ -28,7 +30,6 @@ export default function PostClass() {
     register,
     handleSubmit,
     setValue,
-    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -124,15 +125,15 @@ export default function PostClass() {
                 </p>
               )}
             </div>
-            {/* 과목 코드 */}
+            {/* 강의 */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="course-code">과목 코드:</label>
+                <label htmlFor="course-code">강의:</label>
 
                 <Select
                   {...register('course')}
                   className="ml-3 w-[60%] sm:w-[30%] "
-                  placeholder="과목코드를 선택해주세요"
+                  placeholder="강의를 선택해주세요"
                   onChange={(value) => setValue('course', value)}
                 >
                   {courseList.map((course: any) => (

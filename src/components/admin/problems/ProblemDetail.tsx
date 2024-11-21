@@ -30,6 +30,12 @@ export default function ProblemDetail() {
     }
   }, [problemData.description]);
 
+  const levelMap: { [key: string]: string } = {
+    Low: 'Lv.1',
+    Mid: 'Lv.2',
+    High: 'Lv.3',
+  };
+
   if (!isViewerReady) {
     return null;
   }
@@ -88,7 +94,9 @@ export default function ProblemDetail() {
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
             <span>난이도:</span>
-            <span>{problemData.difficulty}</span>
+            <span>
+              {levelMap[problemData.difficulty as keyof typeof levelMap]}
+            </span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">
