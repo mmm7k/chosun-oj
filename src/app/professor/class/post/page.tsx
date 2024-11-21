@@ -2,11 +2,13 @@
 
 import { postClass } from '@/services/classAdmin/postClass';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { message, Select } from 'antd';
+import { getAllCourse } from '@/services/courseAdmin/getAllCourse';
+import { getCourseList } from '@/services/classAdmin/getCourseList';
 
 const { Option } = Select;
 
@@ -26,11 +28,18 @@ export default function PostClass() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
+  const { data: courseListData } = useQuery({
+    queryKey: ['courseListData'],
+    queryFn: () => getCourseList(),
+  });
+
+  const courseList = courseListData?.data?.data || [];
   const mutation = useMutation({
     mutationFn: (data) => postClass(data),
     onSuccess: () => {
@@ -119,16 +128,19 @@ export default function PostClass() {
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="course-code">과목 코드:</label>
-                <input
+
+                <Select
                   {...register('course')}
-                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                  id="course-code"
-                  type="number"
-                  placeholder="과목 코드를 입력해주세요"
-                  style={{
-                    MozAppearance: 'textfield',
-                  }}
-                />
+                  className="ml-3 w-[60%] sm:w-[30%] "
+                  placeholder="과목코드를 선택해주세요"
+                  onChange={(value) => setValue('course', value)}
+                >
+                  {courseList.map((course: any) => (
+                    <Option key={course.code} value={course.code}>
+                      {course.code} - {course.title}
+                    </Option>
+                  ))}
+                </Select>
               </div>
               {errors.course && (
                 <p className="text-xs text-red-500 mt-1">
@@ -137,7 +149,7 @@ export default function PostClass() {
               )}
             </div>
 
-            {/* 강의 코드 */}
+            {/* 개설년ㄷ */}
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="course-year">개설년도:</label>

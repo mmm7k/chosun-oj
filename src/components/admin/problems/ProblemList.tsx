@@ -25,6 +25,8 @@ export default function ProblemList() {
     useState<boolean>(false);
   const [selectTestcaseId, setIsSelectTestcaseId] = useState<number>(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isMuteLoading, setIsMutateLoading] = useState(false);
+
   const pagesPerBlock = 5;
 
   const {
@@ -92,8 +94,6 @@ export default function ProblemList() {
     });
   };
 
-  const [isMuteLoading, setIsMutateLoading] = useState(false);
-
   const testcaseMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) =>
       postTestcase(id, data),
@@ -102,15 +102,10 @@ export default function ProblemList() {
       setIsTestCaseUploadModalOpen(false);
     },
     onSuccess: () => {
-      setIsMutateLoading(false);
       message.success('테스트케이스가 성공적으로 등록되었습니다.');
-      setIsTestCaseUploadModalOpen(false);
-      setIsTestCaseUploadModalOpen(false);
       refetch();
     },
     onError: (error: any) => {
-      setIsMutateLoading(false);
-      setIsTestCaseUploadModalOpen(false);
       if (error.response?.data?.message === '로그인이 필요합니다.') {
         alert(error.response?.data?.message);
         router.push('/');
@@ -121,6 +116,8 @@ export default function ProblemList() {
     onSettled: () => {
       setIsMutateLoading(false);
       setIsTestCaseUploadModalOpen(false);
+      setSelectedFile(null);
+      setIsSelectTestcaseId(0); // 선택된 문제 초기화
     },
   });
 
@@ -129,12 +126,11 @@ export default function ProblemList() {
   };
 
   // 테스트케이스 업로드 핸들러
-  const handleTestcaseUpload = (id: number) => {
+  const handleTestcaseUpload = async (id: number) => {
     if (!selectedFile) {
       message.error('테스트케이스 파일을 선택하세요.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('spj', 'false'); // `spj`는 기본값 false
@@ -149,7 +145,6 @@ export default function ProblemList() {
     setIsSelectTestcaseId(0); // 선택된 문제 초기화
   };
 
-  const selectedFileName = selectedFile ? selectedFile.name : '';
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
@@ -355,10 +350,10 @@ export default function ProblemList() {
             </Upload>
 
             {/* 선택된 파일 이름 */}
-            {selectedFileName && (
+            {selectedFile && (
               <div className="mt-4 text-md text-gray-700">
                 <span className="font-medium">선택된 파일:</span>{' '}
-                {selectedFileName}
+                {selectedFile.name}
               </div>
             )}
 

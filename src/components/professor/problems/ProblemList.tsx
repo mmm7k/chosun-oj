@@ -102,15 +102,10 @@ export default function ProblemList() {
       setIsTestCaseUploadModalOpen(false);
     },
     onSuccess: () => {
-      setIsMutateLoading(false);
       message.success('테스트케이스가 성공적으로 등록되었습니다.');
-      setIsTestCaseUploadModalOpen(false);
-      setIsTestCaseUploadModalOpen(false);
       refetch();
     },
     onError: (error: any) => {
-      setIsMutateLoading(false);
-      setIsTestCaseUploadModalOpen(false);
       if (error.response?.data?.message === '로그인이 필요합니다.') {
         alert(error.response?.data?.message);
         router.push('/');
@@ -121,6 +116,8 @@ export default function ProblemList() {
     onSettled: () => {
       setIsMutateLoading(false);
       setIsTestCaseUploadModalOpen(false);
+      setSelectedFile(null);
+      setIsSelectTestcaseId(0); // 선택된 문제 초기화
     },
   });
 
