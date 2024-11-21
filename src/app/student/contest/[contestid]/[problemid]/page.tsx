@@ -9,7 +9,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import 'xterm/css/xterm.css';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import 'highlight.js/styles/github.css';
 import { Select } from 'antd';
 import axios from 'axios';
@@ -20,6 +20,9 @@ import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 import { Viewer } from '@toast-ui/react-editor';
 import { postSubmitProblem } from '@/services/problemUser/postSubmitProblem';
 import CircularProgress from '@mui/material/CircularProgress';
+import { set } from 'react-hook-form';
+import { getAllSubmission } from '@/services/problemUser/getAllSubmissionUser';
+import { formattedDate } from '@/utils/dateFormatter';
 
 const { Option } = Select;
 
@@ -55,16 +58,62 @@ export default function Problem({
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [submitResult, setSubmitResult] = useState('');
-  // const languageOptions = ['C', 'C++', 'Java', 'Python3'];
-  // 제출내역 예시 코드
-  const [isCodeVisible, setIsCodeVisible] = useState(false);
-  const [isCodeVisible2, setIsCodeVisible2] = useState(false);
+  const [submitMemory, setSubmitMemory] = useState('');
+  const [submitTime, setSubmitTime] = useState('');
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<
+    number | null
+  >(null);
+  const searchParams = useSearchParams();
+  const initialPage = Number(searchParams.get('page')) || 1;
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const pagesPerBlock = 5;
 
-  // 제출내역 예시 코드
-  const codeString = `function solution(s) {
-let t = s.split(" ");
-return Math.min(...t) + " " + Math.max(...t);
-}`;
+  const toggleSubmissionCode = (submissionId: number) => {
+    // 동일한 ID를 클릭한 경우 닫기
+    if (selectedSubmissionId === submissionId) {
+      setSelectedSubmissionId(null);
+    } else {
+      setSelectedSubmissionId(submissionId);
+    }
+  };
+
+  //제출내역
+  const { data: submissionListData, refetch } = useQuery({
+    queryKey: ['submissionListData', problemId],
+    queryFn: () => getAllSubmission(problemId, currentPage),
+  });
+  const submissionList = submissionListData?.data?.data || [];
+  const totalPages = submissionListData?.data?.total_count
+    ? Math.ceil(submissionListData.data.total_count / 15)
+    : 1;
+  const currentBlock = Math.ceil(currentPage / pagesPerBlock);
+  const startPage = (currentBlock - 1) * pagesPerBlock + 1;
+  const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
+
+  const changePage = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const changePageBlock = (isNext: boolean) => {
+    const newPage = isNext
+      ? Math.min(endPage + 1, totalPages)
+      : Math.max(startPage - pagesPerBlock, 1);
+    changePage(newPage);
+  };
+
+  useEffect(() => {
+    router.replace(
+      `/student/contest/${contestId}/${problemId}?page=${currentPage}`,
+    );
+    refetch();
+  }, [currentPage, router, refetch]);
+
+  useEffect(() => {
+    if (isLeftVisible) {
+      setCurrentPage(1);
+      router.replace(`/student/contest/${contestId}/${problemId}`);
+    }
+  }, [isLeftVisible, contestId, problemId, router]);
 
   const { data: contestProblemData, isError } = useQuery({
     queryKey: ['contestProblemData', contestId, problemId],
@@ -91,7 +140,6 @@ return Math.min(...t) + " " + Math.max(...t);
   //코드실행
   const runcode = async () => {
     setIsLoading(true);
-
     let language = '';
     switch (selectedLanguage) {
       case 'C':
@@ -144,7 +192,6 @@ return Math.min(...t) + " " + Math.max(...t);
       setOutput(output);
       return output;
     } catch (error) {
-      console.error('Execution failed:', error);
       setOutput('Error executing code.');
       return 'Error executing code.';
     } finally {
@@ -160,7 +207,12 @@ return Math.min(...t) + " " + Math.max(...t);
     },
     onSuccess: (data) => {
       setSubmitResult(data?.data?.result === 0 ? '정답입니다.' : '오답입니다.');
-
+      setSubmitMemory(data?.data?.statistic_info?.memory_cost);
+      setSubmitTime(
+        data?.data?.statistic_info?.time_cost === 0
+          ? 0.003
+          : data?.data?.statistic_info?.time_cost,
+      );
       setIsModalVisible(true); // 모달 열기
     },
     onError: (error: any) => {
@@ -302,16 +354,11 @@ return Math.min(...t) + " " + Math.max(...t);
           </div>
           <Select
             id="language-select"
-            placeholder="언어 선택"
+            placeholder="언어"
             value={selectedLanguage}
             onChange={handleLanguageChange}
             className="w-24"
           >
-            {/* {languageOptions.map((language) => (
-              <Option key={language} value={language}>
-                {language}
-              </Option>
-            ))} */}
             {availableLanguages.map((language: string) => (
               <Option key={language} value={language}>
                 {language}
@@ -347,52 +394,101 @@ return Math.min(...t) + " " + Math.max(...t);
                 </pre>
               </div>
             ) : (
-              <div className="w-full h-full p-3">
+              <div className="w-full h-full px-3 overflow-auto">
                 <table className="w-full table-auto text-center border-t">
                   <thead className="border-b-2 text-gray-500 text-xs ">
                     <tr>
                       <th className="py-1 font-normal">제출 일시</th>
                       <th className="py-1 font-normal">언어</th>
+                      <th className="py-1 font-normal">Time</th>
+                      <th className="py-1 font-normal">Memory</th>
                       <th className="py-1 font-normal">채점 내역</th>
                     </tr>
                   </thead>
                   <tbody className="w-full text-gray-600 text-xs">
-                    <tr
-                      className="hover:bg-gray-50 border-b cursor-pointer"
-                      onClick={() => setIsCodeVisible(!isCodeVisible)}
-                    >
-                      <td className="py-3 font-normal">2022-06-22</td>
-                      <td className="py-3 font-normal">Javascript</td>
-                      <td className="py-3 font-normal text-green-500">정답</td>
-                    </tr>
-                    {isCodeVisible && (
-                      <tr>
-                        <td colSpan={3} className="px-4 py-2 text-left">
-                          <pre className="bg-[#1E1E1E] text-[#D4D4D4] p-2">
-                            <code>{codeString}</code>
-                          </pre>
-                        </td>
-                      </tr>
-                    )}
-                    <tr
-                      className="hover:bg-gray-50 border-b cursor-pointer"
-                      onClick={() => setIsCodeVisible2(!isCodeVisible2)}
-                    >
-                      <td className="py-3 font-normal">2022-06-22</td>
-                      <td className="py-3 font-normal">Javascript</td>
-                      <td className="py-3 font-normal text-red-500">오답</td>
-                    </tr>
-                    {isCodeVisible2 && (
-                      <tr>
-                        <td colSpan={3} className="px-4 py-2 text-left">
-                          <pre className="bg-[#1E1E1E] text-[#D4D4D4] p-2">
-                            <code>{codeString}</code>
-                          </pre>
-                        </td>
-                      </tr>
-                    )}
+                    {submissionList.map((submission: any) => (
+                      <>
+                        <tr
+                          className="hover:bg-gray-50 border-b cursor-pointer"
+                          onClick={() => toggleSubmissionCode(submission.id)}
+                        >
+                          <td className="py-3 font-normal">
+                            {formattedDate(submission.create_time)}
+                          </td>
+                          <td className="py-3 font-normal">
+                            {submission.language}
+                          </td>
+                          <td className="py-3 font-normal">
+                            {submission?.statistic_info?.time_cost == 0
+                              ? '0.003'
+                              : submission?.statistic_info?.time_cost}
+                            &nbsp;ms
+                          </td>
+                          <td className="py-3 font-normal">
+                            {submission?.statistic_info?.memory_cost}&nbsp;B
+                          </td>
+                          <td
+                            className={`py-3 font-normal
+  ${submission.result === 0 ? 'text-green-500' : 'text-red-500'}
+  `}
+                          >
+                            {submission.result === 0 ? '정답' : '오답'}
+                          </td>
+                        </tr>
+                        {selectedSubmissionId === submission.id && (
+                          <tr>
+                            <td colSpan={5} className="px-4 py-2 text-left">
+                              <pre className="bg-[#1E1E1E] text-[#D4D4D4] p-2 rounded-sm">
+                                <code>{submission.code}</code>
+                              </pre>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))}
                   </tbody>
                 </table>
+                {/* 페이지네이션 */}
+                <div className="flex items-center justify-center mt-5 space-x-1">
+                  <button
+                    onClick={() => changePageBlock(false)}
+                    disabled={currentBlock === 1}
+                    className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
+            ${currentBlock === 1 ? 'opacity-40' : ''}
+            `}
+                  >
+                    &lt;
+                  </button>
+
+                  <div className="flex space-x-1 font-normal">
+                    {Array.from(
+                      { length: endPage - startPage + 1 },
+                      (_, i) => startPage + i,
+                    ).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => changePage(page)}
+                        className={`px-3 py-1 rounded-xl transition-all ${
+                          page === currentPage
+                            ? 'bg-primary text-white hover:bg-primaryButtonHover'
+                            : 'bg-gray-200 hover:bg-gray-300'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => changePageBlock(true)}
+                    disabled={endPage === totalPages}
+                    className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
+          ${currentBlock === 1 ? 'opacity-40' : ''}
+          `}
+                  >
+                    &gt;
+                  </button>
+                </div>
               </div>
             )}
 
@@ -419,7 +515,9 @@ return Math.min(...t) + " " + Math.max(...t);
                 </h1>
                 <div className="px-5 py-3 text-sm">
                   {isLoading ? (
-                    <Spin indicator={<LoadingOutlined spin />} size="large" />
+                    <div style={{ color: 'white' }}>
+                      <CircularProgress color="inherit" />
+                    </div>
                   ) : (
                     <pre>
                       <code>{output}</code>
@@ -453,52 +551,101 @@ return Math.min(...t) + " " + Math.max(...t);
                 </pre>
               </div>
             ) : (
-              <div className="w-full h-full p-3">
+              <div className="w-full h-full px-3 overflow-auto">
                 <table className="w-full table-auto text-center border-t">
                   <thead className="border-b-2 text-gray-500 text-xs ">
                     <tr>
                       <th className="py-1 font-normal">제출 일시</th>
                       <th className="py-1 font-normal">언어</th>
+                      <th className="py-1 font-normal">Time</th>
+                      <th className="py-1 font-normal">Memory</th>
                       <th className="py-1 font-normal">채점 내역</th>
                     </tr>
                   </thead>
                   <tbody className="w-full text-gray-600 text-xs">
-                    <tr
-                      className="hover:bg-gray-50 border-b cursor-pointer"
-                      onClick={() => setIsCodeVisible(!isCodeVisible)}
-                    >
-                      <td className="py-3 font-normal">2022-06-22</td>
-                      <td className="py-3 font-normal">Javascript</td>
-                      <td className="py-3 font-normal text-green-500">정답</td>
-                    </tr>
-                    {isCodeVisible && (
-                      <tr>
-                        <td colSpan={3} className="px-4 py-2 text-left">
-                          <pre className="bg-[#1E1E1E] text-[#D4D4D4] p-2 ">
-                            <code>{codeString}</code>
-                          </pre>
-                        </td>
-                      </tr>
-                    )}
-                    <tr
-                      className="hover:bg-gray-50 border-b cursor-pointer"
-                      onClick={() => setIsCodeVisible2(!isCodeVisible2)}
-                    >
-                      <td className="py-3 font-normal">2022-06-22</td>
-                      <td className="py-3 font-normal">Javascript</td>
-                      <td className="py-3 font-normal text-red-500">오답</td>
-                    </tr>
-                    {isCodeVisible2 && (
-                      <tr>
-                        <td colSpan={3} className="px-4 py-2 text-left">
-                          <pre className="bg-[#1E1E1E] text-[#D4D4D4] p-2">
-                            <code>{codeString}</code>
-                          </pre>
-                        </td>
-                      </tr>
-                    )}
+                    {submissionList.map((submission: any) => (
+                      <>
+                        <tr
+                          className="hover:bg-gray-50 border-b cursor-pointer"
+                          onClick={() => toggleSubmissionCode(submission.id)}
+                        >
+                          <td className="py-3 font-normal">
+                            {formattedDate(submission.create_time)}
+                          </td>
+                          <td className="py-3 font-normal">
+                            {submission.language}
+                          </td>
+                          <td className="py-3 font-normal">
+                            {submission?.statistic_info?.time_cost == 0
+                              ? '0.003'
+                              : submission?.statistic_info?.time_cost}
+                            &nbsp;ms
+                          </td>
+                          <td className="py-3 font-normal">
+                            {submission?.statistic_info?.memory_cost}&nbsp;B
+                          </td>
+                          <td
+                            className={`py-3 font-normal
+  ${submission.result === 0 ? 'text-green-500' : 'text-red-500'}
+  `}
+                          >
+                            {submission.result === 0 ? '정답' : '오답'}
+                          </td>
+                        </tr>
+                        {selectedSubmissionId === submission.id && (
+                          <tr>
+                            <td colSpan={5} className="px-4 py-2 text-left">
+                              <pre className="bg-[#1E1E1E] text-[#D4D4D4] p-2 rounded-sm">
+                                <code>{submission.code}</code>
+                              </pre>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))}
                   </tbody>
                 </table>
+                {/* 페이지네이션 */}
+                <div className="flex items-center justify-center mt-5 space-x-1">
+                  <button
+                    onClick={() => changePageBlock(false)}
+                    disabled={currentBlock === 1}
+                    className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
+            ${currentBlock === 1 ? 'opacity-40' : ''}
+            `}
+                  >
+                    &lt;
+                  </button>
+
+                  <div className="flex space-x-1 font-normal">
+                    {Array.from(
+                      { length: endPage - startPage + 1 },
+                      (_, i) => startPage + i,
+                    ).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => changePage(page)}
+                        className={`px-3 py-1 rounded-xl transition-all ${
+                          page === currentPage
+                            ? 'bg-primary text-white hover:bg-primaryButtonHover'
+                            : 'bg-gray-200 hover:bg-gray-300'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => changePageBlock(true)}
+                    disabled={endPage === totalPages}
+                    className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
+          ${currentBlock === 1 ? 'opacity-40' : ''}
+          `}
+                  >
+                    &gt;
+                  </button>
+                </div>
               </div>
             )
           ) : (
@@ -565,7 +712,10 @@ return Math.min(...t) + " " + Math.max(...t);
           </button>
           <button
             className="bg-[#002a87] text-white px-4 py-2 rounded-md hover:bg-[#00226e] transition"
-            onClick={onSubmit}
+            onClick={() => {
+              runcode();
+              onSubmit();
+            }}
           >
             제출 후 채점하기
           </button>
@@ -580,10 +730,14 @@ return Math.min(...t) + " " + Math.max(...t);
           <div className="fixed inset-0 bg-black opacity-50"></div>
           {/* 모달 */}
           <div className="bg-white p-8 rounded-md shadow-lg z-50 w-[24rem] mx-auto">
-            <div className="text-gray-800 mb-8 font-semibold">
+            <div className="text-gray-800 text-xl mb-5 font-semibold">
               {submitResult}
             </div>
-            <div className="flex justify-end gap-4">
+            <div className="text-gray-700 ">Time: {submitTime}&nbsp;ms</div>
+
+            <div className="text-gray-700">Memory: {submitMemory}&nbsp;B</div>
+
+            <div className="flex mt-5 justify-end gap-4">
               <button
                 className="px-4 py-2 mt-4 text-white transition bg-gray-400 rounded-md hover:bg-gray-500"
                 onClick={toggleModal} // 모달 닫기
@@ -602,10 +756,11 @@ return Math.min(...t) + " " + Math.max(...t);
       )}
       {isSubmitLoading && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed inset-0 z-50 flex flex-col space-y-4 items-center justify-center bg-black bg-opacity-50"
           style={{ color: 'white' }}
         >
           <CircularProgress color="inherit" />
+          <span className="text-lg"> 채점 중 입니다.</span>
         </div>
       )}
     </div>

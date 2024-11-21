@@ -59,7 +59,7 @@ export default function ProblemEnroll() {
 
   const problems = problemListData?.data?.data || [];
   const totalPages = problemListData?.data?.total_count
-    ? Math.ceil(problemListData.data.total_count / 15)
+    ? Math.ceil(problemListData.data.total_count / 2)
     : 1;
 
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);
