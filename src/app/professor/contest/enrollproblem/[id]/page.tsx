@@ -172,169 +172,179 @@ export default function ProblemEnroll() {
   };
 
   return (
-    <div className="flex flex-col  min-h-screen p-8 space-y-8">
-      <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <section className="flex flex-col sm:flex-row items-center px-16">
-          <h1 className="text-lg">대회 문제 관리</h1>
-        </section>
-        <hr className="mt-5 border-t-2 border-gray-200" />
+    <div className="flex flex-col min-h-screen p-8 ">
+      <div className="space-y-8">
+        <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
+          <section className="flex flex-col sm:flex-row items-center px-16">
+            <h1 className="text-lg">대회 문제 관리</h1>
+          </section>
+          <hr className="mt-5 border-t-2 border-gray-200" />
 
-        <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-          <button
-            onClick={() => setIsProblemModalOpen(true)}
-            className="py-1.5 w-36 text-sm font-normal text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all"
-          >
-            문제 검색 및 목록
-          </button>
-        </div>
-
-        {selectedProblems.length > 0 && (
-          <div className="px-10 mt-4">
-            <h3 className="mb-2 text-sm">선택된 문제(등록):</h3>
-            <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
-              {selectedProblems.map((problem) => (
-                <div
-                  key={problem.id}
-                  className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
-                >
-                  <span className="mr-2">
-                    {problem.id} - {problem.title}
-                  </span>
-                  <button
-                    className="text-red-500"
-                    onClick={() =>
-                      setSelectedProblems((prev) =>
-                        prev.filter((p) => p.id !== problem.id),
-                      )
-                    }
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            <button
+              onClick={() => setIsProblemModalOpen(true)}
+              className="py-1.5 w-36 text-sm font-normal text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all"
+            >
+              문제 검색 및 목록
+            </button>
           </div>
-        )}
 
-        <div className="flex items-center justify-end w-full px-10 mt-8 space-x-3">
-          <span className="flex items-center text-xs font-normal text-gray-400">
-            <PiExclamationMarkFill className="text-lg" />
-            <span>&nbsp; 문제 추가 후 등록 버튼을 눌러주세요.</span>
-          </span>
-          <button
-            onClick={onSubmit}
-            className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
-              selectedProblems.length > 0
-                ? 'bg-primary hover:bg-primaryButtonHover'
-                : 'bg-gray-300 cursor-not-allowed'
-            }`}
-            disabled={selectedProblems.length === 0}
-          >
-            문제 등록
-          </button>
-        </div>
-      </div>
-
-      <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-          <span className="text-lg px-6">등록된 문제 목록</span>
-          <div className="overflow-auto max-h-80 border my-5">
-            <table className="table-auto w-full text-left text-sm">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="px-4 py-2 border-b">ID</th>
-                  <th className="px-4 py-2 border-b">제목</th>
-                  <th className="px-4 py-2 border-b"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {enrolledProblemsIsLoading ? (
-                  Array.from({ length: 4 }).map((_, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {Array.from({ length: 3 }).map((_, colIndex) => (
-                        <td key={colIndex} className="p-4">
-                          <Skeleton animation="wave" width="100%" height={20} />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : enrolledProblems.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="text-center text-gray-500 py-4">
-                      등록된 문제가 없습니다.
-                    </td>
-                  </tr>
-                ) : (
-                  enrolledProblems.map((problem: Problem) => (
-                    <tr
-                      key={problem.id}
-                      className="hover:bg-gray-50"
-                      onClick={() => handleProblemDeleteSelection(problem)}
+          {selectedProblems.length > 0 && (
+            <div className="px-10 mt-4">
+              <h3 className="mb-2 text-sm">선택된 문제(등록):</h3>
+              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
+                {selectedProblems.map((problem) => (
+                  <div
+                    key={problem.id}
+                    className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+                  >
+                    <span className="mr-2">
+                      {problem.id} - {problem.title}
+                    </span>
+                    <button
+                      className="text-red-500"
+                      onClick={() =>
+                        setSelectedProblems((prev) =>
+                          prev.filter((p) => p.id !== problem.id),
+                        )
+                      }
                     >
-                      <td className="px-4 py-2 border-b">
-                        {problem.problem.id}
-                      </td>
-                      <td className="px-4 py-2 border-b">
-                        {problem.problem.title}
-                      </td>
-                      <td className="px-4 py-2 border-b text-center">
-                        <Checkbox
-                          checked={deleteSelectedProblems.some(
-                            (p) => p.id === problem.id,
-                          )}
-                          onChange={() => handleProblemDeleteSelection(problem)}
-                        />
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end w-full px-10 mt-8 space-x-3">
+            <span className="flex items-center text-xs font-normal text-gray-400">
+              <PiExclamationMarkFill className="text-lg" />
+              <span>&nbsp; 문제 추가 후 등록 버튼을 눌러주세요.</span>
+            </span>
+            <button
+              onClick={onSubmit}
+              className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
+                selectedProblems.length > 0
+                  ? 'bg-primary hover:bg-primaryButtonHover'
+                  : 'bg-gray-300 cursor-not-allowed'
+              }`}
+              disabled={selectedProblems.length === 0}
+            >
+              문제 등록
+            </button>
+          </div>
+        </div>
+
+        <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
+          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            <span className="text-lg px-6">등록된 문제 목록</span>
+            <div className="overflow-auto max-h-80 border my-5">
+              <table className="table-auto w-full text-left text-sm">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-4 py-2 border-b">ID</th>
+                    <th className="px-4 py-2 border-b">제목</th>
+                    <th className="px-4 py-2 border-b"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {enrolledProblemsIsLoading ? (
+                    Array.from({ length: 4 }).map((_, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {Array.from({ length: 3 }).map((_, colIndex) => (
+                          <td key={colIndex} className="p-4">
+                            <Skeleton
+                              animation="wave"
+                              width="100%"
+                              height={20}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : enrolledProblems.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="text-center text-gray-500 py-4"
+                      >
+                        등록된 문제가 없습니다.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {deleteSelectedProblems.length > 0 && (
-          <div className="px-10 mt-4">
-            <h3 className="mb-2 text-sm">선택된 문제(삭제):</h3>
-            <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
-              {deleteSelectedProblems.map((problem: Problem) => (
-                <div
-                  key={problem.problem.id}
-                  className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
-                >
-                  <span className="mr-2">
-                    {problem.problem.id} - {problem.problem.title}
-                  </span>
-                  <button
-                    className="text-red-500"
-                    onClick={() =>
-                      setDeleteSelectedProblems((prev) =>
-                        prev.filter((p) => p.id !== problem.id),
-                      )
-                    }
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
+                  ) : (
+                    enrolledProblems.map((problem: Problem) => (
+                      <tr
+                        key={problem.id}
+                        className="hover:bg-gray-50"
+                        onClick={() => handleProblemDeleteSelection(problem)}
+                      >
+                        <td className="px-4 py-2 border-b">
+                          {problem.problem.id}
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          {problem.problem.title}
+                        </td>
+                        <td className="px-4 py-2 border-b text-center">
+                          <Checkbox
+                            checked={deleteSelectedProblems.some(
+                              (p) => p.id === problem.id,
+                            )}
+                            onChange={() =>
+                              handleProblemDeleteSelection(problem)
+                            }
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
-        )}
+          {deleteSelectedProblems.length > 0 && (
+            <div className="px-10 mt-4">
+              <h3 className="mb-2 text-sm">선택된 문제(삭제):</h3>
+              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
+                {deleteSelectedProblems.map((problem: Problem) => (
+                  <div
+                    key={problem.problem.id}
+                    className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+                  >
+                    <span className="mr-2">
+                      {problem.problem.id} - {problem.problem.title}
+                    </span>
+                    <button
+                      className="text-red-500"
+                      onClick={() =>
+                        setDeleteSelectedProblems((prev) =>
+                          prev.filter((p) => p.id !== problem.id),
+                        )
+                      }
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-        <div className="flex items-center justify-end w-full px-10 mt-8">
-          <button
-            onClick={handleDeleteSubmit}
-            className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
-              deleteSelectedProblems.length > 0
-                ? 'bg-primary hover:bg-primaryButtonHover'
-                : 'bg-gray-300 cursor-not-allowed'
-            }`}
-            disabled={deleteSelectedProblems.length === 0}
-          >
-            문제 삭제
-          </button>
+          <div className="flex items-center justify-end w-full px-10 mt-8">
+            <button
+              onClick={handleDeleteSubmit}
+              className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
+                deleteSelectedProblems.length > 0
+                  ? 'bg-primary hover:bg-primaryButtonHover'
+                  : 'bg-gray-300 cursor-not-allowed'
+              }`}
+              disabled={deleteSelectedProblems.length === 0}
+            >
+              문제 삭제
+            </button>
+          </div>
         </div>
       </div>
-
       {isProblemModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-semibold text-gray-700"
@@ -354,7 +364,7 @@ export default function ProblemEnroll() {
             <div className="flex items-center mb-4 border-[1px] border-gray-300 rounded-lg px-3 py-2 w-full bg-white shadow-sm">
               <IoSearchSharp className="mr-2 text-lg text-gray-500" />
               <input
-                className="w-full text-sm text-secondary placeholder:text-sm focus:outline-none"
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
                 type="text"
                 placeholder="제목으로 검색해보세요"
               />

@@ -18,13 +18,13 @@ export default function Contest({ params }: { params: { contestid: string } }) {
   const contest = contestData?.data || {};
   return (
     <>
-      <Suspense>
-        <ContestBanner
-          title={contest.title}
-          startDate={contest.start_time}
-          endDate={contest.end_time}
-        />
-      </Suspense>
+      {/* <Suspense> */}
+      <ContestBanner
+        title={contest.title}
+        startDate={contest.start_time}
+        endDate={contest.end_time}
+      />
+      {/* </Suspense> */}
       <div className="bg-[#f0f4fc] min-h-screen w-full flex  justify-center">
         <div className="w-[90%] lg:w-[62%] pt-12 mb-44">
           <ContestAnnouncement contestId={contestId} />

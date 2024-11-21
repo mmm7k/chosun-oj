@@ -254,248 +254,261 @@ export default function UserEnroll() {
     window.history.replaceState(null, '', newUrl);
   };
   return (
-    <div className="flex flex-col min-h-screen p-8 space-y-8">
-      <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <section className="flex flex-col sm:flex-row items-center justify-between px-16">
-          <h1 className="text-lg">대회 유저 관리</h1>
+    <div className="flex flex-col min-h-screen p-8 ">
+      <div className="space-y-8">
+        <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
+          <section className="flex flex-col sm:flex-row items-center justify-between px-16">
+            <h1 className="text-lg">대회 유저 관리</h1>
 
-          <div className="space-x-2 flex items-center">
-            <button
-              onClick={() => setIsStudentModalOpen(true)}
-              className="py-1.5 w-36 text-sm font-normal text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all"
-            >
-              학생 검색 및 목록
-            </button>
-            <Upload
-              accept=".xlsx, .xls"
-              showUploadList={false}
-              customRequest={handleCustomRequest}
-            >
-              <Button icon={<UploadOutlined />}>엑셀 파일 업로드</Button>
-            </Upload>
-          </div>
-        </section>
-        <hr className="mt-5 border-t-2 border-gray-200" />
+            <div className="space-x-2 flex items-center">
+              <button
+                onClick={() => setIsStudentModalOpen(true)}
+                className="py-1.5 w-36 text-sm font-normal text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all"
+              >
+                학생 검색 및 목록
+              </button>
+              <Upload
+                accept=".xlsx, .xls"
+                showUploadList={false}
+                customRequest={handleCustomRequest}
+              >
+                <Button icon={<UploadOutlined />}>엑셀 파일 업로드</Button>
+              </Upload>
+            </div>
+          </section>
+          <hr className="mt-5 border-t-2 border-gray-200" />
 
-        <form
-          onSubmit={handleSubmit(handleUserAdd)}
-          className="flex flex-col text-sm"
-        >
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 space-y-3">
-            <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
-              <PiExclamationMarkFill className="text-lg" />
-              <span>
-                &nbsp; 엑셀 파일 업로드 시 다음과 같은 형식으로 입력해주세요.
+          <form
+            onSubmit={handleSubmit(handleUserAdd)}
+            className="flex flex-col text-sm"
+          >
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 space-y-3">
+              <span className="flex items-center mt-3 text-xs font-normal text-gray-400">
+                <PiExclamationMarkFill className="text-lg" />
+                <span>
+                  &nbsp; 엑셀 파일 업로드 시 다음과 같은 형식으로 입력해주세요.
+                </span>
               </span>
+              <Image
+                src="/professor/userEnrollExample_professor.png"
+                alt="userEnrollExample"
+                width={200}
+                height={100}
+              />
+            </div>
+
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+              <div className="flex items-center">
+                <label htmlFor="student_number">학번:</label>
+                <input
+                  {...register('student_number')}
+                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal  focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  type="text"
+                  placeholder="학번을 입력해주세요"
+                />
+              </div>
+              {errors.student_number && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.student_number.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+              <div className="flex items-center">
+                <label htmlFor="name">이름:</label>
+                <input
+                  {...register('name')}
+                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal  focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  type="text"
+                  placeholder="이름을 입력해주세요"
+                />
+              </div>
+              {errors.name && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end px-10 mt-4">
+              <button
+                type="submit"
+                className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              >
+                유저 추가
+              </button>
+            </div>
+          </form>
+
+          <hr className="mt-5 border-t-2 border-gray-200" />
+
+          {selectedStudents.length > 0 && (
+            <div className="px-10 mt-4">
+              <h3 className="mb-2 text-sm">선택된 유저(등록):</h3>
+              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
+                {selectedStudents.map((user) => (
+                  <div
+                    key={user.student_number}
+                    className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+                  >
+                    <span className="mr-2">
+                      {user.student_number} - {user.name}
+                    </span>
+                    <button
+                      className="text-red-500"
+                      onClick={() =>
+                        setSelectedStudents((prev) =>
+                          prev.filter(
+                            (s) => s.student_number !== user.student_number,
+                          ),
+                        )
+                      }
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end w-full px-10 mt-8 space-x-3">
+            <span className="flex items-center text-xs font-normal text-gray-400">
+              <PiExclamationMarkFill className="text-lg" />
+              <span>&nbsp; 유저 추가 후 등록 버튼을 눌러주세요.</span>
             </span>
-            <Image
-              src="/professor/userEnrollExample_professor.png"
-              alt="userEnrollExample"
-              width={200}
-              height={100}
-            />
-          </div>
-
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-            <div className="flex items-center">
-              <label htmlFor="student_number">학번:</label>
-              <input
-                {...register('student_number')}
-                className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal  focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                type="text"
-                placeholder="학번을 입력해주세요"
-              />
-            </div>
-            {errors.student_number && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.student_number.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-            <div className="flex items-center">
-              <label htmlFor="name">이름:</label>
-              <input
-                {...register('name')}
-                className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal  focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                type="text"
-                placeholder="이름을 입력해주세요"
-              />
-            </div>
-            {errors.name && (
-              <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div className="flex justify-end px-10 mt-4">
             <button
-              type="submit"
-              className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              onClick={() => onSubmit()}
+              className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
+                selectedStudents.length > 0
+                  ? 'bg-primary hover:bg-primaryButtonHover'
+                  : 'bg-gray-300 cursor-not-allowed'
+              }`}
+              disabled={selectedStudents.length === 0}
             >
-              유저 추가
+              유저 등록
             </button>
           </div>
-        </form>
-
-        <hr className="mt-5 border-t-2 border-gray-200" />
-
-        {selectedStudents.length > 0 && (
-          <div className="px-10 mt-4">
-            <h3 className="mb-2 text-sm">선택된 유저(등록):</h3>
-            <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
-              {selectedStudents.map((user) => (
-                <div
-                  key={user.student_number}
-                  className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
-                >
-                  <span className="mr-2">
-                    {user.student_number} - {user.name}
-                  </span>
-                  <button
-                    className="text-red-500"
-                    onClick={() =>
-                      setSelectedStudents((prev) =>
-                        prev.filter(
-                          (s) => s.student_number !== user.student_number,
-                        ),
-                      )
-                    }
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-end w-full px-10 mt-8 space-x-3">
-          <span className="flex items-center text-xs font-normal text-gray-400">
-            <PiExclamationMarkFill className="text-lg" />
-            <span>&nbsp; 유저 추가 후 등록 버튼을 눌러주세요.</span>
-          </span>
-          <button
-            onClick={() => onSubmit()}
-            className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
-              selectedStudents.length > 0
-                ? 'bg-primary hover:bg-primaryButtonHover'
-                : 'bg-gray-300 cursor-not-allowed'
-            }`}
-            disabled={selectedStudents.length === 0}
-          >
-            유저 등록
-          </button>
         </div>
-      </div>
 
-      <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-          <span className="text-lg px-6">등록된 유저 목록</span>
-          <div className="overflow-auto max-h-80 border my-5">
-            <table className="table-auto w-full text-left text-sm">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="px-4 py-2 border-b">ID</th>
-                  <th className="px-4 py-2 border-b">학번</th>
-                  <th className="px-4 py-2 border-b">이름</th>
-                  <th className="px-4 py-2 border-b"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {enrolledStudentsIsLoading ? (
-                  Array.from({ length: 4 }).map((_, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {Array.from({ length: 3 }).map((_, colIndex) => (
-                        <td key={colIndex} className="p-4">
-                          <Skeleton animation="wave" width="100%" height={20} />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : (enrolledStudents?.length || 0) === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="text-center text-gray-500 py-4">
-                      등록된 유저가 없습니다.
-                    </td>
+        <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
+          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            <span className="text-lg px-6">등록된 유저 목록</span>
+            <div className="overflow-auto max-h-80 border my-5">
+              <table className="table-auto w-full text-left text-sm">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-4 py-2 border-b">ID</th>
+                    <th className="px-4 py-2 border-b">학번</th>
+                    <th className="px-4 py-2 border-b">이름</th>
+                    <th className="px-4 py-2 border-b"></th>
                   </tr>
-                ) : (
-                  enrolledStudents.map((student: any) => (
-                    <tr
-                      key={student.user.id}
-                      className="hover:bg-gray-50"
-                      onClick={() => handleUserDeleteSelection(student.user)}
-                    >
-                      <td className="px-4 py-2 border-b">{student.user.id}</td>
-                      <td className="px-4 py-2 border-b">
-                        {student.user.student_number}
-                      </td>
-                      <td className="px-4 py-2 border-b">
-                        {student.user.name}
-                      </td>
-                      <td className="px-4 py-2 border-b text-center">
-                        <Checkbox
-                          checked={deleteSelectedStudents.some(
-                            (s) =>
-                              s.student_number === student.user.student_number,
-                          )}
-                          onChange={() =>
-                            handleUserDeleteSelection(student.user)
-                          }
-                        />
+                </thead>
+                <tbody>
+                  {enrolledStudentsIsLoading ? (
+                    Array.from({ length: 4 }).map((_, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {Array.from({ length: 3 }).map((_, colIndex) => (
+                          <td key={colIndex} className="p-4">
+                            <Skeleton
+                              animation="wave"
+                              width="100%"
+                              height={20}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : (enrolledStudents?.length || 0) === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="text-center text-gray-500 py-4"
+                      >
+                        등록된 유저가 없습니다.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {deleteSelectedStudents.length > 0 && (
-          <div className="px-10 mt-4">
-            <h3 className="mb-2 text-sm">선택된 유저(삭제):</h3>
-            <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
-              {deleteSelectedStudents.map((user) => (
-                <div
-                  key={user.student_number}
-                  className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
-                >
-                  <span className="mr-2">
-                    {user.student_number} - {user.name}
-                  </span>
-                  <button
-                    className="text-red-500"
-                    onClick={() =>
-                      setDeleteSelectedStudents((prev) =>
-                        prev.filter(
-                          (s) => s.student_number !== user.student_number,
-                        ),
-                      )
-                    }
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
+                  ) : (
+                    enrolledStudents.map((student: any) => (
+                      <tr
+                        key={student.user.id}
+                        className="hover:bg-gray-50"
+                        onClick={() => handleUserDeleteSelection(student.user)}
+                      >
+                        <td className="px-4 py-2 border-b">
+                          {student.user.id}
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          {student.user.student_number}
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          {student.user.name}
+                        </td>
+                        <td className="px-4 py-2 border-b text-center">
+                          <Checkbox
+                            checked={deleteSelectedStudents.some(
+                              (s) =>
+                                s.student_number ===
+                                student.user.student_number,
+                            )}
+                            onChange={() =>
+                              handleUserDeleteSelection(student.user)
+                            }
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
-        )}
+          {deleteSelectedStudents.length > 0 && (
+            <div className="px-10 mt-4">
+              <h3 className="mb-2 text-sm">선택된 유저(삭제):</h3>
+              <div className="flex flex-wrap gap-2 overflow-y-auto max-h-80">
+                {deleteSelectedStudents.map((user) => (
+                  <div
+                    key={user.student_number}
+                    className="flex items-center px-3 py-1 text-sm bg-gray-200 rounded-full"
+                  >
+                    <span className="mr-2">
+                      {user.student_number} - {user.name}
+                    </span>
+                    <button
+                      className="text-red-500"
+                      onClick={() =>
+                        setDeleteSelectedStudents((prev) =>
+                          prev.filter(
+                            (s) => s.student_number !== user.student_number,
+                          ),
+                        )
+                      }
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-        <div className="flex items-center justify-end w-full px-10 mt-8">
-          <button
-            onClick={handleDeleteSubmit}
-            className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
-              deleteSelectedStudents.length > 0
-                ? 'bg-primary hover:bg-primaryButtonHover'
-                : 'bg-gray-300 cursor-not-allowed'
-            }`}
-            disabled={deleteSelectedStudents.length === 0}
-          >
-            유저 삭제
-          </button>
+          <div className="flex items-center justify-end w-full px-10 mt-8">
+            <button
+              onClick={handleDeleteSubmit}
+              className={`px-4 py-2 text-base font-normal text-white rounded-xl ${
+                deleteSelectedStudents.length > 0
+                  ? 'bg-primary hover:bg-primaryButtonHover'
+                  : 'bg-gray-300 cursor-not-allowed'
+              }`}
+              disabled={deleteSelectedStudents.length === 0}
+            >
+              유저 삭제
+            </button>
+          </div>
         </div>
       </div>
-
       {isStudentModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-semibold text-gray-700"
@@ -515,7 +528,7 @@ export default function UserEnroll() {
             <div className="flex items-center mb-4 border-[1px] border-gray-300 rounded-lg px-3 py-2 w-full bg-white shadow-sm">
               <IoSearchSharp className="mr-2 text-lg text-gray-500" />
               <input
-                className="w-full text-sm text-secondary placeholder:text-sm focus:outline-none"
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
                 type="text"
                 placeholder="학번으로 검색해보세요"
               />

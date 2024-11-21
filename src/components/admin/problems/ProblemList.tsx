@@ -7,15 +7,24 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { TbEdit } from 'react-icons/tb';
 import Skeleton from '@mui/material/Skeleton';
-import { Modal, message } from 'antd';
+import { Button, Modal, Upload, message } from 'antd';
 import { getAllProblem } from '@/services/problemAdmin/getAllProblem';
 import { deleteProblem } from '@/services/problemAdmin/deleteProblem';
+import { MdChecklist } from 'react-icons/md';
+import { UploadOutlined } from '@ant-design/icons';
+import { postTestcase } from '@/services/problemAdmin/postTestcase';
+import { set } from 'react-hook-form';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ProblemList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialPage = Number(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [isTestCaseUploadModalOpen, setIsTestCaseUploadModalOpen] =
+    useState<boolean>(false);
+  const [selectTestcaseId, setIsSelectTestcaseId] = useState<number>(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const pagesPerBlock = 5;
 
   const {
@@ -82,6 +91,65 @@ export default function ProblemList() {
       },
     });
   };
+
+  const [isMuteLoading, setIsMutateLoading] = useState(false);
+
+  const testcaseMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) =>
+      postTestcase(id, data),
+    onMutate: () => {
+      setIsMutateLoading(true);
+      setIsTestCaseUploadModalOpen(false);
+    },
+    onSuccess: () => {
+      setIsMutateLoading(false);
+      message.success('테스트케이스가 성공적으로 등록되었습니다.');
+      setIsTestCaseUploadModalOpen(false);
+      setIsTestCaseUploadModalOpen(false);
+      refetch();
+    },
+    onError: (error: any) => {
+      setIsMutateLoading(false);
+      setIsTestCaseUploadModalOpen(false);
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        alert(error.response?.data?.message);
+        router.push('/');
+      } else {
+        message.error('등록 중 오류가 발생했습니다. 파일을 확인해주세요.');
+      }
+    },
+    onSettled: () => {
+      setIsMutateLoading(false);
+      setIsTestCaseUploadModalOpen(false);
+    },
+  });
+
+  const handleFileChange = (file: File) => {
+    setSelectedFile(file);
+  };
+
+  // 테스트케이스 업로드 핸들러
+  const handleTestcaseUpload = (id: number) => {
+    if (!selectedFile) {
+      message.error('테스트케이스 파일을 선택하세요.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('spj', 'false'); // `spj`는 기본값 false
+
+    testcaseMutation.mutate({ id, data: formData });
+  };
+
+  // 모달 닫기 핸들러
+  const closeModal = () => {
+    setIsTestCaseUploadModalOpen(false);
+    setSelectedFile(null); // 파일 초기화
+    setIsSelectTestcaseId(0); // 선택된 문제 초기화
+  };
+
+  const selectedFileName = selectedFile ? selectedFile.name : '';
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
@@ -134,6 +202,7 @@ export default function ProblemList() {
                   <th className="p-4">공개여부</th>
                   <th className="p-4">문제타입</th>
                   <th className="p-4">출제자</th>
+                  <th className="p-4">테스트케이스</th>
                   <th className="p-4">문제 관리</th>
                 </tr>
               </thead>
@@ -158,7 +227,19 @@ export default function ProblemList() {
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                       {item.created_by.name}
                     </td>
+                    <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {item.test_case_id ? '등록' : '미등록'}
+                    </td>
                     <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
+                      <MdChecklist
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsTestCaseUploadModalOpen(true);
+                          setIsSelectTestcaseId(item.id);
+                        }}
+                      />
+
                       <TbEdit
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {
@@ -234,6 +315,73 @@ export default function ProblemList() {
           )}
         </section>
       </div>
+      {isTestCaseUploadModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={closeModal}
+        >
+          <div
+            className="relative w-[90%] max-w-md bg-white rounded-lg shadow-lg p-6 md:p-8 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 모달 헤더 */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                테스트케이스 업로드
+              </h2>
+              <button
+                className="text-gray-400 hover:text-gray-600"
+                onClick={closeModal}
+              >
+                <span className="text-xl font-bold">&times;</span>
+              </button>
+            </div>
+
+            {/* 파일 업로드 */}
+            <Upload
+              accept=".zip"
+              beforeUpload={(file) => {
+                handleFileChange(file);
+                return false; // 자동 업로드 방지
+              }}
+              showUploadList={false}
+            >
+              <Button
+                icon={<UploadOutlined />}
+                className="w-full py-2 px-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+              >
+                테스트케이스.zip 업로드
+              </Button>
+            </Upload>
+
+            {/* 선택된 파일 이름 */}
+            {selectedFileName && (
+              <div className="mt-4 text-md text-gray-700">
+                <span className="font-medium">선택된 파일:</span>{' '}
+                {selectedFileName}
+              </div>
+            )}
+
+            {/* 등록 버튼 */}
+            <div className="mt-6 flex justify-end">
+              <button
+                className="py-2 px-4 bg-primary text-white font-medium rounded-md hover:bg-primaryButtonHover transition-all"
+                onClick={() => handleTestcaseUpload(selectTestcaseId)}
+              >
+                등록
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isMuteLoading && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          style={{ color: 'white' }}
+        >
+          <CircularProgress color="inherit" />
+        </div>
+      )}
     </div>
   );
 }

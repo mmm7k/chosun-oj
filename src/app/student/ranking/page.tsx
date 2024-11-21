@@ -2,11 +2,12 @@
 
 import { getRank } from '@/services/rankingUser/getRank';
 import { rankColor } from '@/utils/rankColor';
+import Skeleton from '@mui/material/Skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { BiSolidAward } from 'react-icons/bi';
 
 export default function Ranking() {
-  const { data: rankData } = useQuery({
+  const { data: rankData, isLoading } = useQuery({
     queryKey: ['rankData'],
     queryFn: () => getRank(),
   });
@@ -86,27 +87,43 @@ export default function Ranking() {
               </tr>
             </thead>
             <tbody className="text-sm text-gray-500">
-              {ranking.map((user: RankingUser, index: number) => (
-                <tr key={user.username} className="shadow-sm hover:bg-gray-50">
-                  <td
-                    className="p-4 border-l-[5px] "
-                    style={{ borderColor: rankColor(user.rank) }}
-                  >
-                    {index + 1}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <BiSolidAward
-                        className="text-[2rem]"
-                        style={{ color: rankColor(user.rank) }}
-                      />
-                      <span>{user.rank}</span>
-                    </div>
-                  </td>
-                  <td className="p-4">{user.username}</td>
-                  <td className="p-4">{user.total_score}</td>
-                </tr>
-              ))}
+              {isLoading
+                ? Array.from({ length: 20 }).map((_, index) => (
+                    <tr key={index}>
+                      <td colSpan={4} className="p-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <Skeleton animation="wave" width="25%" height={40} />
+                          <Skeleton animation="wave" width="25%" height={40} />
+                          <Skeleton animation="wave" width="25%" height={40} />
+                          <Skeleton animation="wave" width="25%" height={40} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                : ranking.map((user: RankingUser, index: number) => (
+                    <tr
+                      key={user.username}
+                      className="shadow-sm hover:bg-gray-50"
+                    >
+                      <td
+                        className="p-4 border-l-[5px]"
+                        style={{ borderColor: rankColor(user.rank) }}
+                      >
+                        {index + 1}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <BiSolidAward
+                            className="text-[2rem]"
+                            style={{ color: rankColor(user.rank) }}
+                          />
+                          <span>{user.rank}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">{user.username}</td>
+                      <td className="p-4">{user.total_score}</td>
+                    </tr>
+                  ))}
             </tbody>
           </table>
         </div>

@@ -458,11 +458,11 @@ export default function StudentMain() {
             />
             <div className="absolute bottom-0 right-0 flex items-center space-x-2 font-light text-gray-500 ">
               <span className="text-xs 2xl:text-sm">Less</span>
-              <div className="rounded-[0.27rem] bg-[#ebedf0] w-[0.9rem] h-[0.9rem]" />
-              <div className="rounded-[0.27rem] bg-[#9be9a8] w-[0.9rem] h-[0.9rem]" />
-              <div className="rounded-[0.27rem] bg-[#40c463] w-[0.9rem] h-[0.9rem]" />
-              <div className="rounded-[0.27rem] bg-[#30a14e] w-[0.9rem] h-[0.9rem]" />
-              <div className="rounded-[0.27rem] bg-[#216e39] w-[0.9rem] h-[0.9rem]" />
+              <div className="rounded-[0.27rem] bg-[#ebedf0] w-[0.7rem] h-[0.7rem]" />
+              <div className="rounded-[0.27rem] bg-[#9be9a8] w-[0.7rem] h-[0.7rem]" />
+              <div className="rounded-[0.27rem] bg-[#40c463] w-[0.7rem] h-[0.7rem]" />
+              <div className="rounded-[0.27rem] bg-[#30a14e] w-[0.7rem] h-[0.7rem]" />
+              <div className="rounded-[0.27rem] bg-[#216e39] w-[0.7rem] h-[0.7rem]" />
               <span className="text-xs 2xl:text-sm ">More</span>
             </div>
           </div>

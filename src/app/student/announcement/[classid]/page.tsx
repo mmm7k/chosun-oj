@@ -21,6 +21,7 @@ export default function Announcement({
   const decodedClass = decodeURIComponent(classId);
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const searchParams = useSearchParams();
 
   // 초기 페이지 설정
@@ -84,6 +85,10 @@ export default function Announcement({
       ? Math.min(endPage + 1, totalPages)
       : Math.max(startPage - pagesPerBlock, 1);
     changePage(newPage);
+  };
+
+  const toggleContent = (id: number) => {
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -161,7 +166,7 @@ export default function Announcement({
       </section>
 
       {/* 메인 공지사항 */}
-      <div className="bg-[#f0f4fc] w-full flex flex-col lg:flex-row items-center lg:items-start justify-center text-secondary">
+      <div className="bg-[#f0f4fc] min-h-screen  w-full flex flex-col lg:flex-row items-center lg:items-start justify-center text-secondary">
         <div className="w-[90%] lg:w-[62%] flex gap-0 lg:gap-12 pt-12 items-start mb-44">
           {/* 공지사항 목록 */}
           <main className="w-full lg:w-[75%]">
@@ -192,15 +197,27 @@ export default function Announcement({
               ) : announcementList.length > 0 ? (
                 announcementList.map((item: any) => (
                   <div key={item.id}>
-                    <div className="flex items-center text-sm p-5 border-b border-gray-200 hover:bg-[#eeeff3] cursor-pointer">
+                    <div
+                      className="flex items-center text-sm p-5 border-b border-gray-200 hover:bg-[#eeeff3] cursor-pointer"
+                      onClick={() => toggleContent(item.id)}
+                    >
                       <span className="w-[60%] ml-[5%]">{item.title}</span>
                       <span className="ml-auto w-[20%]">
                         {formattedDate(item.create_time)}
                       </span>
                       <span className="ml-auto text-xl mr-[2%]">
-                        <IoChevronDown />
+                        {expandedId === item.id ? (
+                          <IoChevronUp />
+                        ) : (
+                          <IoChevronDown />
+                        )}
                       </span>
                     </div>
+                    {expandedId === item.id && (
+                      <div className="p-7 border-b border-gray-200">
+                        <p>{item.content || '공지사항 내용이 없습니다.'}</p>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -241,8 +258,8 @@ export default function Announcement({
                 onClick={() => changePageBlock(true)}
                 disabled={endPage === totalPages}
                 className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
-          ${currentBlock === 1 ? 'opacity-40' : ''}
-          `}
+            ${currentBlock === 1 ? 'opacity-40' : ''}
+            `}
               >
                 &gt;
               </button>

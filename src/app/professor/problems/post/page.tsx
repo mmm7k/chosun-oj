@@ -115,7 +115,7 @@ export default function ProblemPost() {
       input_description: '',
       output_description: '',
       samples: [],
-      test_case_id: 'test',
+      test_case_id: 'null',
       test_case_score: [
         {
           score: data.score,
