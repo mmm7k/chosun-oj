@@ -403,10 +403,12 @@ export default function StudentMain() {
         <div className="flex flex-col items-center justify-between flex-1 px-10 py-10 border border-gray-300 sm:flex-row sm:px-1 md:px-10 lg:px-1 2xl:px-10 rounded-xl">
           {/* 랭크와 스텟 */}
           <div className="flex flex-col items-center flex-1 sm:flex-row ">
-            <BiSolidAward
-              className={`text-[11rem] sm:text-[8rem]  lg:text-[9rem] xl:text-[10rem] 2xl:text-[11rem] animate-pulse mb-5 sm:mb-0`}
-              style={{ color: rankColor(profile?.rank ?? '') }}
-            />
+            {profile?.rank && (
+              <BiSolidAward
+                className={`text-[11rem] sm:text-[8rem]  lg:text-[9rem] xl:text-[10rem] 2xl:text-[11rem] animate-pulse mb-5 sm:mb-0`}
+                style={{ color: rankColor(profile.rank) }}
+              />
+            )}
             <div className="flex flex-col items-start justify-center mb-5 ml-0 space-y-3 text-gray-600 sm:ml-0 lg:ml-3 sm:mb-0">
               <span className="font-semibold lg:text-lg 2xl:text-xl">
                 <span>Rank : </span>

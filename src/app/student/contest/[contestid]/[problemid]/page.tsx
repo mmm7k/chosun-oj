@@ -286,6 +286,7 @@ return Math.min(...t) + " " + Math.max(...t);
             {/* 왼쪽 섹션 */}
             {!isSubmitVisible ? (
               <div className="px-12 space-y-5 overflow-auto w-[50%]">
+                <h1 className="mt-5 font-semibold">문제 설명</h1>
                 <Viewer
                   initialValue={problemData.description || '내용이 없습니다.'}
                 />
@@ -392,18 +393,21 @@ return Math.min(...t) + " " + Math.max(...t);
           {isLeftVisible ? (
             !isSubmitVisible ? (
               <div className="w-full px-4 space-y-5 overflow-auto sm:px-12 ">
+                <h1 className="mt-5 font-semibold">문제 설명</h1>
                 <Viewer
                   initialValue={problemData.description || '내용이 없습니다.'}
                 />
                 <hr className="border-[1px] border-gray-200" />
                 <h1 className="font-semibold">제한 사항</h1>
-                <p className="text-sm">
-                  메모리 제한: {problemData.memory_limit}mb
-                </p>
-                <p className="text-sm">시간 제한: {problemData.time_limit}ms</p>
-                <p className="text-sm">
-                  사용 언어: {problemData.languages.join(', ')}
-                </p>
+                <pre className="text-xs bg-gray-300 rounded-md p-3">
+                  <code>
+                    메모리 제한: {problemData.memory_limit}MB
+                    <br />
+                    시간 제한: {problemData.time_limit}ms
+                    <br />
+                    사용 언어: {problemData.languages.join(', ')}
+                  </code>
+                </pre>
               </div>
             ) : (
               <div className="w-full h-full p-3">

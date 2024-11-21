@@ -30,7 +30,7 @@ export default function ContestProblemList({
 
   const contestProblemList = contestProblemListData?.data?.data || [];
   const totalPages = contestProblemListData?.data?.total_count
-    ? Math.ceil(contestProblemListData.data.total_count / 10)
+    ? Math.ceil(contestProblemListData.data.total_count / 15)
     : 1;
 
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);

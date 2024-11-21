@@ -30,6 +30,7 @@ export default function ProblemPost() {
       setMarkdownContent(content);
     }
   };
+  console.log(markdownContent);
   const problemTags = [
     '변수',
     '데이터 타입',
