@@ -322,16 +322,16 @@ export default function Problem({ params }: { params: { problemid: string } }) {
       <div className="w-full  h-14 border-b-[1.5px] bg-white border-gray-300 px-4 sm:px-12 flex justify-between items-center">
         <div className="space-x-2 sm:space-x-4 flex items-center">
           <button
-            className={`mt-4  pb-3 ${!isSubmitVisible ? 'text-primary border-primary border-b-[3px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
+            className={`mt-4  pb-3 ${!isSubmitVisible ? 'text-primary border-primary border-b-[4px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
             onClick={() => setIsSubmitVisible(!isSubmitVisible)}
           >
-            <div className="max-w-28 overflow-hidden text-ellipsis whitespace-nowrap">
+            <div className="max-w-28 sm:max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
               {problem.title}
             </div>
           </button>
 
           <button
-            className={`mt-4  pb-3 ${isSubmitVisible ? 'text-primary border-primary border-b-[3px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
+            className={`mt-4  pb-3 ${isSubmitVisible ? 'text-primary border-primary border-b-[4px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
             onClick={() => setIsSubmitVisible(!isSubmitVisible)}
           >
             제출 내역
