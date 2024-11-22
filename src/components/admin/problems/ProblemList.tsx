@@ -13,7 +13,6 @@ import { deleteProblem } from '@/services/problemAdmin/deleteProblem';
 import { MdChecklist } from 'react-icons/md';
 import { UploadOutlined } from '@ant-design/icons';
 import { postTestcase } from '@/services/problemAdmin/postTestcase';
-import { set } from 'react-hook-form';
 import CircularProgress from '@mui/material/CircularProgress';
 import { GoCodescan } from 'react-icons/go';
 
@@ -227,7 +226,7 @@ export default function ProblemList() {
                       {item.is_public ? '대회/과제' : '공통'}
                     </td>
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                      {item.created_by.name}
+                      {item?.created_by?.name}
                     </td>
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                       {item.test_case_id ? '등록' : '미등록'}
