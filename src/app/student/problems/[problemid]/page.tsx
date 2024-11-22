@@ -43,6 +43,7 @@ const languageMap: { [key: string]: string } = {
 
 export default function Problem({ params }: { params: { problemid: string } }) {
   const problemId = parseInt(params.problemid);
+
   const [code, setCode] = useState('언어를 선택해주세요.');
   const [output, setOutput] = useState('실행 결과가 표시됩니다.');
   const [isLoading, setIsLoading] = useState(false);
@@ -62,6 +63,15 @@ export default function Problem({ params }: { params: { problemid: string } }) {
   const initialPage = Number(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
+
+  //에디터 커서 위치 테스트
+  const [isFontReady, setIsFontReady] = useState(false); //폰트 로드 확인
+  // 폰트 로드 확인
+  useEffect(() => {
+    document.fonts.ready.then(() => {
+      setIsFontReady(true);
+    });
+  }, []);
 
   const toggleSubmissionCode = (submissionId: number) => {
     // 동일한 ID를 클릭한 경우 닫기
@@ -285,7 +295,11 @@ export default function Problem({ params }: { params: { problemid: string } }) {
     router.back();
   };
 
-  if (!isViewerReady) {
+  // if (!isViewerReady) {
+  //   return null;
+  // }
+
+  if (!isViewerReady || !isFontReady) {
     return null;
   }
 
@@ -305,13 +319,15 @@ export default function Problem({ params }: { params: { problemid: string } }) {
       </div>
 
       {/* 문제 이름 */}
-      <div className="w-full h-14 border-b-[1.5px] bg-white border-gray-300 px-4 sm:px-12 flex justify-between items-center">
-        <div className="space-x-2 sm:space-x-4">
+      <div className="w-full  h-14 border-b-[1.5px] bg-white border-gray-300 px-4 sm:px-12 flex justify-between items-center">
+        <div className="space-x-2 sm:space-x-4 flex items-center">
           <button
             className={`mt-4  pb-3 ${!isSubmitVisible ? 'text-primary border-primary border-b-[3px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
             onClick={() => setIsSubmitVisible(!isSubmitVisible)}
           >
-            {problem.title}
+            <div className="max-w-28 overflow-hidden text-ellipsis whitespace-nowrap">
+              {problem.title}
+            </div>
           </button>
 
           <button
@@ -322,7 +338,7 @@ export default function Problem({ params }: { params: { problemid: string } }) {
           </button>
         </div>
         <div className="flex items-center">
-          <div className="sm:hidden">
+          <div className="sm:hidden ">
             {/* sm 이하에서만 보이는 토글 버튼 그룹 */}
             <ToggleButtonGroup
               color="primary"
@@ -366,7 +382,7 @@ export default function Problem({ params }: { params: { problemid: string } }) {
           <Split className="flex flex-1" sizes={[50, 50]} minSize={200}>
             {/* 왼쪽 섹션 */}
             {!isSubmitVisible ? (
-              <div className="px-12 space-y-5 overflow-auto w-[50%]">
+              <div className="px-12 space-y-5 overflow-auto w-[50%] pb-11">
                 <h1 className="mt-5 font-semibold">문제 설명</h1>
                 <Viewer
                   initialValue={problem.description || '내용이 없습니다.'}
@@ -527,7 +543,7 @@ export default function Problem({ params }: { params: { problemid: string } }) {
         <div className="flex w-screen h-full sm:hidden">
           {isLeftVisible ? (
             !isSubmitVisible ? (
-              <div className="w-full px-4 space-y-5 overflow-auto sm:px-12 ">
+              <div className="w-full px-4 space-y-5 overflow-auto sm:px-12 pb-8 ">
                 <h1 className="mt-5 font-semibold">문제 설명</h1>
                 <Viewer
                   initialValue={problem.description || '내용이 없습니다.'}
