@@ -142,13 +142,13 @@ export default function ProblemPost() {
       // output_description: '',
       // samples: [],
       // test_case_id: 'test',
-      // test_case_score: [
-      // {
-      // score: data.score,
-      // input_name: '1.in',
-      // output_name: '1.out',
-      // },
-      // ],
+      test_case_score: [
+        {
+          score: data.score,
+          input_name: '1.in',
+          output_name: '1.out',
+        },
+      ],
       time_limit: data.time_limit,
       memory_limit: data.memory_limit,
       languages: data.languages,
@@ -170,6 +170,7 @@ export default function ProblemPost() {
       // source: '',
       share_submission: false,
     };
+
     mutation.mutate(formattedData); // Mutation 실행
   };
 
