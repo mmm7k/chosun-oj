@@ -6,6 +6,7 @@ import { FaCodeBranch } from 'react-icons/fa';
 import { AiOutlineCodeSandbox } from 'react-icons/ai';
 import { useQuery } from '@tanstack/react-query';
 import { getClassListUser } from '@/services/classUser/getClassListUser';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const icons = [
   <HiOutlineComputerDesktop className="text-[5rem] md:text-[6rem] text-white" />,
@@ -14,7 +15,7 @@ const icons = [
 ];
 
 export default function ClassSelect() {
-  const { data: classListData } = useQuery({
+  const { data: classListData, isLoading } = useQuery({
     queryKey: ['classListData'],
     queryFn: () => getClassListUser(),
   });
@@ -22,7 +23,9 @@ export default function ClassSelect() {
   const classList = classListData?.data?.data || [];
   return (
     <div className="bg-[#f0f4fc] min-h-screen font-semibold flex justify-center items-center py-[10dvh] md:py-[20dvh]">
-      {classList.length === 0 ? (
+      {isLoading ? (
+        <CircularProgress />
+      ) : classList.length === 0 ? (
         <div className="text-center text-gray-500 text-lg  ">
           참여중인 분반이 없습니다.
         </div>
