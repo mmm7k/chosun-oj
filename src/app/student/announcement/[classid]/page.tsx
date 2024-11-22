@@ -35,7 +35,7 @@ export default function Announcement({
     queryKey: ['classListData'],
     queryFn: () => getClassListUser(),
   });
-  const classList = classListData?.data?.results;
+  const classList = classListData?.data?.data;
   const classItem = classList?.find(
     (item: any) => item.id === parseInt(classId),
   );
@@ -111,7 +111,7 @@ export default function Announcement({
           className={`overflow-hidden ${isMenuOpen ? 'h-auto py-3' : 'max-h-0'}`}
         >
           <ul className="space-y-4 text-gray-500">
-            <Link href="/student/announcement/common">
+            <Link href="/student/announcement/common?page=1">
               <li
                 className={`pl-[5%] py-2 ${
                   classId === 'common'
@@ -123,7 +123,10 @@ export default function Announcement({
               </li>
             </Link>
             {classList?.map((item: any) => (
-              <Link href={`/student/announcement/${item.id}`} key={item.id}>
+              <Link
+                href={`/student/announcement/${item.id}?page=1`}
+                key={item.id}
+              >
                 <li
                   className={`pl-[5%] py-2 ${
                     parseInt(classId) === item.id
@@ -167,11 +170,11 @@ export default function Announcement({
       </section>
 
       {/* 메인 공지사항 */}
-      <div className="bg-[#f0f4fc] min-h-screen  w-full flex flex-col lg:flex-row items-center lg:items-start justify-center text-secondary">
+      <div className="bg-[#f0f4fc] min-h-screen  w-full flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center text-secondary">
         <div className="w-[90%] lg:w-[62%] flex gap-0 lg:gap-12 pt-12 items-start mb-44">
           {/* 공지사항 목록 */}
           <main className="w-full lg:w-[75%]">
-            <div className="flex items-center px-4 bg-white shadow-md rounded-2xl">
+            <div className="flex items-center px-4 bg-white shadow-md rounded-xl">
               <IoSearchSharp className="text-lg text-gray-400" />
               <input
                 type="text"
@@ -270,7 +273,7 @@ export default function Announcement({
           <aside className="flex-1 hidden p-8 text-sm bg-white shadow-md lg:block rounded-2xl">
             <div className="flex flex-col w-full h-full space-y-7">
               <h1 className="mb-2 font-semibold text-secondary">카테고리</h1>
-              <Link href="/student/announcement/common">
+              <Link href="/student/announcement/common?page=1">
                 <li
                   className={`${
                     classId === 'common'
@@ -283,7 +286,10 @@ export default function Announcement({
               </Link>
 
               {classList?.map((item: any) => (
-                <Link href={`/student/announcement/${item.id}`} key={item.id}>
+                <Link
+                  href={`/student/announcement/${item.id}?page=1`}
+                  key={item.id}
+                >
                   <li
                     className={`${
                       parseInt(classId) === item.id

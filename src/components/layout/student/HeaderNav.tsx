@@ -77,7 +77,7 @@ export default function HeaderNav() {
 
         {/* 메뉴 (sm 이상에서만 표시) */}
         <section className="hidden sm:flex ml-[3%] space-x-3 xl:space-x-9">
-          <Link href={'/student/problems?category=all'}>
+          <Link href={'/student/problems?page=1'}>
             <span
               className={`cursor-pointer transition ${
                 pathname.startsWith('/student/problems')
@@ -112,7 +112,7 @@ export default function HeaderNav() {
               Q&A
             </span>
           </Link>
-          <Link href={'/student/announcement/common'}>
+          <Link href={'/student/announcement/common?page=1'}>
             <span
               className={`cursor-pointer transition ${
                 pathname.startsWith('/student/announcement')
@@ -208,7 +208,7 @@ export default function HeaderNav() {
         }`}
       >
         <Link
-          href={'/student/problems?category=all'}
+          href={'/student/problems?page=1'}
           className={`w-full flex justify-center items-center py-3 hover:bg-gray-100  ${
             pathname.startsWith('/student/problems') && 'text-primary'
           }`}

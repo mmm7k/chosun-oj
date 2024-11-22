@@ -32,7 +32,7 @@ export default function ContestSelect() {
           {contestList.map((contest: any, index: number) => (
             <Link
               key={contest.contest?.id}
-              href={`/student/contest/${contest.contest?.id}`}
+              href={`/student/contest/${contest.contest?.id}?page=1`}
             >
               <div className="cursor-pointer bg-white shadow-xl rounded-3xl py-16 md:py-20 px-24 md:px-14 border-[3px] border-transparent hover:border-blue-400 transition-all">
                 <div className="flex flex-col items-center">

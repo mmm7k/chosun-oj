@@ -119,7 +119,7 @@ export default function SideNav() {
                   }`}
                 >
                   <Link
-                    href="/professor/class/courselist"
+                    href="/professor/class/courselist?page=1"
                     onClick={closeAllDropdowns}
                   >
                     개설 강의 목록
@@ -134,7 +134,7 @@ export default function SideNav() {
                   }`}
                 >
                   <Link
-                    href="/professor/class/list"
+                    href="/professor/class/list?page=1"
                     onClick={closeAllDropdowns}
                   >
                     분반 목록
@@ -185,7 +185,7 @@ export default function SideNav() {
                 }`}
               >
                 <Link
-                  href="/professor/problems/list"
+                  href="/professor/problems/list?page=1"
                   onClick={closeAllDropdowns}
                 >
                   <li
@@ -195,7 +195,7 @@ export default function SideNav() {
                         : 'text-secondary hover:text-secondaryHover'
                     }`}
                   >
-                    등록한 문제 목록
+                    문제 목록
                   </li>
                 </Link>
                 <li
@@ -249,7 +249,7 @@ export default function SideNav() {
                   }`}
                 >
                   <Link
-                    href="/professor/assignment/list"
+                    href="/professor/assignment/list?page=1"
                     onClick={closeAllDropdowns}
                   >
                     과제 목록
@@ -320,7 +320,7 @@ export default function SideNav() {
                   }`}
                 >
                   <Link
-                    href="/professor/contest/list"
+                    href="/professor/contest/list?page=1"
                     onClick={closeAllDropdowns}
                   >
                     대회 목록
@@ -496,7 +496,7 @@ export default function SideNav() {
             {isClassDropdownOpen && (
               <ul className="w-full space-y-2 bg-white">
                 <Link
-                  href="/professor/class/courselist"
+                  href="/professor/class/courselist?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -513,7 +513,7 @@ export default function SideNav() {
                 </Link>
 
                 <Link
-                  href="/professor/class/list"
+                  href="/professor/class/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -570,7 +570,7 @@ export default function SideNav() {
             {isProblemsDropdownOpen && (
               <ul className="w-full py-2 space-y-2 bg-white">
                 <Link
-                  href="/professor/problems/list"
+                  href="/professor/problems/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -582,7 +582,7 @@ export default function SideNav() {
                       'text-primary font-semibold'
                     }`}
                   >
-                    등록한 문제 목록
+                    문제 목록
                   </li>
                 </Link>
 
@@ -630,7 +630,7 @@ export default function SideNav() {
             {isAssignmentDropdownOpen && (
               <ul className="w-full py-2 space-y-2 bg-white">
                 <Link
-                  href="/professor/assignment/list"
+                  href="/professor/assignment/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -704,7 +704,7 @@ export default function SideNav() {
             {isContestDropdownOpen && (
               <ul className="w-full py-2 space-y-2 bg-white">
                 <Link
-                  href="/professor/contest/list"
+                  href="/professor/contest/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();

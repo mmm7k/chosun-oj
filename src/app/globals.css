@@ -54,6 +54,11 @@
   background-repeat: repeat;
 }
 
+.custom-select {
+  position: relative; /* 자식 요소와의 관계를 설정 */
+  border-radius: 0.75rem; /* 모서리 둥글게 */
+}
+
 .custom-select .ant-select-selector {
   border: none !important;
   border-radius: 0.75rem !important;

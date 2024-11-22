@@ -15,13 +15,15 @@ import { Select } from 'antd';
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getContestProblemDetailUser } from '@/services/contestUser/getContestProblemDetailUser';
+
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 import { Viewer } from '@toast-ui/react-editor';
 import CircularProgress from '@mui/material/CircularProgress';
 import { formattedDate } from '@/utils/dateFormatter';
-import { postContestSubmission } from '@/services/contestUser/postContestSubmission';
-import { getContestAllSubmissionUser } from '@/services/contestUser/getContestAllSubmissionUser';
+
+import { getAllSubmissionUser } from '@/services/problemUser/getAllSubmissionUser';
+import { getProblemDetailUser } from '@/services/problemUser/getProblemDetailUser';
+import { postProblemSubmission } from '@/services/problemUser/postProblemSubmission';
 
 const { Option } = Select;
 
@@ -39,12 +41,7 @@ const languageMap: { [key: string]: string } = {
   Java: 'java',
 };
 
-export default function Problem({
-  params,
-}: {
-  params: { contestid: string; problemid: string };
-}) {
-  const contestId = parseInt(params.contestid);
+export default function Problem({ params }: { params: { problemid: string } }) {
   const problemId = parseInt(params.problemid);
   const [code, setCode] = useState('언어를 선택해주세요.');
   const [output, setOutput] = useState('실행 결과가 표시됩니다.');
@@ -53,7 +50,6 @@ export default function Problem({
   const router = useRouter();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
-  // const [selectedLanguage, setSelectedLanguage] = useState<string | null>('C');
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [submitResult, setSubmitResult] = useState('');
@@ -78,9 +74,8 @@ export default function Problem({
 
   //제출내역
   const { data: submissionListData, refetch } = useQuery({
-    queryKey: ['submissionListData', contestId, problemId],
-    queryFn: () =>
-      getContestAllSubmissionUser(currentPage, contestId, problemId),
+    queryKey: ['submissionListData', problemId],
+    queryFn: () => getAllSubmissionUser(currentPage, problemId),
   });
 
   const submissionList = submissionListData?.data?.data || [];
@@ -103,40 +98,38 @@ export default function Problem({
   };
 
   useEffect(() => {
-    router.replace(
-      `/student/contest/${contestId}/${problemId}?page=${currentPage}`,
-    );
+    router.replace(`/student/problems/${problemId}?page=${currentPage}`);
     refetch();
   }, [currentPage, router, refetch]);
 
   useEffect(() => {
     if (isLeftVisible) {
       setCurrentPage(1);
-      router.replace(`/student/contest/${contestId}/${problemId}`);
+      router.replace(`/student/problems/${problemId}`);
     }
-  }, [isLeftVisible, contestId, problemId, router]);
+  }, [isLeftVisible, problemId, router]);
 
-  const { data: contestProblemData, isError } = useQuery({
-    queryKey: ['contestProblemData', contestId, problemId],
-    queryFn: () => getContestProblemDetailUser(contestId, problemId),
+  const { data: problemData, isError } = useQuery({
+    queryKey: ['problemData', problemId],
+    queryFn: () => getProblemDetailUser(problemId),
   });
 
   if (isError) {
     alert('문제를 불러오는 중 오류가 발생했습니다.');
     router.push('/student');
   }
-  const problemData = contestProblemData?.data?.problem || {};
+  const problem = problemData?.data?.problem || {};
   const [isViewerReady, setIsViewerReady] = useState(false);
 
   useEffect(() => {
-    if (problemData.description) {
+    if (problem.description) {
       setIsViewerReady(true);
     }
-  }, [problemData.description]);
+  }, [problem.description]);
   // 불러온 사용 언어에서 셀렉트 옵션 생성
   const availableLanguages = useMemo(() => {
-    return problemData.languages || []; // problemData.languages 그대로 사용
-  }, [problemData.languages]);
+    return problem.languages || []; // problemData.languages 그대로 사용
+  }, [problem.languages]);
 
   //코드실행
   const runcode = async () => {
@@ -202,8 +195,7 @@ export default function Problem({
 
   // 제출 서브미션
   const mutation = useMutation({
-    mutationFn: (data: any) =>
-      postContestSubmission(contestId, problemId, data),
+    mutationFn: (data: any) => postProblemSubmission(problemId, data),
     onMutate: () => {
       setIsSubmitLoading(true);
     },
@@ -319,7 +311,7 @@ export default function Problem({
             className={`mt-4  pb-3 ${!isSubmitVisible ? 'text-primary border-primary border-b-[3px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
             onClick={() => setIsSubmitVisible(!isSubmitVisible)}
           >
-            {problemData.title}
+            {problem.title}
           </button>
 
           <button
@@ -377,18 +369,18 @@ export default function Problem({
               <div className="px-12 space-y-5 overflow-auto w-[50%]">
                 <h1 className="mt-5 font-semibold">문제 설명</h1>
                 <Viewer
-                  initialValue={problemData.description || '내용이 없습니다.'}
+                  initialValue={problem.description || '내용이 없습니다.'}
                 />
                 <hr className="border-[1px] border-gray-200" />
                 <h1 className="font-semibold">제한 사항</h1>
 
                 <pre className="text-xs bg-gray-300 rounded-md p-3">
                   <code>
-                    메모리 제한: {problemData.memory_limit}MB
+                    메모리 제한: {problem.memory_limit}MB
                     <br />
-                    시간 제한: {problemData.time_limit}ms
+                    시간 제한: {problem.time_limit}ms
                     <br />
-                    사용 언어: {problemData.languages.join(', ')}
+                    사용 언어: {problem.languages.join(', ')}
                   </code>
                 </pre>
               </div>
@@ -533,17 +525,17 @@ export default function Problem({
               <div className="w-full px-4 space-y-5 overflow-auto sm:px-12 ">
                 <h1 className="mt-5 font-semibold">문제 설명</h1>
                 <Viewer
-                  initialValue={problemData.description || '내용이 없습니다.'}
+                  initialValue={problem.description || '내용이 없습니다.'}
                 />
                 <hr className="border-[1px] border-gray-200" />
                 <h1 className="font-semibold">제한 사항</h1>
                 <pre className="text-xs bg-gray-300 rounded-md p-3">
                   <code>
-                    메모리 제한: {problemData.memory_limit}MB
+                    메모리 제한: {problem.memory_limit}MB
                     <br />
-                    시간 제한: {problemData.time_limit}ms
+                    시간 제한: {problem.time_limit}ms
                     <br />
-                    사용 언어: {problemData.languages.join(', ')}
+                    사용 언어: {problem.languages.join(', ')}
                   </code>
                 </pre>
               </div>

@@ -118,7 +118,10 @@ export default function SideNav() {
                       : 'text-white'
                   }`}
                 >
-                  <Link href="/admin/course/list" onClick={closeAllDropdowns}>
+                  <Link
+                    href="/admin/course/list?page=1"
+                    onClick={closeAllDropdowns}
+                  >
                     강의 목록
                   </Link>
                 </li>
@@ -168,7 +171,10 @@ export default function SideNav() {
                       : 'text-white'
                   }`}
                 >
-                  <Link href="/admin/user/list" onClick={closeAllDropdowns}>
+                  <Link
+                    href="/admin/user/list?page=1"
+                    onClick={closeAllDropdowns}
+                  >
                     유저 목록
                   </Link>
                 </li>
@@ -212,7 +218,10 @@ export default function SideNav() {
                   isProblemsDropdownOpen ? 'max-h-40' : 'max-h-0'
                 }`}
               >
-                <Link href="/admin/problems/list" onClick={closeAllDropdowns}>
+                <Link
+                  href="/admin/problems/list?page=1"
+                  onClick={closeAllDropdowns}
+                >
                   <li
                     className={`transition mt-5 ${
                       pathname === '/admin/problems/list'
@@ -220,7 +229,7 @@ export default function SideNav() {
                         : 'text-white'
                     }`}
                   >
-                    전체 문제 목록
+                    문제 목록
                   </li>
                 </Link>
                 <li
@@ -269,7 +278,10 @@ export default function SideNav() {
                       : 'text-white'
                   }`}
                 >
-                  <Link href="/admin/contest/list" onClick={closeAllDropdowns}>
+                  <Link
+                    href="/admin/contest/list?page=1"
+                    onClick={closeAllDropdowns}
+                  >
                     대회 목록
                   </Link>
                 </li>
@@ -336,7 +348,7 @@ export default function SideNav() {
                   }`}
                 >
                   <Link
-                    href="/admin/announcement/list"
+                    href="/admin/announcement/list?page=1"
                     onClick={closeAllDropdowns}
                   >
                     공지 목록
@@ -427,7 +439,7 @@ export default function SideNav() {
             {isCourseDropdownOpen && (
               <ul className="w-full space-y-2 bg-white">
                 <Link
-                  href="/admin/course/list"
+                  href="/admin/course/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -484,7 +496,7 @@ export default function SideNav() {
             {isStudentDropdownOpen && (
               <ul className="w-full space-y-2 bg-white">
                 <Link
-                  href="/admin/user/list"
+                  href="/admin/user/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -541,7 +553,7 @@ export default function SideNav() {
             {isProblemsDropdownOpen && (
               <ul className="w-full py-2 space-y-2 bg-white">
                 <Link
-                  href="/admin/problems/list"
+                  href="/admin/problems/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -553,7 +565,7 @@ export default function SideNav() {
                       'text-primary font-semibold'
                     }`}
                   >
-                    전체 문제 목록
+                    문제 목록
                   </li>
                 </Link>
 
@@ -599,7 +611,7 @@ export default function SideNav() {
             {isContestDropdownOpen && (
               <ul className="w-full py-2 space-y-2 bg-white">
                 <Link
-                  href="/admin/contest/list"
+                  href="/admin/contest/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();
@@ -675,7 +687,7 @@ export default function SideNav() {
             {isAnnouncementDropdownOpen && (
               <ul className="w-full py-2 space-y-2 bg-white">
                 <Link
-                  href="/admin/announcement/list"
+                  href="/admin/announcement/list?page=1"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     closeAllDropdowns();

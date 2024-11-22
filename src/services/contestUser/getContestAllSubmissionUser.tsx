@@ -1,6 +1,6 @@
 import api from '../api';
 
-export const getContestAllSubmission = async (
+export const getContestAllSubmissionUser = async (
   page: number,
   contestId: number,
   problemId: number,

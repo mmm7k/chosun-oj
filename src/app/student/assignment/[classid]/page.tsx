@@ -64,7 +64,7 @@ export default function Assignment({
             assignments.map((assignment: any) => (
               <Link
                 key={assignment.id}
-                href={`/student/assignment/${classId}/${assignment.id}`}
+                href={`/student/assignment/${classId}/${assignment.id}?page=1`}
                 className="block"
               >
                 <div

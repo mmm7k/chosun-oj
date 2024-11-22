@@ -1,26 +1,13 @@
 import ProblemList from '@/components/student/problems/ProblemList';
 import ProblemsBanner from '@/components/student/problems/ProblemsBanner';
-import ProblemsMenu from '@/components/student/problems/ProblemsMenu';
-import ProblemsMobileMenu from '@/components/student/problems/ProblemsMobileMenu';
-import { Suspense } from 'react';
 
 export default function Problems() {
   return (
     <>
-      {/* lg 이하에서 카테고리*/}
-      <Suspense>
-        <ProblemsMobileMenu />
-      </Suspense>
-      {/* 배너 */}
       <ProblemsBanner />
-      <main className="bg-[#f0f4fc] w-full flex flex-col lg:flex-row items-center lg:items-start justify-center">
-        <div className="w-[90%] lg:w-[62%] flex gap-0 lg:gap-12 pt-12 items-start mb-44 ">
-          <Suspense>
-            <ProblemList />
-          </Suspense>
-          <Suspense>
-            <ProblemsMenu />
-          </Suspense>
+      <main className="bg-[#f0f4fc] min-h-screen w-full flex  justify-center">
+        <div className="w-[90%] lg:w-[62%] pt-12 mb-44">
+          <ProblemList />
         </div>
       </main>
     </>
