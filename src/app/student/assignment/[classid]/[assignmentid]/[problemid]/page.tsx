@@ -15,13 +15,13 @@ import { Select } from 'antd';
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getContestProblemDetailUser } from '@/services/contestUser/getContestProblemDetailUser';
 import '@toast-ui/editor/dist/toastui-editor-viewer.css';
 import { Viewer } from '@toast-ui/react-editor';
 import CircularProgress from '@mui/material/CircularProgress';
 import { formattedDate } from '@/utils/dateFormatter';
-import { postContestSubmission } from '@/services/contestUser/postContestSubmission';
-import { getContestAllSubmission } from '@/services/contestUser/getContestAllSubmissionUser';
+import { getAssignmentProblemDetailUser } from '@/services/assignmentUser/getAssignmentProblemDetailUser';
+import { postAssignmentSubmission } from '@/services/assignmentUser/postAssignmentSubmission';
+import { getAssignmentAllSubmission } from '@/services/assignmentUser/getAssignmentAllSubmissionUser';
 
 const { Option } = Select;
 
@@ -42,9 +42,10 @@ const languageMap: { [key: string]: string } = {
 export default function Problem({
   params,
 }: {
-  params: { contestid: string; problemid: string };
+  params: { classid: string; assignmentid: string; problemid: string };
 }) {
-  const contestId = parseInt(params.contestid);
+  const classId = parseInt(params.classid);
+  const assignmentId = parseInt(params.assignmentid);
   const problemId = parseInt(params.problemid);
   const [code, setCode] = useState('언어를 선택해주세요.');
   const [output, setOutput] = useState('실행 결과가 표시됩니다.');
@@ -53,7 +54,6 @@ export default function Problem({
   const router = useRouter();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
-  // const [selectedLanguage, setSelectedLanguage] = useState<string | null>('C');
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [submitResult, setSubmitResult] = useState('');
@@ -78,11 +78,13 @@ export default function Problem({
 
   //제출내역
   const { data: submissionListData, refetch } = useQuery({
-    queryKey: ['submissionListData', contestId, problemId],
-    queryFn: () => getContestAllSubmission(currentPage, contestId, problemId),
+    queryKey: ['submissionListData', classId, assignmentId, problemId],
+    queryFn: () =>
+      getAssignmentAllSubmission(currentPage, classId, assignmentId, problemId),
   });
 
-  const submissionList = submissionListData?.data?.data || [];
+  const submissionList = submissionListData?.data || [];
+
   const totalPages = submissionListData?.data?.total_count
     ? Math.ceil(submissionListData.data.total_count / 15)
     : 1;
@@ -103,7 +105,7 @@ export default function Problem({
 
   useEffect(() => {
     router.replace(
-      `/student/contest/${contestId}/${problemId}?page=${currentPage}`,
+      `/student/assignment/${classId}/${assignmentId}/${problemId}?page=${currentPage}`,
     );
     refetch();
   }, [currentPage, router, refetch]);
@@ -111,20 +113,23 @@ export default function Problem({
   useEffect(() => {
     if (isLeftVisible) {
       setCurrentPage(1);
-      router.replace(`/student/contest/${contestId}/${problemId}`);
+      router.replace(
+        `/student/assignment/${classId}/${assignmentId}/${problemId}`,
+      );
     }
-  }, [isLeftVisible, contestId, problemId, router]);
+  }, [isLeftVisible, classId, assignmentId, problemId, router]);
 
-  const { data: contestProblemData, isError } = useQuery({
-    queryKey: ['contestProblemData', contestId, problemId],
-    queryFn: () => getContestProblemDetailUser(contestId, problemId),
+  const { data: assignmentProblemData, isError } = useQuery({
+    queryKey: ['assignmentProblemData', classId, assignmentId, problemId],
+    queryFn: () =>
+      getAssignmentProblemDetailUser(classId, assignmentId, problemId),
   });
 
   if (isError) {
     alert('문제를 불러오는 중 오류가 발생했습니다.');
     router.push('/student');
   }
-  const problemData = contestProblemData?.data?.problem || {};
+  const problemData = assignmentProblemData?.data?.problem || {};
   const [isViewerReady, setIsViewerReady] = useState(false);
 
   useEffect(() => {
@@ -202,7 +207,7 @@ export default function Problem({
   // 제출 서브미션
   const mutation = useMutation({
     mutationFn: (data: any) =>
-      postContestSubmission(contestId, problemId, data),
+      postAssignmentSubmission(classId, assignmentId, problemId, data),
     onMutate: () => {
       setIsSubmitLoading(true);
     },

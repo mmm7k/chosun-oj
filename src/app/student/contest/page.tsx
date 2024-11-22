@@ -14,7 +14,7 @@ const icons = [
   <AiOutlineCodeSandbox className="text-[5rem] md:text-[6rem] text-white" />,
 ];
 
-export default function ContestSelectClass() {
+export default function ContestSelect() {
   const { data: contestListData } = useQuery({
     queryKey: ['contestListData'],
     queryFn: () => getContestListUser(),

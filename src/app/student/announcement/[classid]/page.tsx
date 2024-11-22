@@ -1,7 +1,7 @@
 'use client';
 
 import { getAnnouncementUser } from '@/services/announcementUser/getAnnouncementUser';
-import { getClassListUser } from '@/services/announcementUser/getClassListUser';
+
 import { getClassAnnouncementUser } from '@/services/announcementUser/getClassAnnouncementUser';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formattedDate } from '@/utils/dateFormatter';
 import Skeleton from '@mui/material/Skeleton';
+import { getClassListUser } from '@/services/classUser/getClassListUser';
 
 export default function Announcement({
   params,

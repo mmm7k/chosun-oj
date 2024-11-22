@@ -65,63 +65,69 @@ export default function ContestProblemList({
             <span className="w-[10%]">제출</span>
             <span className="w-[10%]">정답률</span>
           </div>
-          {isLoading
-            ? Array.from({ length: 10 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center text-sm py-5 px-5 border-b hover:bg-[#eeeff3] cursor-pointer"
-                >
-                  <span className="w-[10%]">
-                    <Skeleton animation="wave" width="100%" height={20} />
+          {isLoading ? (
+            Array.from({ length: 10 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center text-sm py-5 px-5 border-b hover:bg-[#eeeff3] cursor-pointer"
+              >
+                <span className="w-[10%]">
+                  <Skeleton animation="wave" width="100%" height={20} />
+                </span>
+                <span className="w-[50%]">
+                  <Skeleton animation="wave" width="100%" height={20} />
+                </span>
+                <span className="w-[10%]">
+                  <Skeleton animation="wave" width="80%" height={20} />
+                </span>
+                <span className="w-[10%]">
+                  <Skeleton animation="wave" width="60%" height={20} />
+                </span>
+                <span className="w-[10%]">
+                  <Skeleton animation="wave" width="70%" height={20} />
+                </span>
+              </div>
+            ))
+          ) : contestProblemList.length === 0 ? (
+            <div className="text-center text-gray-500 py-5">
+              등록된 문제가 없습니다.
+            </div>
+          ) : (
+            contestProblemList.map((problemItem: any) => (
+              <Link
+                href={`${pathname}/${problemItem.problem.id}`}
+                key={problemItem.problem.id}
+              >
+                <div className="flex justify-between items-center text-sm py-5 px-5 border-b hover:bg-[#eeeff3] cursor-pointer">
+                  <span className="w-[10%] text-green-500 font-bold">
+                    {/* {problemItem.solved === 'solved' ? '✔' : ''} */}
                   </span>
-                  <span className="w-[50%]">
-                    <Skeleton animation="wave" width="100%" height={20} />
+                  <span className="w-[50%]">{problemItem.problem.title}</span>
+                  <span
+                    className={`w-[10%] font-semibold ${
+                      problemItem.problem.difficulty === 'Low'
+                        ? 'text-green-400'
+                        : problemItem.problem.difficulty === 'Middle'
+                          ? 'text-sky-400'
+                          : 'text-rose-400'
+                    }`}
+                  >
+                    {problemItem.problem.difficulty === 'Low'
+                      ? 'Lv.1'
+                      : problemItem.problem.difficulty === 'Middle'
+                        ? 'Lv.2'
+                        : 'Lv.3'}
                   </span>
-                  <span className="w-[10%]">
-                    <Skeleton animation="wave" width="80%" height={20} />
+                  <span className="w-[10%] flex items-center">
+                    {problemItem.problem.submission_number}
                   </span>
-                  <span className="w-[10%]">
-                    <Skeleton animation="wave" width="60%" height={20} />
-                  </span>
-                  <span className="w-[10%]">
-                    <Skeleton animation="wave" width="70%" height={20} />
+                  <span className="w-[10%] flex items-center">
+                    {problemItem.problem.accuracy}%
                   </span>
                 </div>
-              ))
-            : contestProblemList.map((problemItem: any) => (
-                <Link
-                  href={`${pathname}/${problemItem.problem.id}`}
-                  key={problemItem.problem.id}
-                >
-                  <div className="flex justify-between items-center text-sm py-5 px-5 border-b hover:bg-[#eeeff3] cursor-pointer">
-                    <span className="w-[10%] text-green-500 font-bold">
-                      {/* {problemItem.solved === 'solved' ? '✔' : ''} */}
-                    </span>
-                    <span className="w-[50%]">{problemItem.problem.title}</span>
-                    <span
-                      className={`w-[10%] font-semibold ${
-                        problemItem.problem.difficulty === 'Low'
-                          ? 'text-green-400'
-                          : problemItem.problem.difficulty === 'Middle'
-                            ? 'text-sky-400'
-                            : 'text-rose-400'
-                      }`}
-                    >
-                      {problemItem.problem.difficulty === 'Low'
-                        ? 'Lv.1'
-                        : problemItem.problem.difficulty === 'Middle'
-                          ? 'Lv.2'
-                          : 'Lv.3'}
-                    </span>
-                    <span className="w-[10%] flex items-center">
-                      {problemItem.problem.submission_number}
-                    </span>
-                    <span className="w-[10%] flex items-center">
-                      {problemItem.problem.accuracy}%
-                    </span>
-                  </div>
-                </Link>
-              ))}
+              </Link>
+            ))
+          )}
         </div>
         {/* 페이지네이션 */}
         <div className="flex items-center justify-center mt-16 space-x-1">
