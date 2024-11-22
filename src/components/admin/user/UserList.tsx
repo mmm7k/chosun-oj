@@ -129,6 +129,12 @@ export default function UserList() {
                 ))}
               </tbody>
             </table>
+          ) : userList.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="text-center text-gray-500 py-4">
+                등록된 유저가 없습니다.
+              </td>
+            </tr>
           ) : (
             <table
               className="w-full text-sm text-left border-b-2 table-auto"

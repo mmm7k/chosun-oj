@@ -5,7 +5,6 @@ export const getAllProblem = async (page: number) => {
     const response = await api.get(`/admin/problem?page=${page}&page_size=15`);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

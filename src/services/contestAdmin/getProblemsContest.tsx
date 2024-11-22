@@ -7,7 +7,6 @@ export const getProblemsContest = async (id: number) => {
     );
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

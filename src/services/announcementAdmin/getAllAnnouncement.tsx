@@ -5,7 +5,6 @@ export const getAllAnnouncement = async (page: number) => {
     const response = await api.get(`/admin/announcement?page=${page}`);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

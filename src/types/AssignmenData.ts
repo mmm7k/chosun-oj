@@ -9,5 +9,7 @@ interface AssignmentData {
   last_update_time: string;
   type: string;
   tag: number;
-  group: number;
+  group: {
+    group_name: string;
+  };
 }

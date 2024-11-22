@@ -5,7 +5,6 @@ export const getModifyUser = async (id: number) => {
     const response = await api.get(`/admin/account/user/${id}/modify`);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

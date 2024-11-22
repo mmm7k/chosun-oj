@@ -5,7 +5,6 @@ export const postCourse = async (data: any) => {
     const response = await api.post('/admin/course/', data);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

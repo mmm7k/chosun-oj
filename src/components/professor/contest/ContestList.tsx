@@ -126,6 +126,12 @@ export default function ContestList() {
                 ))}
               </tbody>
             </table>
+          ) : contestList.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="text-center text-gray-500 py-4">
+                등록된 대회가 없습니다.
+              </td>
+            </tr>
           ) : (
             <table
               className="w-full text-sm text-left border-b-2 table-auto"

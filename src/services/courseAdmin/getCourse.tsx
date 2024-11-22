@@ -5,7 +5,6 @@ export const getCourse = async (id: number) => {
     const response = await api.get(`/admin/course/${id}/`);
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

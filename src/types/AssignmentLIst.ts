@@ -3,5 +3,7 @@ interface AssignmentList {
   title: string;
   type: string;
   tag: number;
-  group: number;
+  group: {
+    group_name: string;
+  };
 }

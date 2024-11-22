@@ -10,7 +10,6 @@ export const getClassAnnouncement = async (
     );
     return response.data;
   } catch (error: any) {
-    alert(error.response?.data?.message);
     throw error;
   }
 };

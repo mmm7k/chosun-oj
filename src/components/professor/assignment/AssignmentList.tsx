@@ -127,6 +127,12 @@ export default function AssignmentList() {
                 ))}
               </tbody>
             </table>
+          ) : assignmentList.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="text-center text-gray-500 py-4">
+                등록된 과제가 없습니다.
+              </td>
+            </tr>
           ) : (
             <table
               className="w-full text-sm text-left border-b-2 table-auto"
@@ -138,7 +144,7 @@ export default function AssignmentList() {
 
                   <th className="p-4">과제유형</th>
                   <th className="p-4">주차</th>
-                  <th className="p-4">등록분반ID</th>
+                  <th className="p-4">등록분반</th>
                   <th className="p-4">과제관리</th>
                 </tr>
               </thead>
@@ -162,7 +168,7 @@ export default function AssignmentList() {
                     </td>
 
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                      {item.group}
+                      {item.group?.group_name}
                     </td>
 
                     <td className="flex items-center p-4 space-x-2 ">

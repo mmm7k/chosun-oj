@@ -80,8 +80,8 @@ export default function AssignmentDetail() {
             <span>{assignmentData.tag}주차</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
-            <span>등록 분반ID:</span>
-            <span>{assignmentData.group}</span>
+            <span>등록 분반:</span>
+            <span>{assignmentData.group?.group_name}</span>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { postTestcase } from '@/services/problemAdmin/postTestcase';
 import { set } from 'react-hook-form';
 import CircularProgress from '@mui/material/CircularProgress';
+import { GoCodescan } from 'react-icons/go';
 
 export default function ProblemList() {
   const router = useRouter();
@@ -188,6 +189,12 @@ export default function ProblemList() {
                 ))}
               </tbody>
             </table>
+          ) : problemList.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="text-center text-gray-500 py-4">
+                등록된 문제가 없습니다.
+              </td>
+            </tr>
           ) : (
             <table
               className="w-full text-sm text-left border-b-2 table-auto"
@@ -228,6 +235,15 @@ export default function ProblemList() {
                       {item.test_case_id ? '등록' : '미등록'}
                     </td>
                     <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
+                      <GoCodescan
+                        className="text-base cursor-pointer lg:text-lg hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(
+                            `/professor/problems/submission/${item.id}?page=1`,
+                          );
+                        }}
+                      />
                       <MdChecklist
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {
@@ -373,10 +389,11 @@ export default function ProblemList() {
       )}
       {isMuteLoading && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed inset-0 z-50 flex flex-col space-y-4 items-center justify-center bg-black bg-opacity-50"
           style={{ color: 'white' }}
         >
           <CircularProgress color="inherit" />
+          <span className="text-lg">업로드 중 입니다.</span>
         </div>
       )}
     </div>
