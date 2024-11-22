@@ -118,7 +118,7 @@ export default function Problem({ params }: { params: { problemid: string } }) {
     alert('문제를 불러오는 중 오류가 발생했습니다.');
     router.push('/student');
   }
-  const problem = problemData?.data?.problem || {};
+  const problem = problemData?.data || {};
   const [isViewerReady, setIsViewerReady] = useState(false);
 
   useEffect(() => {

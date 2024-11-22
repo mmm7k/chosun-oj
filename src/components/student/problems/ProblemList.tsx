@@ -244,9 +244,7 @@ export default function ProblemList() {
                   <span className="w-[10%]">
                     {problemItem.submission_number}
                   </span>
-                  <span className="w-[10%]">
-                    {problemItem.accuracy ?? 'N/A'}%
-                  </span>
+                  <span className="w-[10%]">{problemItem.accuracy}%</span>
                 </div>
               </Link>
             ))
