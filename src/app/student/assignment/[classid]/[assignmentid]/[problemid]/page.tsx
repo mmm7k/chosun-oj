@@ -426,7 +426,12 @@ export default function Problem({
                             &nbsp;ms
                           </td>
                           <td className="py-3 font-normal">
-                            {submission?.statistic_info?.memory_cost}&nbsp;B
+                            {submission?.statistic_info?.memory_cost
+                              ? (
+                                  submission.statistic_info.memory_cost /
+                                  (1024 * 1024)
+                                ).toFixed(2) + ' MB'
+                              : 'N/A'}
                           </td>
                           <td
                             className={`py-3 font-normal
@@ -581,7 +586,12 @@ export default function Problem({
                             &nbsp;ms
                           </td>
                           <td className="py-3 font-normal">
-                            {submission?.statistic_info?.memory_cost}&nbsp;B
+                            {submission?.statistic_info?.memory_cost
+                              ? (
+                                  submission.statistic_info.memory_cost /
+                                  (1024 * 1024)
+                                ).toFixed(2) + ' MB'
+                              : 'N/A'}
                           </td>
                           <td
                             className={`py-3 font-normal
@@ -734,7 +744,12 @@ export default function Problem({
             </div>
             <div className="text-gray-700 ">Time: {submitTime}&nbsp;ms</div>
 
-            <div className="text-gray-700">Memory: {submitMemory}&nbsp;B</div>
+            <div className="text-gray-700">
+              Memory:{' '}
+              {submitMemory
+                ? (Number(submitMemory) / (1024 * 1024)).toFixed(2) + ' MB'
+                : 'N/A'}
+            </div>
 
             <div className="flex mt-5 justify-end gap-4">
               <button
