@@ -24,6 +24,7 @@ import { formattedDate } from '@/utils/dateFormatter';
 import { getAllSubmissionUser } from '@/services/problemUser/getAllSubmissionUser';
 import { getProblemDetailUser } from '@/services/problemUser/getProblemDetailUser';
 import { postProblemSubmission } from '@/services/problemUser/postProblemSubmission';
+import Link from 'next/link';
 
 const { Option } = Select;
 
@@ -31,7 +32,7 @@ const codeTemplate = {
   c: `#include <stdio.h>\n\nint main() {\n    // Your code here\n    return 0;\n}`,
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    // Your code here\n    return 0;\n}`,
   python: `def solution():\n    # Your code here\n    pass`,
-  java: `public class Solution {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`,
+  java: `public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`,
 };
 
 const languageMap: { [key: string]: string } = {
@@ -306,18 +307,19 @@ export default function Problem({ params }: { params: { problemid: string } }) {
   return (
     <div className="h-[100dvh] flex flex-col text-gray-800 ">
       {/* 헤더 */}
-      <div className="flex items-center h-20 px-4 text-white lg:h-14 bg-darkPrimary sm:px-12">
-        <div className="relative mr-3 w-9 h-9">
-          <Image
-            src={'/commons/whiteSymbol.png'}
-            alt="Logo"
-            layout="fill"
-            objectFit="contain"
-          />
+      <Link href="/">
+        <div className="flex items-center h-20 px-4 text-white lg:h-14 bg-darkPrimary sm:px-12 cursor-pointer">
+          <div className="relative mr-3 w-9 h-9">
+            <Image
+              src={'/commons/whiteSymbol.png'}
+              alt="Logo"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <span className="text-lg">Chosun Online Judge</span>
         </div>
-        <span className="text-lg">Chosun Online Judge</span>
-      </div>
-
+      </Link>
       {/* 문제 이름 */}
       <div className="w-full  h-14 border-b-[1.5px] bg-white border-gray-300 px-4 sm:px-12 flex justify-between items-center">
         <div className="space-x-2 sm:space-x-4 flex items-center">
@@ -734,8 +736,6 @@ export default function Problem({ params }: { params: { problemid: string } }) {
           </button>
         </div>
       </div>
-      {/* 제출 후 결과 모달 */}
-
       {/* 제출 후 결과 모달 */}
       {isModalVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

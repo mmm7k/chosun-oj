@@ -105,7 +105,7 @@ export default function HeaderNav() {
             </span>
           </Link>
 
-          <Link href={'/student/questions/common'}>
+          <Link href={'/student/questions/common?page=1'}>
             <span
               className={`cursor-pointer transition ${
                 pathname.startsWith('/student/questions')
@@ -232,7 +232,7 @@ export default function HeaderNav() {
         </Link>
 
         <Link
-          href={'/student/questions/common'}
+          href={'/student/questions/common?page=1'}
           className={`w-full flex justify-center items-center py-3 hover:bg-gray-100  ${
             pathname.startsWith('/student/questions') && 'text-primary   '
           }`}

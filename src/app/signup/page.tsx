@@ -38,7 +38,8 @@ export default function Signup() {
       .oneOf([Yup.ref('password'), undefined], '비밀번호가 일치하지 않습니다.')
       .required('비밀번호 확인을 입력해주세요.'),
     studentNumber: Yup.string()
-      .min(8, '학번은 최소 8자 이상이어야 합니다.')
+      .min(4, '학번은 최소 4자 이상이어야 합니다.')
+      .max(16, '학번은 최대 16자 이하여야 합니다.')
       .required('학번을 입력해주세요.'),
     email: Yup.string()
       .email('유효한 이메일 주소를 입력해주세요.')
@@ -95,21 +96,33 @@ export default function Signup() {
       if (type === 'username') {
         response = await checkUsername(value);
         setIsUsernameChecked(true);
-        setUsernameMessage(response.message || '사용 가능한 아이디입니다.');
+        setUsernameMessage(
+          response.message === '직렬화 과정에서 오류가 발생하였습니다.'
+            ? '올바른 아이디를 입력해주세요.'
+            : response.message || '사용 가능한 아이디입니다.',
+        );
       } else if (type === 'email') {
         response = await checkEmail(value);
         setIsEmailChecked(true);
-        setEmailMessage(response.message || '사용 가능한 이메일입니다.');
+        setEmailMessage(
+          response.message === '직렬화 과정에서 오류가 발생하였습니다.'
+            ? '올바른 이메일을 입력해주세요.'
+            : response.message || '사용 가능한 이메일입니다.',
+        );
       } else if (type === 'studentNumber') {
         response = await checkStudentNumber(value);
         setIsStudentNumberChecked(true);
-        setStudentNumberMessage(response.message || '사용 가능한 학번입니다.');
+        setStudentNumberMessage(
+          response.message === '직렬화 과정에서 오류가 발생하였습니다.'
+            ? '올바른 학번을 입력해주세요.'
+            : response.message || '사용 가능한 학번입니다.',
+        );
       }
     } catch (error: any) {
       if (type === 'username') {
         setIsUsernameChecked(false);
         setUsernameMessage(
-          error.response?.data?.message || '중복된 아이디입니다.',
+          error.response?.data?.message || '중복된 아이디입니다',
         );
       } else if (type === 'email') {
         setIsEmailChecked(false);
@@ -167,7 +180,9 @@ export default function Signup() {
                 </div>
                 {usernameMessage && (
                   <p
-                    className={`text-xs pl-2 ${isUsernameChecked ? 'text-blue-500' : 'text-red-500'}`}
+                    className={`text-xs pl-2 ${isUsernameChecked ? 'text-blue-500' : 'text-red-500'}
+                    ${usernameMessage === '사용 가능한 아이디입니다.' ? 'text-blue-500' : 'text-red-500'}
+                    `}
                   >
                     {usernameMessage}
                   </p>
@@ -214,7 +229,7 @@ export default function Signup() {
                   <input
                     {...register('studentNumber')}
                     className="w-[70%] h-10 rounded-md border border-gray-300 pl-4 placeholder:text-sm text-sm focus:ring-1 focus:ring-gray-400 focus:outline-none"
-                    type="number"
+                    type="string"
                     placeholder="학번을 입력해주세요"
                     style={{
                       MozAppearance: 'textfield',
@@ -232,7 +247,9 @@ export default function Signup() {
                   <p
                     className={`text-xs pl-2 ${
                       isStudentNumberChecked ? 'text-blue-500' : 'text-red-500'
-                    }`}
+                    }
+                    ${studentNumberMessage === '사용 가능한 학번입니다.' ? 'text-blue-500' : 'text-red-500'}
+                    `}
                   >
                     {studentNumberMessage}
                   </p>
@@ -265,7 +282,9 @@ export default function Signup() {
                   <p
                     className={`text-xs pl-2 ${
                       isEmailChecked ? 'text-blue-500' : 'text-red-500'
-                    }`}
+                    }
+                    ${emailMessage === '사용 가능한 이메일입니다.' ? 'text-blue-500' : 'text-red-500'}
+                    `}
                   >
                     {emailMessage}
                   </p>
@@ -294,14 +313,14 @@ export default function Signup() {
 
               <button
                 type="submit"
-                className="flex items-center justify-center w-3/4 py-2 text-white transition rounded-md cursor-pointer md:py-5 lg:py-2 bg-primary hover:bg-primaryButtonHover"
+                className="flex items-center justify-center w-3/4 py-2 text-white transition-all rounded-md cursor-pointer md:py-5 lg:py-2 bg-primary hover:bg-primaryButtonHover"
               >
                 회원가입
               </button>
             </form>
             <Link
               href="/login"
-              className="w-3/4 py-2 md:py-5 lg:py-2 rounded-md bg-secondaryButton border-[1px] border-secondaryButtonBorder text-secondary flex items-center justify-center cursor-pointer hover:bg-secondaryButtonHover transition"
+              className="w-3/4 py-2 md:py-5 lg:py-2 rounded-md bg-slate-200  text-secondary flex items-center justify-center cursor-pointer hover:bg-slate-300 transition-all"
             >
               이전으로
             </Link>

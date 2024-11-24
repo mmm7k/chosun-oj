@@ -68,8 +68,8 @@ export default function Announcement({
   }, [currentPage, router, announcementRefetch, classId]);
 
   const announcementList = announcementData?.data?.data || [];
-  const totalPages = announcementList?.data?.total_count
-    ? Math.ceil(announcementList.data.total_count / 15)
+  const totalPages = announcementData?.data?.total_count
+    ? Math.ceil(announcementData.data.total_count / 15)
     : 1;
 
   // 페이지네이션 블록 계산
@@ -237,7 +237,7 @@ export default function Announcement({
                 onClick={() => changePageBlock(false)}
                 disabled={currentBlock === 1}
                 className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3] ${
-                  currentBlock === 1 ? 'opacity-40' : ''
+                  currentBlock === 1 ? 'opacity-70' : ''
                 }`}
               >
                 &lt;
@@ -249,10 +249,10 @@ export default function Announcement({
                 <button
                   key={page}
                   onClick={() => changePage(page)}
-                  className={`px-3 py-1 rounded-xl ${
+                  className={`px-3 py-1 rounded-xl transition-all ${
                     page === currentPage
                       ? 'bg-primary text-white'
-                      : 'bg-gray-200 hover:bg-gray-300'
+                      : ' bg-white border hover:bg-gray-200'
                   }`}
                 >
                   {page}
@@ -261,8 +261,8 @@ export default function Announcement({
               <button
                 onClick={() => changePageBlock(true)}
                 disabled={endPage === totalPages}
-                className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
-            ${currentBlock === 1 ? 'opacity-40' : ''}
+                className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3] 
+            ${currentBlock === 1 ? 'opacity-70' : ''}
             `}
               >
                 &gt;

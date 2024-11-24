@@ -7,7 +7,7 @@ export const checkUsername = async (username: string) => {
     });
     return response.data;
   } catch (error: any) {
-    throw error;
+    return error.response.data;
   }
 };
 
@@ -16,7 +16,7 @@ export const checkEmail = async (email: string) => {
     const response = await api.post('/account/check_email/', { email });
     return response.data;
   } catch (error: any) {
-    throw error;
+    return error.response.data;
   }
 };
 
@@ -27,7 +27,7 @@ export const checkStudentNumber = async (studentNumber: string) => {
     });
     return response.data;
   } catch (error: any) {
-    throw error;
+    return error.response.data;
   }
 };
 

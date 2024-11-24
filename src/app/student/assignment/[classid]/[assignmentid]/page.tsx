@@ -176,38 +176,34 @@ export default function AssignmentDetail({
               <button
                 onClick={() => changePageBlock(false)}
                 disabled={currentBlock === 1}
-                className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
-            ${currentBlock === 1 ? 'opacity-40' : ''}
-            `}
+                className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3] ${
+                  currentBlock === 1 ? 'opacity-70' : ''
+                }`}
               >
                 &lt;
               </button>
-
-              <div className="flex space-x-1 font-normal">
-                {Array.from(
-                  { length: endPage - startPage + 1 },
-                  (_, i) => startPage + i,
-                ).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => changePage(page)}
-                    className={`px-3 py-1 rounded-xl transition-all ${
-                      page === currentPage
-                        ? 'bg-primary text-white hover:bg-primaryButtonHover'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-
+              {Array.from(
+                { length: endPage - startPage + 1 },
+                (_, i) => startPage + i,
+              ).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => changePage(page)}
+                  className={`px-3 py-1 rounded-xl transition-all ${
+                    page === currentPage
+                      ? 'bg-primary text-white'
+                      : ' bg-white border hover:bg-gray-200'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
               <button
                 onClick={() => changePageBlock(true)}
                 disabled={endPage === totalPages}
-                className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3]
-          ${currentBlock === 1 ? 'opacity-40' : ''}
-          `}
+                className={`px-3 py-1 bg-white rounded-2xl shadow-md hover:bg-[#eeeff3] 
+            ${currentBlock === 1 ? 'opacity-70' : ''}
+            `}
               >
                 &gt;
               </button>

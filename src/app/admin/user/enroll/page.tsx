@@ -23,7 +23,8 @@ export default function UserEnroll() {
       .min(6, '비밀번호는 최소 6자 이상이어야 합니다.')
       .required('비밀번호를 입력해주세요.'),
     userNumber: Yup.string()
-      .min(8, '학번은 최소 8자 이상이어야 합니다.')
+      .min(4, '학번은 최소 4자 이상이어야 합니다.')
+      .max(16, '학번은 최대 16자 이하여야 합니다.')
       .required('학번을 입력해주세요.'),
     userEmail: Yup.string()
       .email('유효한 이메일 주소를 입력해주세요.')
@@ -185,7 +186,7 @@ export default function UserEnroll() {
               <input
                 {...register('userNumber')}
                 className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                type="number"
+                type="string"
                 placeholder="학번을 입력해주세요"
                 style={{
                   MozAppearance: 'textfield',

@@ -113,14 +113,14 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="flex items-center justify-center w-3/4 py-2 text-white transition rounded-md cursor-pointer md:py-5 lg:py-2 bg-primary hover:bg-primaryButtonHover"
+                className="flex items-center justify-center w-3/4 py-2 text-white transition-all rounded-md cursor-pointer md:py-5 lg:py-2 bg-primary hover:bg-primaryButtonHover"
               >
                 로그인
               </button>
             </form>
             <Link
               href="/signup"
-              className="w-3/4 py-2  md:py-5 lg:py-2  rounded-md bg-secondaryButton border-[1px] border-secondaryButtonBorder text-secondary flex items-center justify-center cursor-pointer hover:bg-secondaryButtonHover transition"
+              className="w-3/4 py-2  md:py-5 lg:py-2  rounded-md bg-slate-200 border-[1px] border-secondaryButtonBorder text-secondary flex items-center justify-center cursor-pointer hover:bg-slate-300 transition-all"
             >
               회원가입
             </Link>
