@@ -11,14 +11,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { login } from '@/services/accountUser/login';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import useUserStore from '@/store/userstore';
 
 export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  //   useEffect(() => {
-  //     document.cookie = 'sessionid=; Max-Age=0';
-  //     document.cookie = 'csrftoken=; Max-Age=0';
-  //   }, []);
+  const { fetchUser } = useUserStore();
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('아이디를 입력해주세요'),
@@ -40,6 +38,7 @@ export default function Home() {
     setIsLoading(true);
     try {
       await login(username, password);
+      await fetchUser();
       router.push('/student');
     } catch (error: any) {
       alert(error.response?.data?.message);

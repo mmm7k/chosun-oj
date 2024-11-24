@@ -10,11 +10,13 @@ import { logout } from '@/services/accountUser/login';
 import { useQuery } from '@tanstack/react-query';
 import { getMyProfile } from '@/services/accountUser/profile';
 import { FaPersonWalkingArrowLoopLeft } from 'react-icons/fa6';
+import useUserStore from '@/store/userstore';
 
 export default function HeaderNav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
+  const { clearUser } = useUserStore();
 
   const { data: profile } = useQuery({
     queryKey: ['userRole'],
@@ -43,6 +45,8 @@ export default function HeaderNav() {
     } catch (error: any) {
       alert(error.response?.data?.message);
       router.push('/');
+    } finally {
+      clearUser();
     }
   };
 

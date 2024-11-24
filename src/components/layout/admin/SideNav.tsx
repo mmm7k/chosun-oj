@@ -15,6 +15,7 @@ import { GoTrophy } from 'react-icons/go';
 import { logout } from '@/services/accountUser/login';
 import { useRouter } from 'next/navigation';
 import { FiHome } from 'react-icons/fi';
+import useUserStore from '@/store/userstore';
 export default function SideNav() {
   const pathname = usePathname();
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function SideNav() {
     useState(false);
   const [isContestDropdownOpen, setIsContestDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // 햄버거 메뉴 상태
+  const { clearUser } = useUserStore();
 
   const closeAllDropdowns = () => {
     setIsStudentDropdownOpen(false);
@@ -42,6 +44,8 @@ export default function SideNav() {
     } catch (error: any) {
       alert(error.response?.data?.message);
       router.push('/');
+    } finally {
+      clearUser();
     }
   };
 
