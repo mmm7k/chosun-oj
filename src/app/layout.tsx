@@ -18,7 +18,7 @@ export const metadata: Metadata = {
       'Chosun Online Judge는 조선대 학생들의 프로그래밍 능력을 향상시키기 위한 웹사이트입니다.',
     images: [
       {
-        url: '/openGraph.png',
+        url: 'http://chosuncnl.shop:5555/openGraph.png',
         width: 1200,
         height: 630,
         alt: 'Chosun Online Judge',
