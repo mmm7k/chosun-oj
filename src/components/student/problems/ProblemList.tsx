@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getProblemListUser } from '@/services/problemUser/getProblemListUser';
@@ -20,6 +20,8 @@ export default function ProblemList() {
   const initialCategory = searchParams.get('category') || null;
   const initialSolved = searchParams.get('solved') || null;
   const initialLevel = searchParams.get('level') || null;
+  const initialSearch = searchParams.get('search') || null;
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
@@ -31,6 +33,14 @@ export default function ProblemList() {
   const [selectedLevel, setSelectedLevel] = useState<string | null>(
     initialLevel,
   );
+  const [selectedSearch, setSelectedSearch] = useState<string | null>(
+    initialSearch,
+  );
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('search', searchValue);
+  };
 
   const pagesPerBlock = 5;
 
@@ -45,6 +55,7 @@ export default function ProblemList() {
       selectedCategory,
       selectedSolved,
       selectedLevel,
+      selectedSearch,
     ],
     queryFn: () =>
       getProblemListUser(
@@ -58,6 +69,7 @@ export default function ProblemList() {
             : selectedLevel === '3'
               ? 'High'
               : undefined,
+        selectedSearch || undefined,
       ),
   });
 
@@ -67,6 +79,8 @@ export default function ProblemList() {
     if (selectedCategory) query.set('category', selectedCategory);
     if (selectedSolved) query.set('solved', selectedSolved);
     if (selectedLevel) query.set('level', selectedLevel);
+    if (selectedSearch) query.set('search', selectedSearch);
+
     router.push(`${pathname}?${query.toString()}`);
     refetch();
   }, [
@@ -74,6 +88,7 @@ export default function ProblemList() {
     selectedCategory,
     selectedSolved,
     selectedLevel,
+    selectedSearch,
     router,
     refetch,
   ]);
@@ -99,12 +114,13 @@ export default function ProblemList() {
   };
 
   const handleFilterChange = (
-    key: 'category' | 'solved' | 'level',
+    key: 'category' | 'solved' | 'level' | 'search',
     value: string | null,
   ) => {
     if (key === 'category') setSelectedCategory(value);
     if (key === 'solved') setSelectedSolved(value);
     if (key === 'level') setSelectedLevel(value);
+    if (key === 'search') setSelectedSearch(value);
     setCurrentPage(1);
   };
 
@@ -136,11 +152,20 @@ export default function ProblemList() {
       <main className="w-full">
         {/* 문제 검색 */}
         <div className="flex items-center px-4 bg-white shadow-md rounded-xl">
-          <IoSearchSharp className="text-lg text-gray-400" />
+          <IoSearchSharp
+            className="text-lg text-gray-400 cursor-pointer"
+            onClick={() => handleSearch()}
+          />
           <input
             type="text"
             className="w-full py-3 pl-3 text-sm focus:outline-none placeholder:text-sm"
-            placeholder="문제 제목을 입력하세요.(현재 검색 기능은 개발 중입니다.)"
+            placeholder="문제 제목을 입력하세요."
+            ref={searchInputRef}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleFilterChange('search', e.currentTarget.value);
+              }
+            }}
           />
         </div>
         {/* 필터 옵션 */}

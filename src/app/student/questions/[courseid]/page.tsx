@@ -6,10 +6,9 @@ import * as Yup from 'yup';
 import { Avatar, message, Modal } from 'antd';
 import { BsSendCheck } from 'react-icons/bs';
 import { IoChevronDown, IoChevronUp, IoSearchSharp } from 'react-icons/io5';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getCourseListUser } from '@/services/courseUser/getCourseListUser';
 import { getQuestionUser } from '@/services/questionUser/getQuestionUser';
 import { getCourseQuestionUser } from '@/services/questionUser/getCourseQuetionUser';
 import Link from 'next/link';
@@ -31,6 +30,7 @@ import { patchEditAnswer } from '@/services/questionUser/patchEditAnswer';
 import { deleteAnswerAdmin } from '@/services/questionUser/deleteAnswerAdmin';
 import { deleteAnswerUser } from '@/services/questionUser/deleteAnswerUser';
 import { postAnswer } from '@/services/questionUser/postAnswer';
+import { getMyCourseListUser } from '@/services/courseUser/getMyCourseListUser';
 
 export default function Questions({
   params,
@@ -50,6 +50,7 @@ export default function Questions({
   const decodedCourse = decodeURIComponent(courseId);
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const searchParams = useSearchParams();
   // 초기 페이지 설정
   const initialPage = Number(searchParams.get('page')) || 1;
@@ -140,19 +141,40 @@ export default function Questions({
   // 클래스 리스트 데이터 가져오기
   const { data: courseListData } = useQuery({
     queryKey: ['courseListData'],
-    queryFn: () => getCourseListUser(),
+    queryFn: () => getMyCourseListUser(),
   });
   const courseList = courseListData?.data?.data;
   const courseItem = courseList?.find(
     (item: any) => item.id === parseInt(courseId),
   );
 
+  //검색
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const initialSearch = searchParams.get('search') || null;
+  const [selectedSearch, setSelectedSearch] = useState<string | null>(
+    initialSearch,
+  );
+
+  const handleFilterChange = (key: 'search', value: string | null) => {
+    if (key === 'search') setSelectedSearch(value);
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('search', searchValue);
+  };
+
   // Q&A 데이터 가져오기
   const fetchQuestionData = () => {
     if (courseId === 'common') {
-      return getQuestionUser(currentPage);
+      return getQuestionUser(currentPage, selectedSearch || undefined);
     } else {
-      return getCourseQuestionUser(currentPage, parseInt(courseId));
+      return getCourseQuestionUser(
+        currentPage,
+        parseInt(courseId),
+        selectedSearch || undefined,
+      );
     }
   };
 
@@ -161,18 +183,25 @@ export default function Questions({
     refetch: questionRefetch,
     isLoading,
   } = useQuery({
-    queryKey: ['questionData', courseId, currentPage],
+    queryKey: ['questionData', courseId, currentPage, selectedSearch],
     queryFn: fetchQuestionData,
   });
 
   useEffect(() => {
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+
+    if (selectedSearch) {
+      query.set('search', selectedSearch);
+    }
+
     const newPath =
       courseId === 'common'
-        ? `/student/questions/common?page=${currentPage}`
-        : `/student/questions/${courseId}?page=${currentPage}`;
+        ? `/student/questions/common?${query.toString()}`
+        : `/student/questions/${courseId}?${query.toString()}`;
     router.push(newPath);
     questionRefetch();
-  }, [currentPage, router, questionRefetch, courseId]);
+  }, [currentPage, router, questionRefetch, courseId, selectedSearch]);
 
   const questionList = questionData?.data?.data || [];
   const totalPages = questionData?.data?.total_count
@@ -475,11 +504,20 @@ export default function Questions({
           <main className="w-full lg:w-[75%]">
             {/* 검색 */}
             <div className="flex items-center w-full px-4 bg-white shadow-md mb-7 rounded-xl">
-              <IoSearchSharp className="text-lg text-gray-400" />
+              <IoSearchSharp
+                className="text-lg text-gray-400 cursor-pointer"
+                onClick={() => handleSearch()}
+              />
               <input
                 type="text"
                 className="w-full py-3 pl-3 text-sm focus:outline-none placeholder:text-sm"
-                placeholder="키워드를 입력하세요.(기능 개발 중입니다.)"
+                placeholder="키워드를 입력하세요."
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('search', e.currentTarget.value);
+                  }
+                }}
               />
             </div>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -687,7 +725,15 @@ export default function Questions({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar
-                            style={{ backgroundColor: '#0032A0' }}
+                            style={{
+                              backgroundColor:
+                                item?.created_by?.admin_type === 'Super Admin'
+                                  ? '#262627' // Super Admin이면 검정색
+                                  : item?.created_by?.admin_type ===
+                                      'Regular User'
+                                    ? '#19c402' // Regular User면 연두색
+                                    : '#0032A0', // 기본 색상 (Professor일 때)
+                            }}
                             icon={<FaUserGraduate />}
                           />
                           <div className="flex flex-col justify-center ml-4">
@@ -749,7 +795,16 @@ export default function Questions({
                                 className="flex gap-4 relative"
                               >
                                 <Avatar
-                                  style={{ backgroundColor: '#19c402' }}
+                                  style={{
+                                    backgroundColor:
+                                      answer?.created_by?.admin_type ===
+                                      'Super Admin'
+                                        ? '#262627' // Super Admin이면 검정색
+                                        : answer?.created_by?.admin_type ===
+                                            'Regular User'
+                                          ? '#19c402' // Regular User면 연두색
+                                          : '#0032A0', // 기본 색상 (Professor일 때)
+                                  }}
                                   icon={<FaUserGraduate />}
                                 />
 

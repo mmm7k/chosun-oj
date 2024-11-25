@@ -6,6 +6,7 @@ interface QuestionList {
   created_by: {
     student_number: string;
     username: string;
+    admin_type: string;
   };
   create_time: string;
   title: string;
