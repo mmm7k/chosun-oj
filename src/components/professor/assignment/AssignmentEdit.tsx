@@ -262,16 +262,18 @@ export default function AssignmentEdit() {
                     <Select
                       {...field}
                       placeholder="과제를 등록하실 분반 선택하세요."
-                      className="w-[60%] sm:w-[20%] h-8"
+                      className="w-[60%] sm:w-[25%] h-8"
                     >
                       {classList.map(
                         (classData: {
                           id: number;
                           group_name: string;
                           quarter: string;
+                          course: { title: string };
                         }) => (
                           <Option key={classData.id} value={classData.id}>
-                            {classData.group_name} - {classData.quarter}
+                            {classData.course.title} - {classData.group_name} -{' '}
+                            {classData.quarter}
                           </Option>
                         ),
                       )}

@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
-
+import { Select } from 'antd';
 import { formattedDate } from '@/utils/dateFormatter';
 import CircularProgress from '@mui/material/CircularProgress';
 import { getAllSubmissionAssignment } from '@/services/submissionAdmin/getAllSubmissionAssignment';
 import { postReSubmitAssignment } from '@/services/submissionAdmin/postReSubmitAssignment';
+
+const { Option } = Select;
 
 export default function SubmissionList({
   params,
@@ -27,23 +29,58 @@ export default function SubmissionList({
   const pagesPerBlock = 5;
   const [isReSubmitLoading, setIsReSubmitLoading] = useState(false);
   const [openSubmissionId, setOpenSubmissionId] = useState<string | null>(null);
+  const initialStatus = searchParams.get('status') || null;
+  const initialUser = searchParams.get('user') || null;
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(
+    initialStatus,
+  );
+  const [selectedUser, setSelectedUser] = useState<string | null>(initialUser);
 
   const {
     data: submissionListData,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ['submissionListData', currentPage, assignmentId, problemId],
+    queryKey: [
+      'submissionListData',
+      currentPage,
+      assignmentId,
+      problemId,
+      selectedUser,
+      selectedStatus,
+    ],
     queryFn: () =>
-      getAllSubmissionAssignment(currentPage, assignmentId, problemId),
+      getAllSubmissionAssignment(
+        currentPage,
+        assignmentId,
+        problemId,
+        selectedUser || undefined,
+        selectedStatus || undefined,
+      ),
   });
 
+  const handleFilterChange = (key: 'user' | 'status', value: string | null) => {
+    if (key === 'user') setSelectedUser(value);
+    if (key === 'status') setSelectedStatus(value);
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('user', searchValue);
+  };
+
   useEffect(() => {
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedUser) query.set('user', selectedUser);
+    if (selectedStatus) query.set('status', selectedStatus);
     router.push(
-      `/professor/assignment/submission/${assignmentId}/${problemId}?page=${currentPage}`,
+      `/professor/assignment/submission/${assignmentId}/${problemId}?${query.toString()}`,
     );
     refetch();
-  }, [currentPage, router, refetch]);
+  }, [currentPage, router, refetch, selectedStatus, selectedUser]);
 
   const submissionList = submissionListData?.data?.data || [];
   const totalPages = submissionListData?.data?.total_count
@@ -106,13 +143,34 @@ export default function SubmissionList({
         {/* Header */}
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">제출 목록</h1>
-          <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
-            <IoSearchSharp className="mr-2 text-lg text-gray-500" />
-            <input
-              className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
-              type="text"
-              placeholder="유저 이름으로 검색해보세요"
-            />
+          <div className="flex items-center gap-2">
+            <Select
+              placeholder="정답/오답"
+              value={selectedStatus}
+              onChange={(value) => handleFilterChange('status', value)}
+              className="w-28"
+              allowClear
+            >
+              <Option value={'success'}>정답</Option>
+              <Option value={'failed'}>오답</Option>
+            </Select>
+            <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
+              <IoSearchSharp
+                className="mr-2 text-lg text-gray-500"
+                onClick={() => handleSearch()}
+              />
+              <input
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
+                type="text"
+                placeholder="유저 이름으로 검색하세요"
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('user', e.currentTarget.value);
+                  }
+                }}
+              />
+            </div>
           </div>
         </section>
 
@@ -179,7 +237,7 @@ export default function SubmissionList({
                         {item.ip}
                       </td>
                       <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                        {item?.user?.username}
+                        {item?.user?.name}
                       </td>
                       <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                         {formattedDate(item.create_time)}

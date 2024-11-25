@@ -86,7 +86,7 @@ export default function ProblemPost() {
       time_limit: 1000,
       memory_limit: 256,
       languages: [],
-      is_public: false,
+      is_public: true,
       is_visible: true,
       difficulty: 'Low',
       tags: [],
@@ -427,8 +427,8 @@ export default function ProblemPost() {
                   control={control}
                   render={({ field }) => (
                     <Checkbox
-                      checked={field.value || false}
-                      onChange={(e) => field.onChange(e.target.checked)}
+                      checked={!field.value || false}
+                      onChange={(e) => field.onChange(!e.target.checked)}
                     ></Checkbox>
                   )}
                 />

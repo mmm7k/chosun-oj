@@ -89,14 +89,14 @@ export default function CourseList() {
         {/* Header */}
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">강의 목록</h1>
-          <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
+          {/* <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
             <IoSearchSharp className="mr-2 text-lg text-gray-500" />
             <input
               className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
               type="text"
               placeholder="강의 이름으로 검색해보세요"
             />
-          </div>
+          </div> */}
         </section>
 
         <hr className="mt-5 border-t-2 border-gray-200" />

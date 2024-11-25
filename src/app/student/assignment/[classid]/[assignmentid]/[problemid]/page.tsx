@@ -729,20 +729,20 @@ export default function Problem({
       {/* 푸터 */}
       <div className="flex items-center justify-between px-4 text-white bg-white border-t border-gray-300 min-h-16 sm:px-12">
         <button
-          className="px-4 py-2 text-gray-800 transition bg-gray-200 rounded-md hover:bg-gray-300"
+          className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300"
           onClick={handleBack}
         >
           이전으로
         </button>
         <div className="flex space-x-4">
           <button
-            className="px-4 py-2 text-gray-800 transition bg-gray-200 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300"
             onClick={handleResetCode}
           >
             초기화
           </button>
           <button
-            className="px-4 py-2 text-gray-800 transition bg-gray-200 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-gray-800 transition bg-slate-200 rounded-md hover:bg-gray-300"
             onClick={runcode}
           >
             코드 실행

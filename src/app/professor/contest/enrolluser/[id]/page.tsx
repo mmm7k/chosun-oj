@@ -9,7 +9,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import Skeleton from '@mui/material/Skeleton';
@@ -37,12 +37,34 @@ export default function UserEnroll() {
   const initialPage = Number(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
+  const initialUser = searchParams.get('user') || null;
+  const [selectedUser, setSelectedUser] = useState<string | null>(initialUser);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFilterChange = (key: 'user', value: string | null) => {
+    if (key === 'user') setSelectedUser(value);
+    setCurrentPage(1);
+  };
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('user', searchValue);
+  };
+
+  // useEffect(() => {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const page = Number(urlParams.get('page')) || 1;
+  //   setCurrentPage(page);
+  // }, []);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = Number(urlParams.get('page')) || 1;
-    setCurrentPage(page);
-  }, []);
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedUser) {
+      query.set('user', selectedUser);
+    }
+    const newUrl = `/professor/contest/enrolluser/${contestId}?${query.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+  }, [currentPage, selectedUser, contestId]);
 
   // 모달이 처음 열릴 때 쿼리 실행
   useEffect(() => {
@@ -56,16 +78,27 @@ export default function UserEnroll() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['userListData', currentPage],
-    queryFn: () => getAllUser(currentPage),
+    queryKey: ['userListData', currentPage, selectedUser],
+    queryFn: () => getAllUser(currentPage, selectedUser || undefined),
   });
 
+  // const updateUrlAndPage = (page: number) => {
+  //   window.history.replaceState(
+  //     null,
+  //     '',
+  //     `/professor/contest/enrolluser/${contestId}?page=${page}`,
+  //   );
+  //   setCurrentPage(page);
+  // };
+
   const updateUrlAndPage = (page: number) => {
-    window.history.replaceState(
-      null,
-      '',
-      `/professor/contest/enrolluser/${contestId}?page=${page}`,
-    );
+    const query = new URLSearchParams();
+    query.set('page', page.toString());
+    if (selectedUser) {
+      query.set('user', selectedUser);
+    }
+    const newUrl = `/professor/contest/enrolluser/${contestId}?${query.toString()}`;
+    window.history.replaceState(null, '', newUrl);
     setCurrentPage(page);
   };
 
@@ -518,11 +551,20 @@ export default function UserEnroll() {
               x
             </button>
             <div className="flex items-center mb-4 border-[1px] border-gray-300 rounded-lg px-3 py-2 w-full bg-white shadow-sm">
-              <IoSearchSharp className="mr-2 text-lg text-gray-500" />
+              <IoSearchSharp
+                className="mr-2 text-lg text-gray-500"
+                onClick={() => handleSearch()}
+              />
               <input
                 className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
                 type="text"
-                placeholder="학번으로 검색해보세요"
+                placeholder="이름으로 검색하세요."
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('user', e.currentTarget.value);
+                  }
+                }}
               />
             </div>
 

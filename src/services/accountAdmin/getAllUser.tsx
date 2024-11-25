@@ -1,10 +1,10 @@
 import api from '../api';
 
-export const getAllUser = async (page: number) => {
+export const getAllUser = async (page: number, user?: string) => {
   try {
-    const response = await api.get(
-      `/admin/account/users?page=${page}&page_size=15`,
-    );
+    let queryParams = `page=${page}&page_size=15`;
+    if (user) queryParams += `&user=${encodeURIComponent(user)}`;
+    const response = await api.get(`/admin/account/users?${queryParams}`);
     return response.data;
   } catch (error: any) {
     throw error;

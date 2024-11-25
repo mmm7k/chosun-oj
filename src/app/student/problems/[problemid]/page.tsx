@@ -25,6 +25,7 @@ import { getAllSubmissionUser } from '@/services/problemUser/getAllSubmissionUse
 import { getProblemDetailUser } from '@/services/problemUser/getProblemDetailUser';
 import { postProblemSubmission } from '@/services/problemUser/postProblemSubmission';
 import Link from 'next/link';
+import { FaLock } from 'react-icons/fa6';
 
 const { Option } = Select;
 
@@ -339,7 +340,7 @@ export default function Problem({ params }: { params: { problemid: string } }) {
             className={`mt-4  pb-3 ${!isSubmitVisible ? 'text-primary border-primary border-b-[4px] font-semibold ' : 'text-gray-400 border-gray-400'}`}
             onClick={() => setIsSubmitVisible(!isSubmitVisible)}
           >
-            <div className="max-w-28 sm:max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
+            <div className="max-w-28 sm:max-w-96 overflow-hidden text-ellipsis whitespace-nowrap ">
               {problem.title}
             </div>
           </button>
@@ -719,20 +720,29 @@ export default function Problem({ params }: { params: { problemid: string } }) {
       {/* 푸터 */}
       <div className="flex items-center justify-between px-4 text-white bg-white border-t border-gray-300 min-h-16 sm:px-12">
         <button
-          className="px-4 py-2 text-gray-800 transition bg-gray-200 rounded-md hover:bg-gray-300"
+          className="px-4 py-2 text-gray-800 transition bg-slate-200 rounded-md hover:bg-gray-300"
           onClick={handleBack}
         >
           이전으로
         </button>
         <div className="flex space-x-4">
+          <Link href={`/student/problems/${problemId}/other?page=1`}>
+            <button
+              className="hidden sm:flex px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300 items-center"
+              disabled={!problem?.is_solved}
+            >
+              {!problem?.is_solved ? <FaLock className="mr-2" /> : null}
+              다른 사람의 풀이
+            </button>
+          </Link>
           <button
-            className="px-4 py-2 text-gray-800 transition bg-gray-200 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300"
             onClick={handleResetCode}
           >
             초기화
           </button>
           <button
-            className="px-4 py-2 text-gray-800 transition bg-gray-200 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300"
             onClick={runcode}
           >
             코드 실행

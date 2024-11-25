@@ -6,6 +6,7 @@ interface SubmissionList {
   ip: string;
   user: {
     username: string;
+    name: string;
   };
   create_time: string;
 }

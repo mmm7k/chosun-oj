@@ -73,8 +73,8 @@ export default function ProblemDetail() {
             <span>{problemData.is_visible ? '공개' : '비공개'}</span>
           </div>
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
-            <span>대회/과제용 여부:</span>
-            <span>{problemData.is_public ? '대회/과제용' : '공통문제'}</span>
+            <span>문제 타입:</span>
+            <span>{problemData.is_public ? '공통문제' : '대회/과제용'}</span>
           </div>
 
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10 ">

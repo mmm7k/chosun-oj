@@ -263,7 +263,7 @@ export default function ContestEdit() {
               className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
               type="submit"
             >
-              대회 등록
+              대회 수정
             </button>
           </div>
         </form>

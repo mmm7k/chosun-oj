@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,20 +17,35 @@ export default function UserList() {
   const initialPage = Number(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
+  const initialUser = searchParams.get('user') || null;
+  const [selectedUser, setSelectedUser] = useState<string | null>(initialUser);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFilterChange = (key: 'user', value: string | null) => {
+    if (key === 'user') setSelectedUser(value);
+    setCurrentPage(1);
+  };
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('user', searchValue);
+  };
 
   const {
     data: userListData,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ['userListData', currentPage],
-    queryFn: () => getAllUser(currentPage),
+    queryKey: ['userListData', currentPage, selectedUser],
+    queryFn: () => getAllUser(currentPage, selectedUser || undefined),
   });
 
   useEffect(() => {
-    router.push(`/admin/user/list?page=${currentPage}`);
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedUser) query.set('user', selectedUser);
+    router.push(`/admin/user/list?${query.toString()}`);
     refetch();
-  }, [currentPage, router, refetch]);
+  }, [currentPage, router, refetch, selectedUser]);
 
   const userList = userListData?.data?.data || [];
   const totalPages = userListData?.data?.total_count
@@ -94,11 +109,20 @@ export default function UserList() {
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">유저 전체 목록</h1>
           <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
-            <IoSearchSharp className="mr-2 text-lg text-gray-500" />
+            <IoSearchSharp
+              className="mr-2 text-lg text-gray-500 cursor-pointer"
+              onClick={() => handleSearch()}
+            />
             <input
               className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
               type="text"
-              placeholder="학번으로 검색해보세요"
+              placeholder="이름으로 검색하세요."
+              ref={searchInputRef}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilterChange('user', e.currentTarget.value);
+                }
+              }}
             />
           </div>
         </section>

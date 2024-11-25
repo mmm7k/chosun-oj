@@ -135,7 +135,7 @@ export default function ContestAnnouncementEdit() {
               className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
               type="submit"
             >
-              공지 등록
+              공지 수정
             </button>
           </div>
         </form>
