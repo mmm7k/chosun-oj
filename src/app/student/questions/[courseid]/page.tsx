@@ -197,7 +197,7 @@ export default function Questions({
 
   const deleteQuestionMutation = useMutation({
     mutationFn:
-      admin_type === 'admin'
+      admin_type === 'Super Admin'
         ? (id: number) => deleteQuestionAdmin(id)
         : (id: number) => deleteQuestionUser(id),
     onSuccess: () => {
@@ -227,6 +227,7 @@ export default function Questions({
     });
   };
 
+  // 질문수정
   const [editingQuestionId, setEditingQuestionId] = useState<number | null>(
     null,
   );
@@ -249,7 +250,7 @@ export default function Questions({
 
   const updateMutation = useMutation({
     mutationFn:
-      admin_type === 'admin'
+      admin_type === 'Super Admin'
         ? ({
             id,
             data,
@@ -341,7 +342,7 @@ export default function Questions({
 
   const deleteAnswerMutation = useMutation({
     mutationFn:
-      admin_type === 'admin'
+      admin_type === 'Super Admin'
         ? (id: number) => deleteAnswerAdmin(id)
         : (id: number) => deleteAnswerUser(id),
     onSuccess: () => {
@@ -389,6 +390,11 @@ export default function Questions({
       }
     },
   });
+
+  const onSubmitAnswer = (data: { questionId: number; content: string }) => {
+    postAnswerMutation.mutate({ ...data });
+  };
+
   return (
     <>
       {/* 모바일 카테고리 메뉴 */}
@@ -837,10 +843,7 @@ export default function Questions({
                           {/* 답변 생성 기능 */}
                           <form
                             onSubmit={handleAnswerSubmit((data) =>
-                              postAnswerMutation.mutate({
-                                questionId: item.id,
-                                content: data.content,
-                              }),
+                              onSubmitAnswer({ questionId: item.id, ...data }),
                             )}
                             className="flex flex-col gap-4 mt-4"
                           >
@@ -862,7 +865,7 @@ export default function Questions({
                             <div className="flex justify-end">
                               <button
                                 type="submit"
-                                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                                className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all"
                               >
                                 답변 등록
                               </button>

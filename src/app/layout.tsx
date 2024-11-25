@@ -10,6 +10,21 @@ const notoSansKr = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: 'Chosun Online Judge',
   description: 'Chosun Online Judge',
+  openGraph: {
+    url: 'http://chosuncnl.shop:5555',
+    type: 'website',
+    title: 'Chosun Online Judge',
+    description:
+      'Chosun Online Judge는 조선대 학생들의 프로그래밍 능력을 향상시키기 위한 웹사이트입니다.',
+    images: [
+      {
+        url: '/commons/opengraph.png',
+        width: 1200,
+        height: 630,
+        alt: 'Chosun Online Judge',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
