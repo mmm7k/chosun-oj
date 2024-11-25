@@ -40,10 +40,10 @@ export default function SideNav() {
   const onClickLogout = async () => {
     try {
       await logout();
-      router.push('/');
+      router.push('/login');
     } catch (error: any) {
-      alert(error.response?.data?.message);
-      router.push('/');
+      // alert(error.response?.data?.message);
+      router.push('/login');
     } finally {
       clearUser();
     }

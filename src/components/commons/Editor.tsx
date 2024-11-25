@@ -81,7 +81,6 @@ const EditorComponent = ({
           { type: 'closeTag', tagName: 'div', outerNewLine: true },
         ];
       } catch (error) {
-        console.error('KaTeX 렌더링 에러:', error);
         return [
           { type: 'openTag', tagName: 'div', outerNewLine: true },
           { type: 'html', content: '잘못된 LaTeX 문법입니다.' },
