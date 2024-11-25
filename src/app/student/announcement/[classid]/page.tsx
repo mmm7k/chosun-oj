@@ -174,14 +174,14 @@ export default function Announcement({
         <div className="w-[90%] lg:w-[62%] flex gap-0 lg:gap-12 pt-12 items-start mb-44">
           {/* 공지사항 목록 */}
           <main className="w-full lg:w-[75%]">
-            <div className="flex items-center px-4 bg-white shadow-md rounded-xl">
+            {/* <div className="flex items-center px-4 bg-white shadow-md rounded-xl">
               <IoSearchSharp className="text-lg text-gray-400" />
               <input
                 type="text"
                 className="w-full py-3 pl-3 text-sm focus:outline-none placeholder:text-sm"
                 placeholder="공지 제목을 입력하세요."
               />
-            </div>
+            </div> */}
             <div className="mt-5 text-sm text-gray-500 bg-white border shadow-md rounded-2xl">
               <div className="flex items-center px-5 py-2 text-gray-800 bg-white border-b rounded-t-2xl">
                 <span className="ml-[30%]">공지 제목</span>

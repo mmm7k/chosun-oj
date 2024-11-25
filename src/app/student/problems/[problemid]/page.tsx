@@ -33,6 +33,7 @@ const codeTemplate = {
   cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    // Your code here\n    return 0;\n}`,
   python: `def solution():\n    # Your code here\n    pass`,
   java: `public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`,
+  rust: 'fn main() {\n    // Your code here\n}',
 };
 
 const languageMap: { [key: string]: string } = {
@@ -40,6 +41,7 @@ const languageMap: { [key: string]: string } = {
   'C++': 'cpp',
   Python3: 'python',
   Java: 'java',
+  Rust: 'rust',
 };
 
 export default function Problem({ params }: { params: { problemid: string } }) {
@@ -159,6 +161,9 @@ export default function Problem({ params }: { params: { problemid: string } }) {
       case 'Java':
         language = '62';
         break;
+      case 'Rust':
+        language = '73';
+        break;
       default:
         language = '';
     }
@@ -261,6 +266,9 @@ export default function Problem({ params }: { params: { problemid: string } }) {
       case 'Java':
         setCode(codeTemplate.java);
         break;
+      case 'Rust':
+        setCode(codeTemplate.rust);
+        break;
       default:
         setCode('');
     }
@@ -281,6 +289,10 @@ export default function Problem({ params }: { params: { problemid: string } }) {
       case 'Java':
         setCode(codeTemplate.java);
         break;
+      case 'Rust':
+        setCode(codeTemplate.rust);
+        break;
+
       default:
         setCode('');
     }

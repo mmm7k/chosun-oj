@@ -6,5 +6,6 @@ interface ProblemList {
   test_case_id: string;
   created_by: {
     name: string;
+    username: string;
   };
 }

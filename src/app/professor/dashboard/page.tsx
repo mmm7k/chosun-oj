@@ -12,6 +12,8 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import useUserStore from '@/store/userstore';
+import { useEffect } from 'react';
 
 ChartJS.register(
   ArcElement,
@@ -130,6 +132,14 @@ const barOptions = {
 };
 
 export default function Dashboard() {
+  const { username, admin_type, fetchUser } = useUserStore();
+
+  useEffect(() => {
+    if (!username || !admin_type) {
+      fetchUser(); // 상태가 없으면 API 호출
+    }
+  }, [username, admin_type, fetchUser]);
+
   return (
     <div className="flex flex-col min-h-screen p-8 2xl:flex-row">
       <div className="flex flex-col flex-1 gap-4 2xl:flex-row">
@@ -141,7 +151,7 @@ export default function Dashboard() {
               <div className="w-24 h-24 mb-4 bg-gray-200 rounded-full"></div>
               <div className="flex items-center text-xl font-bold text-primary">
                 <LiaChalkboardTeacherSolid className="mr-2 text-3xl" />
-                <span>강문수</span>
+                <span>{username}</span>
               </div>
             </section>
             <hr className="w-full my-4 " />

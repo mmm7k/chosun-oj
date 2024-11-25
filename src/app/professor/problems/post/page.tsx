@@ -234,7 +234,7 @@ export default function ProblemPost() {
                   /> */}
                   <EditorComponent
                     editorRef={editorRef}
-                    initialValue=" "
+                    initialValue=""
                     previewStyle="vertical"
                     height="25rem"
                     initialEditType="markdown"
@@ -375,6 +375,21 @@ export default function ProblemPost() {
                         }
                       >
                         Python3
+                      </Checkbox>
+
+                      <Checkbox
+                        checked={field.value?.includes('Rust') || false}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.checked
+                              ? [...(field.value || []), 'Rust']
+                              : (field.value || []).filter(
+                                  (lang: string) => lang !== 'Rust',
+                                ),
+                          )
+                        }
+                      >
+                        Rust
                       </Checkbox>
                     </div>
                   )}

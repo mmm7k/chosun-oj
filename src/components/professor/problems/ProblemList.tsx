@@ -16,6 +16,7 @@ import { postTestcase } from '@/services/problemAdmin/postTestcase';
 import { set } from 'react-hook-form';
 import CircularProgress from '@mui/material/CircularProgress';
 import { GoCodescan } from 'react-icons/go';
+import useUserStore from '@/store/userstore';
 
 export default function ProblemList() {
   const router = useRouter();
@@ -27,6 +28,12 @@ export default function ProblemList() {
   const [selectTestcaseId, setIsSelectTestcaseId] = useState<number>(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const pagesPerBlock = 5;
+  const { username, admin_type, fetchUser } = useUserStore();
+  useEffect(() => {
+    if (!username || !admin_type) {
+      fetchUser(); // 상태가 없으면 API 호출
+    }
+  }, [username, admin_type, fetchUser]);
 
   const {
     data: problemListData,
@@ -235,38 +242,45 @@ export default function ProblemList() {
                       {item.test_case_id ? '등록' : '미등록'}
                     </td>
                     <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                      <GoCodescan
-                        className="text-base cursor-pointer lg:text-lg hover:text-gray-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(
-                            `/professor/problems/submission/${item.id}?page=1`,
-                          );
-                        }}
-                      />
-                      <MdChecklist
-                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsTestCaseUploadModalOpen(true);
-                          setIsSelectTestcaseId(item.id);
-                        }}
-                      />
+                      {(admin_type === 'Super Admin' ||
+                        username === item?.created_by?.username) && (
+                        <>
+                          <GoCodescan
+                            className="text-base cursor-pointer lg:text-lg hover:text-gray-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(
+                                `/professor/problems/submission/${item.id}?page=1`,
+                              );
+                            }}
+                          />
+                          <MdChecklist
+                            className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsTestCaseUploadModalOpen(true);
+                              setIsSelectTestcaseId(item.id);
+                            }}
+                          />
 
-                      <TbEdit
-                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/professor/problems/edit/${item.id}`);
-                        }}
-                      />
-                      <FiTrash2
-                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(item.id);
-                        }}
-                      />
+                          <TbEdit
+                            className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(
+                                `/professor/problems/edit/${item.id}`,
+                              );
+                            }}
+                          />
+                          <FiTrash2
+                            className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(item.id);
+                            }}
+                          />
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
