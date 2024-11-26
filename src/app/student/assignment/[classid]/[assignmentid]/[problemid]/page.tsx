@@ -535,7 +535,7 @@ export default function Problem({
             )}
 
             {/* 오른쪽 섹션 */}
-            <Split direction="vertical" sizes={[50, 50]} minSize={100}>
+            <Split direction="vertical" sizes={[70, 30]} minSize={100}>
               <div className="h-full overflow-auto ">
                 <MonacoEditor
                   //@ts-ignore
@@ -696,7 +696,7 @@ export default function Problem({
           ) : (
             <Split
               direction="vertical"
-              sizes={[50, 50]}
+              sizes={[70, 30]}
               minSize={100}
               className="w-screen"
             >
