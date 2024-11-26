@@ -214,17 +214,9 @@ export default function ProblemPost() {
                 <label htmlFor="markdown-editor">문제 본문: </label>
 
                 <div className="mt-6">
-                  {/* <MdEditor
-                  id="markdown-editor"
-                  value={markdownText}
-                  style={{ height: '25rem' }}
-                  renderHTML={(text) => mdParser.render(text)}
-                  onChange={handleEditorChange}
-                /> */}
-
-                  {/* <Editor
-                    ref={editorRef}
-                    initialValue=" "
+                  {/* <EditorComponent
+                    editorRef={editorRef}
+                    initialValue=""
                     previewStyle="vertical"
                     height="25rem"
                     initialEditType="markdown"
@@ -236,10 +228,11 @@ export default function ProblemPost() {
                     editorRef={editorRef}
                     initialValue=""
                     previewStyle="vertical"
-                    height="25rem"
-                    initialEditType="markdown"
+                    height="50rem"
+                    // initialEditType="markdown"
+                    initialEditType="wysiwyg"
                     useCommandShortcut={false}
-                    hideModeSwitch={true}
+                    hideModeSwitch={false}
                     onChange={handleEditorChange}
                   />
                 </div>
