@@ -56,12 +56,14 @@ export default function Problem({
   const [isLeftVisible, setIsLeftVisible] = useState(true);
   const router = useRouter();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isTestCaseModalVisible, setIsTestCaseModalVisible] = useState(false);
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [submitResult, setSubmitResult] = useState('');
   const [submitMemory, setSubmitMemory] = useState('');
   const [submitTime, setSubmitTime] = useState('');
+  const [testCase, setTestCase] = useState('');
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<
     number | null
   >(null);
@@ -179,12 +181,13 @@ export default function Problem({
     }
     try {
       const encodedSourceCode = Buffer.from(code, 'utf-8').toString('base64');
+      const encodedStdin = Buffer.from(testCase).toString('base64');
       const response = await axios.post(
         'http://chosuncnl.shop:2358/submissions?base64_encoded=true&wait=true',
         {
           source_code: encodedSourceCode,
           language_id: language,
-          stdin: '',
+          stdin: encodedStdin,
           compiler_options: '',
           command_line_arguments: '',
           redirect_stderr_to_stdout: true,
@@ -311,6 +314,11 @@ export default function Problem({
   // 모달 열기/닫기 함수
   const toggleModal = () => {
     setIsModalVisible((prev) => !prev);
+  };
+
+  // 테스트케이스 모달 열기/닫기 함수
+  const toggleTestCaseModal = () => {
+    setIsTestCaseModalVisible((prev) => !prev);
   };
 
   // 뒤로 가기
@@ -729,20 +737,26 @@ export default function Problem({
       {/* 푸터 */}
       <div className="flex items-center justify-between px-4 text-white bg-white border-t border-gray-300 min-h-16 sm:px-12">
         <button
-          className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300"
+          className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-slate-300"
           onClick={handleBack}
         >
           이전으로
         </button>
         <div className="flex space-x-4">
           <button
-            className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-slate-300"
             onClick={handleResetCode}
           >
             초기화
           </button>
           <button
-            className="px-4 py-2 text-gray-800 transition bg-slate-200 rounded-md hover:bg-gray-300"
+            className="px-4 py-2 text-gray-800 transition bg-slate-200  rounded-md hover:bg-slate-300"
+            onClick={toggleTestCaseModal}
+          >
+            테스트 케이스
+          </button>
+          <button
+            className="px-4 py-2 text-gray-800 transition bg-slate-200 rounded-md hover:bg-slate-300"
             onClick={runcode}
           >
             코드 실행
@@ -803,6 +817,46 @@ export default function Problem({
         >
           <CircularProgress color="inherit" />
           <span className="text-lg"> 채점 중 입니다.</span>
+        </div>
+      )}
+      {/* 테스트케이스 등록 모달 */}
+      {isTestCaseModalVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* 배경 어둡게 만들기 */}
+          <div className="fixed inset-0 bg-black opacity-30"></div>
+          {/* 모달 */}
+          <div className="bg-white p-8 rounded-md shadow-lg z-50 w-[32rem] mx-auto">
+            <div className="text-gray-800 text-xl mb-5 font-semibold">
+              테스트 케이스 등록
+            </div>
+            {/* 코드 입력 영역 */}
+            <textarea
+              className="w-full h-40 p-4 border rounded-md text-sm font-mono bg-gray-50 focus:outline-none"
+              placeholder={`// 테스트 케이스를 입력하세요\n// 예: 3 5`}
+              value={testCase} // 입력값 상태 연결
+              onChange={(e) => setTestCase(e.target.value)} // 상태 업데이트
+            ></textarea>
+            <div className="flex mt-5 justify-end space-x-4">
+              <button
+                className="px-4 py-2   text-gray-800  transition bg-slate-200 rounded-md hover:bg-slate-300"
+                onClick={() => {
+                  setTestCase('');
+                }}
+              >
+                초기화
+              </button>
+
+              <button
+                className="px-4 py-2 text-white transition bg-primary rounded-md hover:bg-primaryButtonHover"
+                onClick={() => {
+                  // handleTestCase(testCaseInput); // 테스트케이스 저장 로직
+                  toggleTestCaseModal();
+                }}
+              >
+                확인
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
