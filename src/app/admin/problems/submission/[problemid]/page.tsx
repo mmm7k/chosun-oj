@@ -104,10 +104,12 @@ export default function SubmissionList({
     },
     onSuccess: () => {
       message.success('재채점을 성공적으로 요청했습니다.');
-      setTimeout(() => {
-        refetch();
-        setIsReSubmitLoading(false);
-      }, 3000);
+      // setTimeout(() => {
+      //   refetch();
+      //   setIsReSubmitLoading(false);
+      // }, 3000);
+      refetch();
+      setIsReSubmitLoading(false);
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {

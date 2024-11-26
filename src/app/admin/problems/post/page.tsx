@@ -237,9 +237,10 @@ export default function ProblemPost() {
                     initialValue=""
                     previewStyle="vertical"
                     height="25rem"
-                    initialEditType="markdown"
+                    // initialEditType="markdown"
+                    initialEditType="wysiwyg"
                     useCommandShortcut={false}
-                    hideModeSwitch={true}
+                    hideModeSwitch={false}
                     onChange={handleEditorChange}
                   />
                 </div>
