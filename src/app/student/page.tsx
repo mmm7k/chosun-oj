@@ -13,7 +13,7 @@ import { FaCodeBranch } from 'react-icons/fa';
 import { PiRanking } from 'react-icons/pi';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
-import '@/app/styles/heatmap.css';
+import '@/styles/heatmap.css';
 import { BiSolidAward } from 'react-icons/bi';
 import { useEffect, useMemo, useState } from 'react';
 import Slider from 'react-slick';
