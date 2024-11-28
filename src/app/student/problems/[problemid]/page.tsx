@@ -877,10 +877,14 @@ export default function Problem({ params }: { params: { problemid: string } }) {
             </div>
             {/* 코드 입력 영역 */}
             <textarea
-              className="w-full h-40 p-4 border rounded-md text-sm font-mono bg-gray-50 focus:outline-none"
+              className="w-full p-4 h-auto min-h-[15dvh] max-h-[70dvh] border rounded-md text-sm font-mono bg-gray-50 focus:outline-none resize-none overflow-auto"
               placeholder={`// 테스트 케이스를 입력하세요\n// 예: 3 5`}
-              value={testCase} // 입력값 상태 연결
-              onChange={(e) => setTestCase(e.target.value)} // 상태 업데이트
+              value={testCase}
+              onChange={(e) => {
+                setTestCase(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = `${e.target.scrollHeight}px`;
+              }}
             ></textarea>
             <div className="flex mt-5 justify-end space-x-4">
               <button
