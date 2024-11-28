@@ -81,8 +81,14 @@ export default function Problem({
     },
   );
 
-  const serverStatus = serverStatusData?.data?.servers[0]?.status || 'unknown';
-
+  let serverStatus;
+  if (serverStatusData?.error) {
+    // 에러 처리
+    serverStatus = 'abnormal';
+  } else {
+    // 정상적인 데이터 처리
+    serverStatus = serverStatusData?.data?.servers[0]?.status || 'abnormal';
+  }
   //에디터 커서 위치 테스트
   const [isFontReady, setIsFontReady] = useState(false); //폰트 로드 확인
   // 폰트 로드 확인
@@ -415,7 +421,7 @@ export default function Problem({
               </Option>
             ))}
           </Select>
-          {isServerStatusLoading || serverStatus === 'unknown' ? (
+          {isServerStatusLoading ? (
             <div className="hidden sm:flex ml-2 items-center w-20 h-10 bg-white rounded-full shadow-lg border border-gray-300 px-1">
               <span className="flex-1 text-gray-400 text-xs text-center ">
                 Judge
