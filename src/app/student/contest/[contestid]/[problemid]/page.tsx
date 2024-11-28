@@ -23,6 +23,7 @@ import { formattedDate } from '@/utils/dateFormatter';
 import { postContestSubmission } from '@/services/contestUser/postContestSubmission';
 import { getContestAllSubmissionUser } from '@/services/contestUser/getContestAllSubmissionUser';
 import Link from 'next/link';
+import { getServerStatus } from '@/services/problemUser/getServerStatus';
 
 const { Option } = Select;
 
@@ -70,6 +71,16 @@ export default function Problem({
   const initialPage = Number(searchParams.get('page')) || 1;
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
+
+  // 저지 서버 상태
+  const { data: serverStatusData, isLoading: isServerStatusLoading } = useQuery(
+    {
+      queryKey: ['serverStatusData'],
+      queryFn: () => getServerStatus(),
+    },
+  );
+
+  const serverStatus = serverStatusData.data?.servers[0]?.status;
 
   //에디터 커서 위치 테스트
   const [isFontReady, setIsFontReady] = useState(false); //폰트 로드 확인
@@ -399,6 +410,28 @@ export default function Problem({
               </Option>
             ))}
           </Select>
+          {isServerStatusLoading ? (
+            <div className="hidden sm:flex ml-2 items-center w-20 h-10 bg-white rounded-full shadow-lg border border-gray-300 px-1">
+              <span className="flex-1 text-gray-400 text-xs text-center ">
+                Judge
+              </span>
+              <div className="w-5 h-5 bg-gradient-to-br from-gray-400 to-gray-500 animate-pulse rounded-full shadow-md  "></div>
+            </div>
+          ) : serverStatus === 'normal' ? (
+            <div className="hidden sm:flex ml-2 items-center w-20 h-10 bg-white rounded-full shadow-lg border border-gray-300 px-1">
+              <span className="flex-1 text-gray-400 text-xs text-center ">
+                Judge
+              </span>
+              <div className="w-5 h-5 bg-gradient-to-br from-green-400 to-teal-500 animate-pulse rounded-full shadow-md  "></div>
+            </div>
+          ) : (
+            <div className="hidden sm:flex ml-2 items-center w-20 h-10 bg-white rounded-full shadow-lg border border-gray-300 px-1">
+              <span className="flex-1 text-gray-400 text-xs  text-center">
+                Judge
+              </span>
+              <div className="w-5 h-5 bg-gradient-to-br from-red-500 to-orange-400 animate-pulse rounded-full shadow-md "></div>
+            </div>
+          )}
         </div>
       </div>
 
