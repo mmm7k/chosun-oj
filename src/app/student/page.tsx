@@ -29,7 +29,6 @@ import {
   getSolveLevel,
   getSolveTag,
 } from '@/services/accountUser/profile';
-import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { rankColor } from '@/utils/rankColor';
 

@@ -56,6 +56,7 @@ export default function UserList() {
     'Regular User': '학생',
     Professor: '교수',
     'Super Admin': '관리자',
+    Tutor: '튜터',
   };
 
   const currentBlock = Math.ceil(currentPage / pagesPerBlock);

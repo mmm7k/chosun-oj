@@ -157,6 +157,15 @@ export default function UserEdit() {
                   <input
                     {...register('adminType')}
                     type="radio"
+                    value="Tutor"
+                    className="mr-1"
+                  />
+                  튜터
+                </label>
+                <label>
+                  <input
+                    {...register('adminType')}
+                    type="radio"
                     value="Professor"
                     className="mr-1"
                   />

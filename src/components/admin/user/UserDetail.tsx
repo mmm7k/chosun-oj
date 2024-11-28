@@ -23,6 +23,7 @@ export default function UserDetail() {
     'Regular User': '학생',
     Professor: '교수',
     'Super Admin': '관리자',
+    Tutor: '튜터',
   };
 
   return (

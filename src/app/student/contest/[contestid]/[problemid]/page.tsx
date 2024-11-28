@@ -80,14 +80,8 @@ export default function Problem({
     },
   );
 
-  let serverStatus;
-  if (serverStatusData?.error) {
-    // 에러 처리
-    serverStatus = 'abnormal';
-  } else {
-    // 정상적인 데이터 처리
-    serverStatus = serverStatusData?.data?.servers[0]?.status || 'abnormal';
-  }
+  const serverStatus = serverStatusData?.data[0]?.status || 'abnormal';
+
   //에디터 커서 위치 테스트
   const [isFontReady, setIsFontReady] = useState(false); //폰트 로드 확인
   // 폰트 로드 확인
