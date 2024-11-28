@@ -81,7 +81,7 @@ export default function Problem({
     },
   );
 
-  const serverStatus = serverStatusData.data?.servers[0]?.status;
+  const serverStatus = serverStatusData?.data?.servers[0]?.status;
 
   //에디터 커서 위치 테스트
   const [isFontReady, setIsFontReady] = useState(false); //폰트 로드 확인
