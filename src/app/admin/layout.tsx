@@ -8,9 +8,9 @@ export default function ProfessorLayout({
 }>) {
   return (
     <ReactQueryProvider>
-      <div className="bg-[#f0f4fc] flex flex-col 2xl:flex-row min-w-screen 2xl:min-h-screen">
+      <div className="bg-[#f0f4fc] flex flex-col md:flex-row min-w-screen md:min-h-screen">
         <SideNav />
-        <main className="w-full 2xl:pl-52">{children}</main>
+        <main className="w-full md:pl-52">{children}</main>
       </div>
     </ReactQueryProvider>
   );

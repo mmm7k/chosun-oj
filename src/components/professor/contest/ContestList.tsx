@@ -12,6 +12,7 @@ import { RiUserAddLine } from 'react-icons/ri';
 import { getAllContest } from '@/services/contestAdmin/getAllContest';
 import { deleteContest } from '@/services/contestAdmin/deleteContest';
 import { MdOutlineLibraryAdd } from 'react-icons/md';
+import Link from 'next/link';
 
 export default function ContestList() {
   const router = useRouter();
@@ -216,7 +217,25 @@ export default function ContestList() {
         </section>
 
         {/* Pagination */}
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <div className="flex space-x-3">
+            <Link href="/professor/contest/post">
+              <button
+                className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+                type="submit"
+              >
+                대회 등록
+              </button>
+            </Link>
+            <Link href="/professor/contest/submission">
+              <button
+                className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+                type="submit"
+              >
+                제출 확인
+              </button>
+            </Link>
+          </div>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (

@@ -12,11 +12,11 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
+import { getAllUser } from '@/services/accountAdmin/getAllUser';
 import Skeleton from '@mui/material/Skeleton';
 import { getUsersContest } from '@/services/contestAdmin/getUsersContest';
 import { deleteUsersContest } from '@/services/contestAdmin/deleteUsersContest';
 import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest';
-import { getAllUser } from '@/services/accountAdmin/getAllUser';
 
 interface FormData {
   student_number: string;
@@ -28,6 +28,9 @@ export default function UserEnroll() {
   const queryClient = useQueryClient();
   const [isStudentModalOpen, setIsStudentModalOpen] = useState<boolean>(false);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
+  const [tempSelectedStudents, setTempSelectedStudents] = useState<Student[]>(
+    [],
+  );
   const [deleteSelectedStudents, setDeleteSelectedStudents] = useState<
     Student[]
   >([]);
@@ -50,12 +53,6 @@ export default function UserEnroll() {
     handleFilterChange('user', searchValue);
   };
 
-  // useEffect(() => {
-  //   const urlParams = new URLSearchParams(window.location.search);
-  //   const page = Number(urlParams.get('page')) || 1;
-  //   setCurrentPage(page);
-  // }, []);
-
   useEffect(() => {
     const query = new URLSearchParams();
     query.set('page', currentPage.toString());
@@ -73,6 +70,12 @@ export default function UserEnroll() {
     }
   }, [isStudentModalOpen]);
 
+  useEffect(() => {
+    if (isStudentModalOpen) {
+      setTempSelectedStudents([...selectedStudents]);
+    }
+  }, [isStudentModalOpen, selectedStudents]);
+
   const {
     data: userListData,
     isLoading,
@@ -81,15 +84,6 @@ export default function UserEnroll() {
     queryKey: ['userListData', currentPage, selectedUser],
     queryFn: () => getAllUser(currentPage, selectedUser || undefined),
   });
-
-  // const updateUrlAndPage = (page: number) => {
-  //   window.history.replaceState(
-  //     null,
-  //     '',
-  //     `/professor/contest/enrolluser/${contestId}?page=${page}`,
-  //   );
-  //   setCurrentPage(page);
-  // };
 
   const updateUrlAndPage = (page: number) => {
     const query = new URLSearchParams();
@@ -207,22 +201,57 @@ export default function UserEnroll() {
     mutation.mutate();
   };
 
-  const handleStudentSelection = (student: {
-    name: string;
-    student_number: string;
-  }) => {
-    setSelectedStudents(
-      (prev: any) =>
-        prev.some(
-          (s: { student_number: string }) =>
-            s.student_number === student.student_number,
-        )
-          ? prev.filter(
-              (s: { student_number: string }) =>
-                s.student_number !== student.student_number,
-            ) // 선택 해제
-          : [...prev, student], // 선택 추가
+  // const handleStudentSelection = (student: {
+  //   name: string;
+  //   student_number: string;
+  // }) => {
+  //   setSelectedStudents(
+  //     (prev: any) =>
+  //       prev.some(
+  //         (s: { student_number: string }) =>
+  //           s.student_number === student.student_number,
+  //       )
+  //         ? prev.filter(
+  //             (s: { student_number: string }) =>
+  //               s.student_number !== student.student_number,
+  //           ) // 선택 해제
+  //         : [...prev, student], // 선택 추가
+  //   );
+  // };
+  const handleStudentSelection = (student: Student) => {
+    setTempSelectedStudents((prev) =>
+      prev.some((s) => s.student_number === student.student_number)
+        ? prev.filter((s) => s.student_number !== student.student_number)
+        : [...prev, student],
     );
+  };
+
+  const onModalSubmit = () => {
+    // `tempSelectedProblems`에 있는 항목은 유지하고, 없는 항목은 제거
+    setSelectedStudents((prev) =>
+      prev
+        .filter((student) =>
+          tempSelectedStudents.some(
+            (temp) => temp.student_number === student.student_number,
+          ),
+        )
+        .concat(
+          tempSelectedStudents.filter(
+            (temp) =>
+              !prev.some(
+                (student) => student.student_number === temp.student_number,
+              ),
+          ),
+        ),
+    );
+    closeModal();
+  };
+
+  const closeModal = () => {
+    setTempSelectedStudents([]); // 선택 초기화
+    setIsStudentModalOpen(false);
+    const newUrl = `/professor/contest/enrolluser/${contestId}`;
+    window.history.replaceState(null, '', newUrl);
   };
 
   const { data: enrolledStudentsData, isLoading: enrolledStudentsIsLoading } =
@@ -269,15 +298,23 @@ export default function UserEnroll() {
       okText: '삭제',
       okType: 'danger',
       cancelText: '취소',
-      onOk: () => deleteMutation.mutate(idsToDelete),
+      onOk: async () => {
+        try {
+          await deleteMutation.mutateAsync(idsToDelete); // 삭제 실행
+        } catch (error: any) {
+          message.error(
+            error.response?.data?.message || '오류가 발생했습니다.',
+          );
+        }
+      },
     });
   };
 
-  const closeModal = () => {
-    setIsStudentModalOpen(false);
-    const newUrl = `/professor/contest/enrolluser/${contestId}`;
-    window.history.replaceState(null, '', newUrl);
-  };
+  // const closeModal = () => {
+  //   setIsStudentModalOpen(false);
+  //   const newUrl = `/admin/contest/enrolluser/${contestId}`;
+  //   window.history.replaceState(null, '', newUrl);
+  // };
   return (
     <div className="flex flex-col min-h-screen p-8 ">
       <div className="space-y-8">
@@ -615,15 +652,19 @@ export default function UserEnroll() {
                       {student.student_number}
                     </span>
                     <Checkbox
-                      checked={selectedStudents.some(
+                      // checked={selectedStudents.some(
+                      //   (s) => s.student_number === student.student_number,
+                      // )}
+                      checked={tempSelectedStudents.some(
                         (s) => s.student_number === student.student_number,
                       )}
-                      onChange={() =>
+                      onChange={(e) => {
+                        e.stopPropagation();
                         handleStudentSelection({
                           student_number: student.student_number,
                           name: student.name,
-                        })
-                      }
+                        });
+                      }}
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -657,6 +698,16 @@ export default function UserEnroll() {
                 className={`px-3 py-1 rounded-xl ${endPage === totalPages ? 'bg-gray-200 opacity-50' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 &gt;
+              </button>
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 text-sm font-normal text-white rounded-xl 
+                    
+                           bg-primary hover:bg-primaryButtonHover"
+                onClick={onModalSubmit}
+              >
+                등록
               </button>
             </div>
           </div>

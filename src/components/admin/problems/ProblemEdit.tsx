@@ -12,6 +12,10 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { getProblem } from '@/services/problemAdmin/getProblem';
 import { editProblem } from '@/services/problemAdmin/editProblem';
+import dynamic from 'next/dynamic';
+const EditorComponent = dynamic(() => import('@/components/commons/Editor'), {
+  ssr: false,
+});
 
 const { Option } = Select;
 
@@ -243,7 +247,7 @@ export default function ProblemPost() {
                 <label htmlFor="markdown-editor">문제 본문: </label>
 
                 <div className="mt-6">
-                  <Suspense>
+                  {/* <Suspense>
                     <Editor
                       ref={editorRef}
                       initialValue={markdownContent || ' '}
@@ -254,7 +258,18 @@ export default function ProblemPost() {
                       hideModeSwitch={true}
                       onChange={handleEditorChange}
                     />
-                  </Suspense>
+                  </Suspense> */}
+                  <EditorComponent
+                    editorRef={editorRef}
+                    initialValue=""
+                    previewStyle="vertical"
+                    height="50rem"
+                    // initialEditType="markdown"
+                    initialEditType="wysiwyg"
+                    useCommandShortcut={false}
+                    hideModeSwitch={false}
+                    onChange={handleEditorChange}
+                  />
                 </div>
               </div>
             </div>

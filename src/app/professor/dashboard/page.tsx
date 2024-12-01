@@ -141,12 +141,12 @@ export default function Dashboard() {
   }, [username, admin_type, fetchUser]);
 
   return (
-    <div className="flex flex-col min-h-screen p-8 2xl:flex-row">
-      <div className="flex flex-col flex-1 gap-4 2xl:flex-row">
+    <div className="flex flex-col min-h-screen p-8 md:flex-row">
+      <div className="flex flex-col flex-1 gap-4 md:flex-row">
         {/* 좌측 영역 */}
-        <div className="flex flex-col w-full gap-4 2xl:w-1/3">
+        <div className="flex flex-col w-full gap-4 md:w-1/3">
           {/* 좌측 프로필 영역 */}
-          <div className="flex flex-col h-auto p-6 bg-white shadow-lg rounded-3xl 2xl:h-1/2">
+          <div className="flex flex-col h-auto p-6 bg-white shadow-lg rounded-3xl md:h-1/2">
             <section className="flex flex-col items-center">
               <div className="w-24 h-24 mb-4 bg-gray-200 rounded-full"></div>
               <div className="flex items-center text-xl font-bold text-primary">
@@ -156,56 +156,56 @@ export default function Dashboard() {
             </section>
             <hr className="w-full my-4 " />
             <ul className="mt-2 space-y-3">
-              <li>• 알고리즘 - 01 분반</li>
+              {/* <li>• 알고리즘 - 01 분반</li>
               <li>• 알고리즘 - 02 분반</li>
               <li>• 네트워크 보안 - 01 분반</li>
-              <li>• 네트워크 보안 - 02 분반</li>
+              <li>• 네트워크 보안 - 02 분반</li> */}
             </ul>
           </div>
 
           {/* 좌측 하단 도넛 그래프 영역 */}
           <div className="flex-grow p-6 bg-white shadow-lg rounded-3xl">
-            <span className="font-bold">💡 학생 분포도</span>
+            {/* <span className="font-bold">💡 학생 분포도</span> */}
             <hr className="w-full my-4 " />
             <div className="flex items-center justify-center h-72">
-              <Doughnut data={donutData} options={donutOptions} />
+              {/* <Doughnut data={donutData} options={donutOptions} /> */}
             </div>
           </div>
         </div>
 
         {/* 우측 영역 */}
-        <div className="flex flex-col w-full gap-4 2xl:w-2/3">
+        <div className="flex flex-col w-full gap-4 md:w-2/3">
           {/* 상단 3개의 작은 카드 영역 */}
-          <div className="flex flex-col gap-4 text-sm 2xl:flex-row">
+          <div className="flex flex-col gap-4 text-sm md:flex-row">
             <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl">
-              <span className="font-bold">📝 할 일 목록</span>
+              {/* <span className="font-bold">📝 할 일 목록</span> */}
               <hr className="w-full my-2 " />
               <ul className="mt-2 space-y-1 ">
-                <li>• 코딩 과제</li>
-                <li>• 강의 준비</li>
+                {/* <li>• 코딩 과제</li> */}
+                {/* <li>• 강의 준비</li> */}
               </ul>
             </div>
             <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl">
-              <span className="font-bold">📢 공지사항</span>
+              {/* <span className="font-bold">📢 공지사항</span> */}
               <hr className="w-full my-2 " />
               <ul className="mt-2 space-y-1">
-                <li>• 다음 주 휴강 안내</li>
-                <li>• 새 과제 업데이트</li>
+                {/* <li>• 다음 주 휴강 안내</li> */}
+                {/* <li>• 새 과제 업데이트</li> */}
               </ul>
             </div>
             <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl">
-              <span className="font-bold">🗒 메모</span>
+              {/* <span className="font-bold">🗒 메모</span> */}
               <hr className="w-full my-2 " />
-              <p className="mt-2">오늘 할 일 완료</p>
+              {/* <p className="mt-2">오늘 할 일 완료</p> */}
             </div>
           </div>
 
           {/* 우측 메인 그래프 영역 */}
           <div className="flex-grow p-6 bg-white shadow-lg rounded-3xl">
-            <h2 className="text-lg font-bold">📊 분반별 성적 비교</h2>
+            {/* <h2 className="text-lg font-bold">📊 분반별 성적 비교</h2> */}
             <hr className="w-full my-6 " />
             <div className="h-[35rem]">
-              <Bar data={barData} options={barOptions} />
+              {/* <Bar data={barData} options={barOptions} /> */}
             </div>
           </div>
         </div>

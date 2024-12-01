@@ -4,14 +4,18 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Checkbox, message, Select, Spin } from 'antd';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import '@toast-ui/editor/toastui-editor.css';
-import { Editor } from '@toast-ui/react-editor';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { getProblem } from '@/services/problemAdmin/getProblem';
 import { editProblem } from '@/services/problemAdmin/editProblem';
+import dynamic from 'next/dynamic';
+import { Editor } from '@toast-ui/react-editor';
+const EditorComponent = dynamic(() => import('@/components/commons/Editor'), {
+  ssr: false,
+});
 
 const { Option } = Select;
 
@@ -243,18 +247,31 @@ export default function ProblemPost() {
                 <label htmlFor="markdown-editor">문제 본문: </label>
 
                 <div className="mt-6">
-                  <Suspense>
+                  {/* <Suspense>
                     <Editor
                       ref={editorRef}
-                      initialValue={markdownContent || ' '}
+                      initialValue={markdownContent || ''}
                       previewStyle="vertical"
-                      height="25rem"
-                      initialEditType="markdown"
+                      height="50rem"
+                      // initialEditType="markdown"
+                      initialEditType="wysiwyg"
                       useCommandShortcut={false}
-                      hideModeSwitch={true}
+                      hideModeSwitch={false}
                       onChange={handleEditorChange}
                     />
-                  </Suspense>
+                    
+                  </Suspense> */}
+                  <EditorComponent
+                    editorRef={editorRef}
+                    initialValue=""
+                    previewStyle="vertical"
+                    height="50rem"
+                    // initialEditType="markdown"
+                    initialEditType="wysiwyg"
+                    useCommandShortcut={false}
+                    hideModeSwitch={false}
+                    onChange={handleEditorChange}
+                  />
                 </div>
               </div>
             </div>

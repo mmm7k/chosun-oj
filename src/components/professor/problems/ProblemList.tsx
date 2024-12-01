@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
-import { IoSearchSharp } from 'react-icons/io5';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { TbEdit } from 'react-icons/tb';
@@ -13,10 +13,13 @@ import { deleteProblem } from '@/services/problemAdmin/deleteProblem';
 import { MdChecklist } from 'react-icons/md';
 import { UploadOutlined } from '@ant-design/icons';
 import { postTestcase } from '@/services/problemAdmin/postTestcase';
-import { set } from 'react-hook-form';
 import CircularProgress from '@mui/material/CircularProgress';
 import { GoCodescan } from 'react-icons/go';
-import useUserStore from '@/store/userstore';
+import Link from 'next/link';
+import { IoSearchSharp } from 'react-icons/io5';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 export default function ProblemList() {
   const router = useRouter();
@@ -27,27 +30,76 @@ export default function ProblemList() {
     useState<boolean>(false);
   const [selectTestcaseId, setIsSelectTestcaseId] = useState<number>(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isMuteLoading, setIsMutateLoading] = useState(false);
   const pagesPerBlock = 5;
-  const { username, admin_type, fetchUser } = useUserStore();
-  useEffect(() => {
-    if (!username || !admin_type) {
-      fetchUser(); // 상태가 없으면 API 호출
-    }
-  }, [username, admin_type, fetchUser]);
+
+  const initialKeyword = searchParams.get('keyword') || null;
+  const initialType = searchParams.get('type') || null;
+  const initialLanguage = searchParams.get('language') || null;
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(initialType);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(
+    initialLanguage,
+  );
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(
+    initialKeyword,
+  );
 
   const {
     data: problemListData,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ['problemListData', currentPage],
-    queryFn: () => getAllProblem(currentPage),
+    queryKey: [
+      'problemListData',
+      ,
+      currentPage,
+      selectedType,
+      selectedLanguage,
+      selectedKeyword,
+    ],
+    queryFn: () =>
+      getAllProblem(
+        currentPage,
+        selectedKeyword || undefined,
+        selectedType || undefined,
+        selectedLanguage || undefined,
+      ),
   });
 
+  const handleFilterChange = (
+    key: 'keyword' | 'language' | 'type',
+    value: string | null,
+  ) => {
+    if (key === 'keyword') setSelectedKeyword(value);
+    if (key === 'type') setSelectedType(value);
+    if (key === 'language') setSelectedLanguage(value);
+
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('keyword', searchValue);
+  };
+
   useEffect(() => {
-    router.push(`/professor/problems/list?page=${currentPage}`);
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedKeyword) query.set('keyword', selectedKeyword);
+    if (selectedType) query.set('type', selectedType);
+    if (selectedLanguage) query.set('language', selectedLanguage);
+
+    router.push(`/professor/problems/list?${query.toString()}`);
     refetch();
-  }, [currentPage, router, refetch]);
+  }, [
+    currentPage,
+    router,
+    refetch,
+    selectedType,
+    selectedLanguage,
+    selectedKeyword,
+  ]);
 
   const problemList = problemListData?.data?.data || [];
   const totalPages = problemListData?.data?.total_count
@@ -100,8 +152,6 @@ export default function ProblemList() {
     });
   };
 
-  const [isMuteLoading, setIsMutateLoading] = useState(false);
-
   const testcaseMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) =>
       postTestcase(id, data),
@@ -134,12 +184,11 @@ export default function ProblemList() {
   };
 
   // 테스트케이스 업로드 핸들러
-  const handleTestcaseUpload = (id: number) => {
+  const handleTestcaseUpload = async (id: number) => {
     if (!selectedFile) {
       message.error('테스트케이스 파일을 선택하세요.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('spj', 'false'); // `spj`는 기본값 false
@@ -154,20 +203,55 @@ export default function ProblemList() {
     setIsSelectTestcaseId(0); // 선택된 문제 초기화
   };
 
-  const selectedFileName = selectedFile ? selectedFile.name : '';
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">문제 목록</h1>
-          {/* <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
-            <IoSearchSharp className="mr-2 text-lg text-gray-500" />
-            <input
-              className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
-              type="text"
-              placeholder="문제 이름으로 검색해보세요"
-            />
-          </div> */}
+          <div className="flex items-center gap-2">
+            <Select
+              placeholder="문제타입"
+              value={selectedType}
+              onChange={(value) => handleFilterChange('type', value)}
+              className="w-28"
+              allowClear
+            >
+              <Option value={'public'}>공통</Option>
+              <Option value={'other'}>대회/과제</Option>
+            </Select>
+
+            <Select
+              placeholder="언어"
+              value={selectedLanguage}
+              onChange={(value) => handleFilterChange('language', value)}
+              className="w-28"
+              allowClear
+            >
+              <Option value={'C'}>C</Option>
+              <Option value={'C++'}>C++</Option>
+              <Option value={'Java'}>Java</Option>
+              <Option value={'Python3'}>Python3</Option>
+              <Option value={'Rust'}>Rust</Option>
+            </Select>
+
+            <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
+              <IoSearchSharp
+                className="mr-2 text-lg text-gray-500"
+                onClick={() => handleSearch()}
+              />
+              <input
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
+                type="text"
+                placeholder="문제를 검색해보세요"
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('keyword', e.currentTarget.value);
+                  }
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         <hr className="mt-5 border-t-2 border-gray-200" />
@@ -223,7 +307,7 @@ export default function ProblemList() {
                     className="border-b cursor-pointer hover:bg-gray-50"
                     key={item.id}
                     onClick={() =>
-                      router.push(`/professor/problems/list/${item.id}`)
+                      router.push(`/admin/problems/list/${item.id}`)
                     }
                   >
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
@@ -242,45 +326,38 @@ export default function ProblemList() {
                       {item.test_case_id ? '등록' : '미등록'}
                     </td>
                     <td className="flex items-center p-4 space-x-2 text-xs sm:text-base">
-                      {(admin_type === 'Super Admin' ||
-                        username === item?.created_by?.username) && (
-                        <>
-                          <GoCodescan
-                            className="text-base cursor-pointer lg:text-lg hover:text-gray-500"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(
-                                `/professor/problems/submission/${item.id}?page=1`,
-                              );
-                            }}
-                          />
-                          <MdChecklist
-                            className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsTestCaseUploadModalOpen(true);
-                              setIsSelectTestcaseId(item.id);
-                            }}
-                          />
+                      <GoCodescan
+                        className="text-base cursor-pointer lg:text-lg hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(
+                            `/admin/problems/submission/${item.id}?page=1`,
+                          );
+                        }}
+                      />
+                      <MdChecklist
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsTestCaseUploadModalOpen(true);
+                          setIsSelectTestcaseId(item.id);
+                        }}
+                      />
 
-                          <TbEdit
-                            className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(
-                                `/professor/problems/edit/${item.id}`,
-                              );
-                            }}
-                          />
-                          <FiTrash2
-                            className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(item.id);
-                            }}
-                          />
-                        </>
-                      )}
+                      <TbEdit
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/problems/edit/${item.id}`);
+                        }}
+                      />
+                      <FiTrash2
+                        className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -289,7 +366,15 @@ export default function ProblemList() {
           )}
         </section>
 
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <Link href="/admin/problems/post">
+            <button
+              className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              type="submit"
+            >
+              문제 등록
+            </button>
+          </Link>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (
@@ -382,10 +467,10 @@ export default function ProblemList() {
             </Upload>
 
             {/* 선택된 파일 이름 */}
-            {selectedFileName && (
+            {selectedFile && (
               <div className="mt-4 text-md text-gray-700">
                 <span className="font-medium">선택된 파일:</span>{' '}
-                {selectedFileName}
+                {selectedFile.name}
               </div>
             )}
 

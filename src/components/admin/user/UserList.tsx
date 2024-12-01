@@ -10,6 +10,7 @@ import { TbEdit } from 'react-icons/tb';
 import Skeleton from '@mui/material/Skeleton';
 import { deleteUser } from '@/services/accountAdmin/deleteUser';
 import { Modal, message } from 'antd';
+import Link from 'next/link';
 
 export default function UserList() {
   const router = useRouter();
@@ -216,7 +217,15 @@ export default function UserList() {
           )}
         </section>
 
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <Link href="/admin/user/enroll">
+            <button
+              className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              type="submit"
+            >
+              유저 등록
+            </button>
+          </Link>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (

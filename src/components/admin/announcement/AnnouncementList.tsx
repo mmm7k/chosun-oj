@@ -13,6 +13,7 @@ import { MdOutlineLibraryAdd } from 'react-icons/md';
 import { getAllAnnouncement } from '@/services/announcementAdmin/getAllAnnouncement';
 import { deleteAnnouncement } from '@/services/announcementAdmin/deleteAnnouncement';
 import { formattedDate } from '@/utils/dateFormatter';
+import Link from 'next/link';
 
 export default function AnnouncementList() {
   const router = useRouter();
@@ -190,7 +191,15 @@ export default function AnnouncementList() {
         </section>
 
         {/* Pagination */}
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <Link href="/admin/announcement/post">
+            <button
+              className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              type="submit"
+            >
+              공지 등록
+            </button>
+          </Link>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (

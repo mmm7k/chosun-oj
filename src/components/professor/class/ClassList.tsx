@@ -11,6 +11,7 @@ import { Modal, message } from 'antd';
 import { getAllClass } from '@/services/classAdmin/getAllClass';
 import { deleteClass } from '@/services/classAdmin/deleteClass';
 import { RiUserAddLine } from 'react-icons/ri';
+import Link from 'next/link';
 
 export default function ClassList() {
   const router = useRouter();
@@ -210,7 +211,25 @@ export default function ClassList() {
         </section>
 
         {/* Pagination */}
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <div className="flex space-x-3">
+            <Link href="/professor/class/post">
+              <button
+                className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+                type="submit"
+              >
+                분반 개설
+              </button>
+            </Link>
+            <Link href="/professor/class/courselist?page=1">
+              <button
+                className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+                type="submit"
+              >
+                개설 강의 목록
+              </button>
+            </Link>
+          </div>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (

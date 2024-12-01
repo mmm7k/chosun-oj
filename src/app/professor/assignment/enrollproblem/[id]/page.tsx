@@ -3,7 +3,7 @@
 import { Checkbox, message, Modal } from 'antd';
 import { PiExclamationMarkFill } from 'react-icons/pi';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoSearchSharp } from 'react-icons/io5';
 import Skeleton from '@mui/material/Skeleton';
@@ -11,12 +11,19 @@ import { getAllProblem } from '@/services/problemAdmin/getAllProblem';
 import { enrollProblemsAssignment } from '@/services/assignmentAdmin/enrollProblemsContest';
 import { getProblemsAssignment } from '@/services/assignmentAdmin/getProblemsAssignment';
 import { deleteProblemsAssignment } from '@/services/assignmentAdmin/deleteProblemsAssignment';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 export default function ProblemEnroll() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isProblemModalOpen, setIsProblemModalOpen] = useState<boolean>(false);
   const [selectedProblems, setSelectedProblems] = useState<Problem[]>([]);
+  const [tempSelectedProblems, setTempSelectedProblems] = useState<Problem[]>(
+    [],
+  );
+
   const [deleteSelectedProblems, setDeleteSelectedProblems] = useState<
     Problem[]
   >([]);
@@ -27,35 +34,94 @@ export default function ProblemEnroll() {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = Number(urlParams.get('page')) || 1;
-    setCurrentPage(page);
-  }, []);
-
-  useEffect(() => {
-    if (isProblemModalOpen) {
-      refetch();
-    }
-  }, [isProblemModalOpen]);
+  const initialKeyword = searchParams.get('keyword') || null;
+  const initialType = searchParams.get('type') || null;
+  const initialLanguage = searchParams.get('language') || null;
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(initialType);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(
+    initialLanguage,
+  );
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(
+    initialKeyword,
+  );
 
   const {
     data: problemListData,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['problemListData', currentPage],
-    queryFn: () => getAllProblem(currentPage),
+    queryKey: [
+      'problemListData',
+      currentPage,
+      selectedType,
+      selectedLanguage,
+      selectedKeyword,
+    ],
+    queryFn: () =>
+      getAllProblem(
+        currentPage,
+        selectedKeyword || undefined,
+        selectedType || undefined,
+        selectedLanguage || undefined,
+      ),
   });
 
-  const updateUrlAndPage = (page: number) => {
+  const handleFilterChange = (
+    key: 'keyword' | 'language' | 'type',
+    value: string | null,
+  ) => {
+    if (key === 'keyword') setSelectedKeyword(value);
+    if (key === 'type') setSelectedType(value);
+    if (key === 'language') setSelectedLanguage(value);
+
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('keyword', searchValue);
+  };
+
+  useEffect(() => {
+    if (isProblemModalOpen) {
+      setTempSelectedProblems([...selectedProblems]); // 이미 등록된 문제를 temp 상태로 복사
+    }
+    //  else {
+    //   setTempSelectedProblems([]); // 모달 닫을 때 초기화
+    // }
+  }, [isProblemModalOpen, selectedProblems]);
+
+  // const updateUrlAndPage = (page: number) => {
+  //   window.history.replaceState(
+  //     null,
+  //     '',
+  //     `/professor/assignment/enrollproblem/${assignmentId}?page=${page}`,
+  //   );
+  //   setCurrentPage(page);
+  // };
+
+  useEffect(() => {
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedKeyword) query.set('keyword', selectedKeyword);
+    if (selectedType) query.set('type', selectedType);
+    if (selectedLanguage) query.set('language', selectedLanguage);
+
     window.history.replaceState(
       null,
       '',
-      `/professor/assignment/enrollproblem/${assignmentId}?page=${page}`,
+      `/professor/assignment/enrollproblem/${assignmentId}?${query.toString()}`,
     );
-    setCurrentPage(page);
-  };
+    refetch();
+  }, [
+    currentPage,
+    router,
+    refetch,
+    selectedType,
+    selectedLanguage,
+    selectedKeyword,
+  ]);
 
   const problems = problemListData?.data?.data || [];
   const totalPages = problemListData?.data?.total_count
@@ -67,9 +133,8 @@ export default function ProblemEnroll() {
   const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
 
   const changePage = (page: number) => {
-    updateUrlAndPage(page);
+    setCurrentPage(page);
   };
-
   const changePageBlock = (isNext: boolean) => {
     const newPage = isNext
       ? Math.min(endPage + 1, totalPages)
@@ -105,12 +170,45 @@ export default function ProblemEnroll() {
     mutation.mutate();
   };
 
+  // const handleProblemSelection = (problem: Problem) => {
+  //   setSelectedProblems((prev) =>
+  //     prev.some((p) => p.id === problem.id)
+  //       ? prev.filter((p) => p.id !== problem.id)
+  //       : [...prev, problem],
+  //   );
+  // };
+
+  // 모달에서 문제 선택
   const handleProblemSelection = (problem: Problem) => {
-    setSelectedProblems((prev) =>
+    setTempSelectedProblems((prev) =>
       prev.some((p) => p.id === problem.id)
         ? prev.filter((p) => p.id !== problem.id)
         : [...prev, problem],
     );
+  };
+
+  const onModalSubmit = () => {
+    // `tempSelectedProblems`에 있는 항목은 유지하고, 없는 항목은 제거
+    setSelectedProblems((prev) =>
+      prev
+        .filter((problem) =>
+          tempSelectedProblems.some((temp) => temp.id === problem.id),
+        )
+        .concat(
+          tempSelectedProblems.filter(
+            (temp) => !prev.some((problem) => problem.id === temp.id),
+          ),
+        ),
+    );
+    closeModal();
+  };
+
+  // 모달 닫기 버튼 클릭 시 (선택 취소)
+  const closeModal = () => {
+    setTempSelectedProblems([]); // 선택 초기화
+    setIsProblemModalOpen(false);
+    const newUrl = `/professor/assignment/enrollproblem/${assignmentId}`;
+    window.history.replaceState(null, '', newUrl);
   };
 
   const { data: enrolledProblemsData, isLoading: enrolledProblemsIsLoading } =
@@ -165,11 +263,11 @@ export default function ProblemEnroll() {
     });
   };
 
-  const closeModal = () => {
-    setIsProblemModalOpen(false);
-    const newUrl = `/professor/assignment/enrollproblem/${assignmentId}`;
-    window.history.replaceState(null, '', newUrl);
-  };
+  // const closeModal = () => {
+  //   setIsProblemModalOpen(false);
+  //   const newUrl = `/professor/assignment/enrollproblem/${assignmentId}`;
+  //   window.history.replaceState(null, '', newUrl);
+  // };
 
   return (
     <div className="flex flex-col min-h-screen p-8 ">
@@ -348,6 +446,7 @@ export default function ProblemEnroll() {
       {isProblemModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-semibold text-gray-700"
+          // onClick={() => setIsProblemModalOpen(false)}
           onClick={closeModal}
         >
           <div
@@ -357,19 +456,54 @@ export default function ProblemEnroll() {
             <h2 className="text-lg mb-4">문제 검색 및 목록</h2>
             <button
               className="absolute right-10 top-7 text-xl"
+              // onClick={() => setIsProblemModalOpen(false)}
               onClick={closeModal}
             >
               x
             </button>
             <div className="flex items-center mb-4 border-[1px] border-gray-300 rounded-lg px-3 py-2 w-full bg-white shadow-sm">
-              <IoSearchSharp className="mr-2 text-lg text-gray-500" />
+              <IoSearchSharp
+                className="mr-2 text-lg text-gray-500"
+                onClick={() => handleSearch()}
+              />
               <input
-                className="w-full text-sm text-secondary placeholder:text-sm focus:outline-none"
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
                 type="text"
-                placeholder="제목으로 검색해보세요"
+                placeholder="문제를 검색해보세요"
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('keyword', e.currentTarget.value);
+                  }
+                }}
               />
             </div>
+            <div className="flex items-center gap-2">
+              <Select
+                placeholder="문제타입"
+                value={selectedType}
+                onChange={(value) => handleFilterChange('type', value)}
+                className="w-28"
+                allowClear
+              >
+                <Option value={'public'}>공통</Option>
+                <Option value={'other'}>대회/과제</Option>
+              </Select>
 
+              <Select
+                placeholder="언어"
+                value={selectedLanguage}
+                onChange={(value) => handleFilterChange('language', value)}
+                className="w-28"
+                allowClear
+              >
+                <Option value={'C'}>C</Option>
+                <Option value={'C++'}>C++</Option>
+                <Option value={'Java'}>Java</Option>
+                <Option value={'Python3'}>Python3</Option>
+                <Option value={'Rust'}>Rust</Option>
+              </Select>
+            </div>
             <div className="flex-1 overflow-y-auto border-t mt-2">
               {isLoading ? (
                 <table className="w-full text-sm text-left border-b-2 table-auto">
@@ -411,10 +545,17 @@ export default function ProblemEnroll() {
                     <span className="text-sm">{problem.title}</span>
 
                     <Checkbox
-                      checked={selectedProblems.some(
+                      // checked={selectedProblems.some(
+                      //   (p) => p.id === problem.id,
+                      // )}
+                      // onChange={() => handleProblemSelection(problem)}
+                      checked={tempSelectedProblems.some(
                         (p) => p.id === problem.id,
                       )}
-                      onChange={() => handleProblemSelection(problem)}
+                      onChange={(e) => {
+                        e.stopPropagation(); // 부모 div 클릭 이벤트 중지
+                        handleProblemSelection(problem);
+                      }}
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -448,6 +589,16 @@ export default function ProblemEnroll() {
                 className={`px-3 py-1 rounded-xl ${endPage === totalPages ? 'bg-gray-200 opacity-50' : 'bg-gray-200 hover:bg-gray-300'}`}
               >
                 &gt;
+              </button>
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 text-sm font-normal text-white rounded-xl 
+                    
+                           bg-primary hover:bg-primaryButtonHover"
+                onClick={onModalSubmit}
+              >
+                등록
               </button>
             </div>
           </div>

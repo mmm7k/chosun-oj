@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
-import { IoSearchSharp } from 'react-icons/io5';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { TbEdit } from 'react-icons/tb';
@@ -15,6 +15,11 @@ import { UploadOutlined } from '@ant-design/icons';
 import { postTestcase } from '@/services/problemAdmin/postTestcase';
 import CircularProgress from '@mui/material/CircularProgress';
 import { GoCodescan } from 'react-icons/go';
+import Link from 'next/link';
+import { IoSearchSharp } from 'react-icons/io5';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 export default function ProblemList() {
   const router = useRouter();
@@ -26,22 +31,75 @@ export default function ProblemList() {
   const [selectTestcaseId, setIsSelectTestcaseId] = useState<number>(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isMuteLoading, setIsMutateLoading] = useState(false);
-
   const pagesPerBlock = 5;
+
+  const initialKeyword = searchParams.get('keyword') || null;
+  const initialType = searchParams.get('type') || null;
+  const initialLanguage = searchParams.get('language') || null;
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(initialType);
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(
+    initialLanguage,
+  );
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(
+    initialKeyword,
+  );
 
   const {
     data: problemListData,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ['problemListData', currentPage],
-    queryFn: () => getAllProblem(currentPage),
+    queryKey: [
+      'problemListData',
+      ,
+      currentPage,
+      selectedType,
+      selectedLanguage,
+      selectedKeyword,
+    ],
+    queryFn: () =>
+      getAllProblem(
+        currentPage,
+        selectedKeyword || undefined,
+        selectedType || undefined,
+        selectedLanguage || undefined,
+      ),
   });
 
+  const handleFilterChange = (
+    key: 'keyword' | 'language' | 'type',
+    value: string | null,
+  ) => {
+    if (key === 'keyword') setSelectedKeyword(value);
+    if (key === 'type') setSelectedType(value);
+    if (key === 'language') setSelectedLanguage(value);
+
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('keyword', searchValue);
+  };
+
   useEffect(() => {
-    router.push(`/admin/problems/list?page=${currentPage}`);
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedKeyword) query.set('keyword', selectedKeyword);
+    if (selectedType) query.set('type', selectedType);
+    if (selectedLanguage) query.set('language', selectedLanguage);
+
+    router.push(`/admin/problems/list?${query.toString()}`);
     refetch();
-  }, [currentPage, router, refetch]);
+  }, [
+    currentPage,
+    router,
+    refetch,
+    selectedType,
+    selectedLanguage,
+    selectedKeyword,
+  ]);
 
   const problemList = problemListData?.data?.data || [];
   const totalPages = problemListData?.data?.total_count
@@ -150,14 +208,50 @@ export default function ProblemList() {
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">문제 목록</h1>
-          {/* <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
-            <IoSearchSharp className="mr-2 text-lg text-gray-500" />
-            <input
-              className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
-              type="text"
-              placeholder="문제 이름으로 검색해보세요"
-            />
-          </div> */}
+          <div className="flex items-center gap-2">
+            <Select
+              placeholder="문제타입"
+              value={selectedType}
+              onChange={(value) => handleFilterChange('type', value)}
+              className="w-28"
+              allowClear
+            >
+              <Option value={'public'}>공통</Option>
+              <Option value={'other'}>대회/과제</Option>
+            </Select>
+
+            <Select
+              placeholder="언어"
+              value={selectedLanguage}
+              onChange={(value) => handleFilterChange('language', value)}
+              className="w-28"
+              allowClear
+            >
+              <Option value={'C'}>C</Option>
+              <Option value={'C++'}>C++</Option>
+              <Option value={'Java'}>Java</Option>
+              <Option value={'Python3'}>Python3</Option>
+              <Option value={'Rust'}>Rust</Option>
+            </Select>
+
+            <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
+              <IoSearchSharp
+                className="mr-2 text-lg text-gray-500"
+                onClick={() => handleSearch()}
+              />
+              <input
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
+                type="text"
+                placeholder="문제를 검색해보세요"
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('keyword', e.currentTarget.value);
+                  }
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         <hr className="mt-5 border-t-2 border-gray-200" />
@@ -272,7 +366,15 @@ export default function ProblemList() {
           )}
         </section>
 
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <Link href="/admin/problems/post">
+            <button
+              className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              type="submit"
+            >
+              문제 등록
+            </button>
+          </Link>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (

@@ -11,6 +11,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { Modal, message } from 'antd';
 import { deleteCourse } from '@/services/courseAdmin/deleteCourse';
 import { formattedDate } from '@/utils/dateFormatter';
+import Link from 'next/link';
 
 export default function CourseList() {
   const router = useRouter();
@@ -189,7 +190,15 @@ export default function CourseList() {
         </section>
 
         {/* Pagination */}
-        <section className="flex items-center justify-center w-full px-16 mt-4 sm:justify-end">
+        <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
+          <Link href="/admin/course/post">
+            <button
+              className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
+              type="submit"
+            >
+              강의 개설
+            </button>
+          </Link>
           {isLoading ? (
             <div className="flex space-x-2">
               {Array.from({ length: 5 }).map((_, index) => (
