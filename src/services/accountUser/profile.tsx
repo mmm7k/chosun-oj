@@ -53,3 +53,21 @@ export const getSolveTag = async () => {
     throw error;
   }
 };
+
+export const getOngoingAssignment = async () => {
+  try {
+    const response = await api.get('/assignment/ongoing');
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getOngoingContest = async () => {
+  try {
+    const response = await api.get('/contest/ongoing');
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};

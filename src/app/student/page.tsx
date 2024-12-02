@@ -25,6 +25,8 @@ import { RiEdit2Line } from 'react-icons/ri';
 import Link from 'next/link';
 import {
   getMyProfile,
+  getOngoingAssignment,
+  getOngoingContest,
   getSolveGrass,
   getSolveLevel,
   getSolveTag,
@@ -32,6 +34,8 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { rankColor } from '@/utils/rankColor';
 import { getTop3AnnouncementUser } from '@/services/announcementUser/getAnnouncementUser';
+import { on } from 'events';
+import { formattedDate } from '@/utils/dateFormatter';
 
 ChartJS.register(
   ArcElement,
@@ -295,6 +299,19 @@ export default function StudentMain() {
     return radarData.labels[maxIndex] || 'N/A'; // 데이터가 없을 경우 기본값 반환
   }, [radarData]);
 
+  const { data: onGoginAssignmentData } = useQuery({
+    queryKey: ['onGoginAssignmentData'],
+    queryFn: getOngoingAssignment,
+  });
+
+  const { data: onGoingCotestData } = useQuery({
+    queryKey: ['onGoingCotest'],
+    queryFn: getOngoingContest,
+  });
+
+  const onGoingAssignment = onGoginAssignmentData?.data || [];
+  const onGoingCotest = onGoingCotestData?.data || [];
+
   return (
     <div className="flex flex-col items-center justify-center w-full gap-12 mb-36">
       {/* 배너 캐러셀 */}
@@ -472,6 +489,44 @@ export default function StudentMain() {
           </div>
         </div>
       </section>
+
+      <section className=" w-[90%] lg:w-[62%] flex items-stretch gap-10 text-gray-700">
+        <div className="border border-gray-300 rounded-xl py-10 px-5 w-[50%] flex flex-col space-y-1">
+          <span className="font-semibold mb-5">📌 진행중인 과제</span>
+          {onGoingAssignment.length === 0 ? (
+            <span>진행중인 과제가 없습니다</span>
+          ) : (
+            onGoingAssignment.map((item: any) => (
+              <div className="flex justify-between items-center">
+                <span>
+                  {item.type === 'Quiz' ? '[퀴즈]' : '과제'} {item.title}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {formattedDate(item.start_time)} ~{' '}
+                  {formattedDate(item.end_time)}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="border border-gray-300 rounded-xl py-10 px-5 w-[50%] flex flex-col space-y-1">
+          <span className="font-semibold mb-5">📊 진행중인 대회</span>
+          {onGoingCotest.length === 0 ? (
+            <span>진행중인 대회가 없습니다</span>
+          ) : (
+            onGoingCotest.map((item: any) => (
+              <div className="flex justify-between items-center">
+                <span>{item.title}</span>
+                <span className="text-sm text-gray-500">
+                  {formattedDate(item.start_time)} ~{' '}
+                  {formattedDate(item.end_time)}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
       <section className="border border-gray-300 rounded-xl w-[90%] lg:w-[62%] py-10 flex-col">
         <p className="flex items-center text-lg font-semibold text-secondary pl-9 mb-7">
           <PiRanking className="text-2xl mr-1 mt-[0.18rem] " />
