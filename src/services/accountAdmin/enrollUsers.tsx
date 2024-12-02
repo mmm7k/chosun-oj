@@ -8,6 +8,7 @@ export const enrollUsers = async (users: any[]) => {
       user.userEmail,
       user.userNumber,
       user.userName,
+      user.userType,
     ]),
   };
 

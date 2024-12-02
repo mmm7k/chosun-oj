@@ -30,6 +30,7 @@ export default function UserEnroll() {
       .email('유효한 이메일 주소를 입력해주세요.')
       .required('이메일을 입력해주세요.'),
     userName: Yup.string().required('이름을 입력해주세요.'),
+    userType: Yup.string().required('유저 권한을 선택해주세요.'),
   });
 
   const {
@@ -49,13 +50,26 @@ export default function UserEnroll() {
         const workbook = XLSX.read(binaryStr, { type: 'binary' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
         const UserData = data.slice(1).map((row: any) => ({
           userId: String(row[0]),
           userPassword: String(row[1]),
           userEmail: String(row[2]),
           userNumber: String(row[3]),
           userName: String(row[4]),
+          userType: (() => {
+            switch (String(row[5])) {
+              case '관리자':
+                return 'Super Admin';
+              case '교수':
+                return 'Professor';
+              case '튜터':
+                return 'Tutor';
+              case '학생':
+                return 'Regular User';
+              default:
+                return 'Unknown'; // 예외 처리를 위한 기본값
+            }
+          })(),
         }));
         setSelectedUsers((prev) => [...prev, ...UserData]);
         message.success('엑셀 파일이 성공적으로 업로드되었습니다.');
@@ -79,6 +93,7 @@ export default function UserEnroll() {
       userName: data.userName,
       userNumber: data.userNumber,
       userEmail: data.userEmail,
+      userType: data.userType,
     };
     setSelectedUsers((prev) => [...prev, newUser]);
     reset();
@@ -133,7 +148,7 @@ export default function UserEnroll() {
             </span>
             <div
               className="relative w-full max-w-md"
-              style={{ aspectRatio: '5 / 1' }}
+              style={{ aspectRatio: '4 / 1' }}
             >
               <Image
                 src="/admin/userEnrollExample.png"
@@ -234,6 +249,55 @@ export default function UserEnroll() {
                 </p>
               )}
             </div>
+          </div>
+          {/* 유저권한 */}
+          <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+            <div className="flex items-center space-x-2">
+              <label htmlFor="userType">권한:</label>
+              <div className="ml-3 space-x-2 flex ">
+                <label>
+                  <input
+                    {...register('userType')}
+                    type="radio"
+                    value="Regular User"
+                    className="mr-1"
+                  />
+                  학생
+                </label>
+                <label>
+                  <input
+                    {...register('userType')}
+                    type="radio"
+                    value="Tutor"
+                    className="mr-1"
+                  />
+                  튜터
+                </label>
+                <label>
+                  <input
+                    {...register('userType')}
+                    type="radio"
+                    value="Professor"
+                    className="mr-1"
+                  />
+                  교수
+                </label>
+                <label>
+                  <input
+                    {...register('userType')}
+                    type="radio"
+                    value="Super Admin"
+                    className="mr-1"
+                  />
+                  관리자
+                </label>
+              </div>
+            </div>
+            {errors.userType && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.userType.message}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end px-10 mt-4">

@@ -61,7 +61,7 @@ export async function middleware(req: NextRequest) {
     }
     if (
       pathname.startsWith('/student') &&
-      !['Regular User', 'Professor', 'Super Admin'].includes(role)
+      !['Regular User', 'Professor', 'Super Admin', 'Tutor'].includes(role)
     ) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
