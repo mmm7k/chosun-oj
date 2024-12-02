@@ -72,11 +72,23 @@ export default function PostContest() {
   });
 
   const onSubmit = (data: any) => {
+    // UTC -> KST 변환
+    const convertToKST = (date: Date | null) => {
+      if (!date) return null;
+      const kstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000); // 9시간 추가
+      return kstDate.toISOString().slice(0, -1); // 'Z' 제거
+    };
+
+    const startTimeKST = convertToKST(startDateTime);
+    const endTimeKST = convertToKST(endDateTime);
+
     const formattedData: any = {
       title: data.title,
       description: data.description,
-      start_time: startDateTime?.toISOString(),
-      end_time: endDateTime?.toISOString(),
+      // start_time: startDateTime?.toISOString(),
+      // end_time: endDateTime?.toISOString(),
+      start_time: startTimeKST,
+      end_time: endTimeKST,
       password: data.password,
       visible: isVisible,
       allowed_ip_ranges: [allowedIpRanges],
