@@ -89,9 +89,9 @@ export default function SideNav() {
               //  onClick={closeAllDropdowns}
             >
               <div
-                className={`flex justify-between items-center ${
+                className={`flex justify-between items-center  ${
                   pathname === '/admin/dashboard'
-                    ? 'text-white underline decoration-dotted '
+                    ? 'text-white border-b-[2px]  border-white'
                     : 'text-white'
                 }`}
               >
@@ -109,7 +109,7 @@ export default function SideNav() {
               <div
                 className={`flex justify-between cursor-pointer items-center ${
                   pathname.startsWith('/admin/course')
-                    ? 'text-white underline decoration-dotted'
+                    ? 'text-white border-b-[2px]  border-white'
                     : 'text-white'
                 }`}
                 // onClick={() => setIsCourseDropdownOpen(!isCourseDropdownOpen)}
@@ -167,7 +167,7 @@ export default function SideNav() {
               <div
                 className={`flex justify-between cursor-pointer items-center ${
                   pathname.startsWith('/admin/user')
-                    ? 'text-white underline decoration-dotted'
+                    ? 'text-white border-b-[2px]  border-white'
                     : 'text-white'
                 }`}
                 // onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
@@ -224,7 +224,7 @@ export default function SideNav() {
               <div
                 className={`flex justify-between cursor-pointer items-center ${
                   pathname.startsWith('/admin/problems')
-                    ? 'text-white underline decoration-dotted'
+                    ? 'text-white border-b-[2px]  border-white'
                     : 'text-white'
                 }`}
                 // onClick={() =>
@@ -284,7 +284,7 @@ export default function SideNav() {
               <div
                 className={`flex justify-between cursor-pointer items-center ${
                   pathname.startsWith('/admin/contest')
-                    ? 'text-white underline decoration-dotted'
+                    ? 'text-white border-b-[2px]  border-white'
                     : 'text-white'
                 }`}
                 // onClick={() => setIsContestDropdownOpen(!isContestDropdownOpen)}
@@ -358,7 +358,7 @@ export default function SideNav() {
               <div
                 className={`flex justify-between cursor-pointer items-center ${
                   pathname.startsWith('/admin/announcement')
-                    ? 'text-white underline decoration-dotted'
+                    ? 'text-white border-b-[2px]  border-white'
                     : 'text-white'
                 }`}
                 // onClick={() =>
