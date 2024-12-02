@@ -87,10 +87,14 @@ export default function ContestSelect() {
                             ~{formattedDate(contest.contest?.end_time)}
                           </div>
                         </div>
-
-                        <button className="px-4 py-2 text-sm  text-white bg-blue-500 rounded-md hover:bg-blue-600">
-                          시작
-                        </button>
+                        <Link
+                          href={`/student/contest/${contest.contest?.id}?page=1`}
+                          key={contest.contest?.id}
+                        >
+                          <button className="px-4 py-2 text-sm  text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                            시작
+                          </button>
+                        </Link>
                       </div>
                     </div>
                   ))}
