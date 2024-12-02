@@ -160,52 +160,52 @@ export default function Dashboard() {
           </div>
 
           {/* 좌측 하단 도넛 그래프 영역 */}
-          <div className="flex-grow p-6 bg-white shadow-lg rounded-3xl">
-            {/* <span className="font-bold">💡 학생 분포도</span> */}
-            <hr className="w-full my-4 " />
-            <div className="flex items-center justify-center h-72">
-              {/* <Doughnut data={donutData} options={donutOptions} /> */}
-            </div>
-          </div>
+          {/* <div className="flex-grow p-6 bg-white shadow-lg rounded-3xl"> */}
+          {/* <span className="font-bold">💡 학생 분포도</span> */}
+          {/* <hr className="w-full my-4 " /> */}
+          {/* <div className="flex items-center justify-center h-72"> */}
+          {/* <Doughnut data={donutData} options={donutOptions} /> */}
+          {/* </div> */}
+          {/* </div> */}
         </div>
 
         {/* 우측 영역 */}
-        <div className="flex flex-col w-full gap-4 md:w-2/3">
-          {/* 상단 3개의 작은 카드 영역 */}
-          <div className="flex flex-col gap-4 text-sm md:flex-row">
-            <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl">
-              {/* <span className="font-bold">📝 할 일 목록</span> */}
-              <hr className="w-full my-2 " />
-              <ul className="mt-2 space-y-1 ">
-                {/* <li>• 코딩 과제</li> */}
-                {/* <li>• 강의 준비</li> */}
-              </ul>
-            </div>
-            <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl">
-              {/* <span className="font-bold">📢 공지사항</span> */}
-              <hr className="w-full my-2 " />
-              <ul className="mt-2 space-y-1">
-                {/* <li>• 다음 주 휴강 안내</li> */}
-                {/* <li>• 새 과제 업데이트</li> */}
-              </ul>
-            </div>
-            <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl">
-              {/* <span className="font-bold">🗒 메모</span> */}
-              <hr className="w-full my-2 " />
-              {/* <p className="mt-2">오늘 할 일 완료</p> */}
-            </div>
-          </div>
-
-          {/* 우측 메인 그래프 영역 */}
-          <div className="flex-grow p-6 bg-white shadow-lg rounded-3xl">
-            {/* <h2 className="text-lg font-bold">📊 분반별 성적 비교</h2> */}
-            <hr className="w-full my-6 " />
-            <div className="h-[35rem]">
-              {/* <Bar data={barData} options={barOptions} /> */}
-            </div>
-          </div>
-        </div>
+        {/* <div className="flex flex-col w-full gap-4 md:w-2/3"> */}
+        {/* 상단 3개의 작은 카드 영역 */}
+        {/* <div className="flex flex-col gap-4 text-sm md:flex-row"> */}
+        {/* <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl"> */}
+        {/* <span className="font-bold">📝 할 일 목록</span> */}
+        {/* <hr className="w-full my-2 " /> */}
+        {/* <ul className="mt-2 space-y-1 "> */}
+        {/* <li>• 코딩 과제</li> */}
+        {/* <li>• 강의 준비</li> */}
+        {/* </ul> */}
+        {/* </div> */}
+        {/* <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl"> */}
+        {/* <span className="font-bold">📢 공지사항</span> */}
+        {/* <hr className="w-full my-2 " /> */}
+        {/* <ul className="mt-2 space-y-1"> */}
+        {/* <li>• 다음 주 휴강 안내</li> */}
+        {/* <li>• 새 과제 업데이트</li> */}
+        {/* </ul> */}
+        {/* </div> */}
+        {/* <div className="flex-grow h-32 p-6 bg-white shadow-lg rounded-3xl"> */}
+        {/* <span className="font-bold">🗒 메모</span> */}
+        {/* <hr className="w-full my-2 " /> */}
+        {/* <p className="mt-2">오늘 할 일 완료</p> */}
+        {/* </div> */}
       </div>
+
+      {/* 우측 메인 그래프 영역 */}
+      {/* <div className="flex-grow p-6 bg-white shadow-lg rounded-3xl"> */}
+      {/* <h2 className="text-lg font-bold">📊 분반별 성적 비교</h2> */}
+      {/* <hr className="w-full my-6 " /> */}
+      {/* <div className="h-[35rem]"> */}
+      {/* <Bar data={barData} options={barOptions} /> */}
+      {/* </div> */}
+      {/* </div> */}
+      {/* </div> */}
+      {/* </div> */}
     </div>
   );
 }

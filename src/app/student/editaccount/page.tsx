@@ -2,10 +2,11 @@
 
 import { getMyInformation, modifyInfo } from '@/services/accountUser/profile';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { message } from 'antd';
+import { message, Select } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+const { Option } = Select;
 
 export default function EditAccount() {
   const router = useRouter();
@@ -15,15 +16,18 @@ export default function EditAccount() {
   });
   const informationData: InformationData | null = information?.data;
 
-  const { register, handleSubmit, reset } = useForm<ModifyInfoPayload>({
-    defaultValues: {
-      user: {
-        email: informationData?.user.email || '',
+  const { register, handleSubmit, reset, control } = useForm<ModifyInfoPayload>(
+    {
+      defaultValues: {
+        user: {
+          email: informationData?.user.email || '',
+        },
+        school: informationData?.school || '',
+        major: informationData?.major || '',
+        language: informationData?.language || '',
       },
-      school: informationData?.school || '',
-      major: informationData?.major || '',
     },
-  });
+  );
 
   useEffect(() => {
     if (informationData) {
@@ -33,6 +37,7 @@ export default function EditAccount() {
         },
         school: informationData.school,
         major: informationData.major,
+        language: informationData.language,
       });
     }
   }, [informationData, reset]);
@@ -91,6 +96,27 @@ export default function EditAccount() {
             type="text"
             className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm placeholder:text-sm text-sm focus:ring-1 focus:ring-gray-400 focus:outline-none"
             placeholder="새로운 전공을 입력하세요"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-gray-700">선호 언어</label>
+          <Controller
+            name="language"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                placeholder="선호언어를 선택하세요."
+                className="w-full h-8 mt-1"
+              >
+                <Option value="C">C</Option>
+                <Option value="C++">C++</Option>
+                <Option value="Java">Java</Option>
+                <Option value="Python3">Python</Option>
+                <Option value="Rust">Rust</Option>
+              </Select>
+            )}
           />
         </div>
 

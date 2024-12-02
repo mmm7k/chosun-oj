@@ -274,7 +274,7 @@ export default function ProblemEnroll() {
       <div className="space-y-8">
         <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
           <section className="flex flex-col sm:flex-row items-center px-16">
-            <h1 className="text-lg">분반 문제 관리</h1>
+            <h1 className="text-lg">과제 문제 관리</h1>
           </section>
           <hr className="mt-5 border-t-2 border-gray-200" />
 

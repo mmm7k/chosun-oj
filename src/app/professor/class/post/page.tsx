@@ -33,6 +33,9 @@ export default function PostClass() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    defaultValues: {
+      year: 2024,
+    },
   });
 
   const { data: courseListData } = useQuery({

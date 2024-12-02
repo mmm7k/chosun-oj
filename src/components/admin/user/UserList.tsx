@@ -118,7 +118,7 @@ export default function UserList() {
             <input
               className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
               type="text"
-              placeholder="이름으로 검색하세요."
+              placeholder="이름 또는 아이디로 검색하세요."
               ref={searchInputRef}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {

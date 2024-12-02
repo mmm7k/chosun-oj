@@ -4,4 +4,5 @@ interface InformationData {
   user: {
     email: string;
   };
+  language: string;
 }

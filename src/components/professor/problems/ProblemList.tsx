@@ -307,7 +307,7 @@ export default function ProblemList() {
                     className="border-b cursor-pointer hover:bg-gray-50"
                     key={item.id}
                     onClick={() =>
-                      router.push(`/admin/problems/list/${item.id}`)
+                      router.push(`/professor/problems/list/${item.id}`)
                     }
                   >
                     <td className="p-4 text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
@@ -331,7 +331,7 @@ export default function ProblemList() {
                         onClick={(e) => {
                           e.stopPropagation();
                           router.push(
-                            `/admin/problems/submission/${item.id}?page=1`,
+                            `/professor/problems/submission/${item.id}?page=1`,
                           );
                         }}
                       />
@@ -348,7 +348,7 @@ export default function ProblemList() {
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/admin/problems/edit/${item.id}`);
+                          router.push(`/professor/problems/edit/${item.id}`);
                         }}
                       />
                       <FiTrash2
@@ -367,7 +367,7 @@ export default function ProblemList() {
         </section>
 
         <section className="flex items-center w-full px-3 sm:px-16 mt-4 justify-between">
-          <Link href="/admin/problems/post">
+          <Link href="/professor/problems/post">
             <button
               className="px-4 py-2 text-sm font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
               type="submit"

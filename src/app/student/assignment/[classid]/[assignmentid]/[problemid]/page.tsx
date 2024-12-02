@@ -167,6 +167,36 @@ export default function Problem({
     return problemData.languages || []; // problemData.languages 그대로 사용
   }, [problemData.languages]);
 
+  useEffect(() => {
+    if (availableLanguages.length > 0) {
+      const defaultLanguage = availableLanguages[0]; // 첫 번째 언어
+      setSelectedLanguage(defaultLanguage); // 선택된 언어 설정
+      setCodeTemplate(defaultLanguage); // 코드 템플릿 설정
+    }
+  }, [availableLanguages]);
+
+  const setCodeTemplate = (language: string) => {
+    switch (language) {
+      case 'C':
+        setCode(codeTemplate.c);
+        break;
+      case 'C++':
+        setCode(codeTemplate.cpp);
+        break;
+      case 'Python3':
+        setCode(codeTemplate.python);
+        break;
+      case 'Java':
+        setCode(codeTemplate.java);
+        break;
+      case 'Rust':
+        setCode(codeTemplate.rust);
+        break;
+      default:
+        setCode('');
+    }
+  };
+
   //코드실행
   const runcode = async () => {
     setIsLoading(true);

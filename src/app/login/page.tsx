@@ -16,7 +16,7 @@ import useUserStore from '@/store/userstore';
 export default function Home() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchUser } = useUserStore();
+  const { admin_type, fetchUser } = useUserStore();
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('아이디를 입력해주세요'),
@@ -33,13 +33,25 @@ export default function Home() {
     resolver: yupResolver(validationSchema),
   });
 
+  const adminPath = (type: string | null | undefined): string => {
+    switch (type) {
+      case 'Professor':
+        return '/professor';
+      case 'Super Admin':
+        return '/admin';
+      default:
+        return '/student';
+    }
+  };
+
   const onSubmit = async (data: { username: string; password: string }) => {
     const { username, password } = data;
     setIsLoading(true);
     try {
-      await login(username, password);
+      const user = await login(username, password);
       await fetchUser();
-      router.push('/student');
+      const userType = user?.data?.admin_type;
+      router.push(adminPath(userType));
     } catch (error: any) {
       alert(error.response?.data?.message);
     } finally {

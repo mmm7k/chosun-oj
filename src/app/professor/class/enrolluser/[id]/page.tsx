@@ -451,7 +451,8 @@ export default function UserEnroll() {
         <div className="w-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
           <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
             <span className="text-lg px-6">등록된 유저 목록</span>
-            <div className="overflow-auto max-h-80 border my-5">
+            {/* <div className="overflow-auto max-h-80 border my-5"> */}
+            <div className=" border my-5">
               <table className="table-auto w-full text-left text-sm">
                 <thead>
                   <tr className="bg-gray-200">
@@ -589,7 +590,7 @@ export default function UserEnroll() {
               <input
                 className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
                 type="text"
-                placeholder="이름으로 검색하세요."
+                placeholder="이름 또는 아이디로 검색하세요."
                 ref={searchInputRef}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -642,6 +643,9 @@ export default function UserEnroll() {
                     }
                   >
                     <span className="text-sm">{student.name}</span>
+                    <span className="text-xs text-gray-500">
+                      {student.username}
+                    </span>
                     <span className="text-xs text-gray-500">
                       {student.student_number}
                     </span>

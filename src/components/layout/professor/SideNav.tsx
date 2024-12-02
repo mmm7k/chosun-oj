@@ -50,10 +50,13 @@ export default function SideNav() {
   };
 
   return (
-    <nav className="flex justify-center w-screen h-20 text-sm font-semibold bg-white shadow-xl md:w-52 md:min-h-screen md:fixed md:left-0 md:top-0 text-secondary">
-      <div className="flex md:flex-col items-center justify-between md:justify-normal w-[100%] px-[5%] md:px-0 md:min-h-screen relative">
+    // <nav className="flex justify-center w-screen h-20 text-sm font-semibold bg-white shadow-xl md:w-52 md:min-h-screen md:fixed md:left-0 md:top-0 text-secondary">
+    <nav className="flex justify-center max-w-[100vw] h-16 text-sm font-semibold shadow-xl bg-white   text-secondary">
+      {/* <div className="flex md:flex-col items-center justify-between md:justify-normal w-[100%] px-[5%] md:px-0 md:min-h-screen relative"> */}
+      <div className="flex items-center justify-between w-full px-[5%] relative">
         {/* 로고 이미지 */}
-        <div className="relative min-w-9 md:min-w-16 min-h-9 md:min-h-16 md:mt-11">
+        {/* <div className="relative min-w-9 md:min-w-16 min-h-9 md:min-h-16 md:mt-11"> */}
+        <div className="relative min-w-9 min-h-9 ">
           <Link
             href="/student"
 
@@ -77,8 +80,10 @@ export default function SideNav() {
         </div>
 
         {/* 메뉴 (2XL 이상에서 표시) */}
-        <div className="hidden md:flex flex-col justify-between w-full px-[15%] mt-12 pb-[10%] h-full overflow-y-auto ">
-          <section className="space-y-8">
+        {/* <div className="hidden md:flex flex-col justify-between w-full px-[15%] mt-12 pb-[10%] h-full overflow-y-auto "> */}
+        <div className="hidden md:flex flex-1">
+          {/* <section className="space-y-8"> */}
+          <section className="w-full flex  items-center text-lg space-x-8 ml-[5%]">
             <Link
               href="/professor/dashboard"
               // onClick={closeAllDropdowns}
@@ -90,9 +95,11 @@ export default function SideNav() {
                     : 'text-secondary hover:text-secondaryHover'
                 }`}
               >
-                <div className="flex items-center transition">
+                {/* <div className="flex items-center transition"> */}
+                <div className="flex items-center transition flex-shrink-0  ">
                   <LuLayoutDashboard className="mr-2 text-lg" />
-                  <span> 대시보드</span>
+                  {/* <span> 대시보드</span> */}
+                  <span className="text-base"> 대시보드</span>
                 </div>
               </div>
             </Link>
@@ -110,7 +117,7 @@ export default function SideNav() {
                 <Link href="/professor/class/list?page=1">
                   <div className="flex items-center transition">
                     <PiBookOpenTextLight className="mr-2 text-xl" />
-                    <span>분반</span>
+                    <span className="text-base">분반</span>
                   </div>
                 </Link>
                 {/* {isClassDropdownOpen ? (
@@ -185,7 +192,7 @@ export default function SideNav() {
                 <Link href="/professor/problems/list?page=1">
                   <div className="flex items-center transition">
                     <HiOutlinePencilSquare className="mr-2 text-xl" />
-                    <span>문제</span>
+                    <span className="text-base">문제</span>
                   </div>
                 </Link>
                 {/* {isProblemsDropdownOpen ? (
@@ -244,7 +251,7 @@ export default function SideNav() {
                 <Link href="/professor/assignment/list?page=1">
                   <div className="flex items-center transition">
                     <MdOutlineTask className="mr-2 text-xl" />
-                    <span>과제</span>
+                    <span className="text-base">과제</span>
                   </div>
                 </Link>
                 {/* {isAssignmentDropdownOpen ? (
@@ -317,7 +324,7 @@ export default function SideNav() {
                 <Link href="/professor/contest/list?page=1">
                   <div className="flex items-center transition">
                     <GoTrophy className="mr-2 text-xl" />
-                    <span>대회</span>
+                    <span className="text-base">대회</span>
                   </div>
                 </Link>
                 {/* {isContestDropdownOpen ? (
@@ -449,13 +456,14 @@ export default function SideNav() {
               </ul>
             </div> */}
           </section>
-          <section className="space-y-4">
+          {/* <section className="space-y-4"> */}
+          <section className="flex justify-end space-x-5 flex-shrink-0">
             <Link
               href={'/student'}
               className="flex items-center transition cursor-pointer hover:text-secondaryHover"
             >
               <FiHome className=" mr-2 text-xl " />
-              <span>메인페이지</span>
+              <span className="text-base">메인페이지</span>
             </Link>
 
             <div
@@ -463,7 +471,7 @@ export default function SideNav() {
               onClick={onClickLogout}
             >
               <MdLogout className="mr-2 text-xl" />
-              <span>로그아웃</span>
+              <span className="text-base">로그아웃</span>
             </div>
           </section>
         </div>

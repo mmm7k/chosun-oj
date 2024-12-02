@@ -263,7 +263,7 @@ export default function ProblemPost() {
                   </Suspense> */}
                   <EditorComponent
                     editorRef={editorRef}
-                    initialValue=""
+                    initialValue={markdownContent || ''}
                     previewStyle="vertical"
                     height="50rem"
                     // initialEditType="markdown"

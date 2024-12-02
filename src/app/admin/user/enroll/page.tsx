@@ -18,7 +18,9 @@ export default function UserEnroll() {
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
 
   const validationSchema = Yup.object().shape({
-    userId: Yup.string().required('아이디를 입력해주세요.'),
+    userId: Yup.string()
+      .max(32, '아이디는 최대 32자 입니다.')
+      .required('아이디를 입력해주세요.'),
     userPassword: Yup.string()
       .min(6, '비밀번호는 최소 6자 이상이어야 합니다.')
       .required('비밀번호를 입력해주세요.'),
@@ -27,6 +29,7 @@ export default function UserEnroll() {
       .max(16, '학번은 최대 16자 이하여야 합니다.')
       .required('학번을 입력해주세요.'),
     userEmail: Yup.string()
+      .max(64, '이메일은 최대 64자 입니다.')
       .email('유효한 이메일 주소를 입력해주세요.')
       .required('이메일을 입력해주세요.'),
     userName: Yup.string().required('이름을 입력해주세요.'),

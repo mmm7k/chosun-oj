@@ -49,7 +49,6 @@ const languageMap: { [key: string]: string } = {
 
 export default function Problem({ params }: { params: { problemid: string } }) {
   const problemId = parseInt(params.problemid);
-
   const [code, setCode] = useState('언어를 선택해주세요.');
   const [output, setOutput] = useState('실행 결과가 표시됩니다.');
   const [isLoading, setIsLoading] = useState(false);
@@ -84,6 +83,7 @@ export default function Problem({ params }: { params: { problemid: string } }) {
 
   //에디터 커서 위치 테스트
   const [isFontReady, setIsFontReady] = useState(false); //폰트 로드 확인
+
   // 폰트 로드 확인
   useEffect(() => {
     document.fonts.ready.then(() => {
@@ -159,6 +159,35 @@ export default function Problem({ params }: { params: { problemid: string } }) {
     return problem.languages || []; // problemData.languages 그대로 사용
   }, [problem.languages]);
 
+  useEffect(() => {
+    if (availableLanguages.length > 0) {
+      const defaultLanguage = availableLanguages[0]; // 첫 번째 언어
+      setSelectedLanguage(defaultLanguage); // 선택된 언어 설정
+      setCodeTemplate(defaultLanguage); // 코드 템플릿 설정
+    }
+  }, [availableLanguages]);
+
+  const setCodeTemplate = (language: string) => {
+    switch (language) {
+      case 'C':
+        setCode(codeTemplate.c);
+        break;
+      case 'C++':
+        setCode(codeTemplate.cpp);
+        break;
+      case 'Python3':
+        setCode(codeTemplate.python);
+        break;
+      case 'Java':
+        setCode(codeTemplate.java);
+        break;
+      case 'Rust':
+        setCode(codeTemplate.rust);
+        break;
+      default:
+        setCode('');
+    }
+  };
   //코드실행
   const runcode = async () => {
     setIsLoading(true);

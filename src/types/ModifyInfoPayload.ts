@@ -4,4 +4,5 @@ interface ModifyInfoPayload {
   };
   school: string;
   major: string;
+  language: string;
 }

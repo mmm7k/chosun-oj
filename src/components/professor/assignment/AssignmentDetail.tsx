@@ -1,13 +1,18 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'next/navigation';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getAssignment } from '@/services/assignmentAdmin/getAssignment';
 import { formattedDate } from '@/utils/dateFormatter';
+import { MdOutlineLibraryAdd } from 'react-icons/md';
+import { TbEdit } from 'react-icons/tb';
+import { FiTrash2 } from 'react-icons/fi';
+import { deleteAssignment } from '@/services/assignmentAdmin/deleteAssignment';
+import { message, Modal } from 'antd';
 
 export default function AssignmentDetail() {
   const pathname = usePathname();
-
+  const router = useRouter();
   // URL의 마지막 숫자 추출
   const assignmentId = Number(pathname.split('/').pop());
 
@@ -20,12 +25,66 @@ export default function AssignmentDetail() {
   const assignmentData: AssignmentData =
     assignmentInformation?.data || ({} as AssignmentData);
 
+  const deleteAssignmentMutation = useMutation({
+    mutationFn: (id: number) => deleteAssignment(id),
+    onSuccess: () => {
+      message.success('과제가 성공적으로 삭제되었습니다.');
+      router.push('/professor/assignment/list?page=1');
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
+
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: '정말 삭제하시겠습니까?',
+      content: '이 작업은 되돌릴 수 없습니다.',
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: () => {
+        deleteAssignmentMutation.mutate(id);
+      },
+    });
+  };
+
   return (
     <div className="flex min-h-screen p-8">
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
-        <section className="flex px-16">
-          <h1 className="text-lg">과제 정보</h1>
-        </section>
+        <div className="flex justify-between items-center  px-16 ">
+          <section className="flex">
+            <h1 className="text-lg">과제 정보</h1>
+          </section>
+          <div className="flex items-center gap-2">
+            <MdOutlineLibraryAdd
+              className="text-lg cursor-pointer lg:text-2xl hover:text-gray-500"
+              onClick={() => {
+                router.push(
+                  `/professor/assignment/enrollproblem/${assignmentId}`,
+                );
+              }}
+            />
+
+            <TbEdit
+              className="text-lg cursor-pointer lg:text-2xl hover:text-gray-500"
+              onClick={() => {
+                router.push(`/professor/assignment/edit/${assignmentId}`);
+              }}
+            />
+            <FiTrash2
+              className="text-lg cursor-pointer lg:text-2xl hover:text-gray-500"
+              onClick={() => {
+                handleDelete(assignmentId);
+              }}
+            />
+          </div>
+        </div>
         <hr className="mt-5 border-t-2 border-gray-200" />
 
         {/* 사용자 정보 표시 */}

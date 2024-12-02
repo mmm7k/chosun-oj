@@ -29,8 +29,8 @@ export default function UserEdit() {
       .min(6, '비밀번호는 최소 6자 이상이어야 합니다.')
       .required('비밀번호를 입력해주세요.'),
     userNumber: Yup.string()
-      .min(8, '학번은 최소 8자 이상이어야 합니다.')
-      .max(12, '학번은 최대 12자 입니다.')
+      .min(4, '학번은 최소 4자 이상이어야 합니다.')
+      .max(16, '학번은 최대 16자 입니다.')
       .required('학번을 입력해주세요.'),
     userEmail: Yup.string()
       .max(64, '이메일은 최대 64자 입니다.')
@@ -40,7 +40,7 @@ export default function UserEdit() {
     school: Yup.string().nullable(),
     major: Yup.string().nullable(),
     isDisabled: Yup.string().required('계정 활성화 여부를 선택해주세요.'),
-    adminType: Yup.string().required('관리자 유형을 선택해주세요.'),
+    adminType: Yup.string().required('유저 권한을 선택해주세요.'),
     problemPermission: Yup.string().required('문제 권한을 선택해주세요.'),
   });
 
@@ -139,10 +139,10 @@ export default function UserEdit() {
             )}
           </div>
 
-          {/* 관리자 유형 */}
+          {/* 권한 */}
           <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
             <div className="flex items-center space-x-2">
-              <label>관리자 유형:</label>
+              <label>권한:</label>
               <div className="ml-3 space-x-2 flex ">
                 <label>
                   <input
