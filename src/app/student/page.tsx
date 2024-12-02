@@ -31,6 +31,7 @@ import {
 } from '@/services/accountUser/profile';
 import { useQuery } from '@tanstack/react-query';
 import { rankColor } from '@/utils/rankColor';
+import { getTop3AnnouncementUser } from '@/services/announcementUser/getAnnouncementUser';
 
 ChartJS.register(
   ArcElement,
@@ -82,6 +83,12 @@ export default function StudentMain() {
     waitForAnimate: false,
   };
 
+  const { data: announcementData } = useQuery({
+    queryKey: ['announcementData'],
+    queryFn: getTop3AnnouncementUser,
+  });
+  console.log(announcementData);
+  const announcement = announcementData?.data?.data || [];
   //잔디
   const { data: solveGrassData } = useQuery({
     queryKey: ['solveGrassData'],
@@ -373,9 +380,9 @@ export default function StudentMain() {
       {/* 공지사항 */}
       <section className="w-[90%] lg:w-[62%] p-2 border border-gray-300 rounded-lg">
         <Slider {...noticeSettings} className="w-full h-full text-gray-700">
-          <span>📢 서비스 이용 중 문의 사항은 Q&A 게시판을 이용해주세요.</span>
-          <span>📢 자세한 공지사항은 공지사항 게시판을 이용해주세요.</span>
-          <span>📢 많은 이용 부탁드립니다. 감사합니다.</span>
+          {announcement.map((item: any) => (
+            <span key={item.id}>📢 {item.title}</span>
+          ))}
         </Slider>
       </section>
       <section className="w-[90%] lg:w-[62%] flex flex-col sm:flex-row space-x-0 sm:space-x-12 space-y-12 sm:space-y-0">
