@@ -34,23 +34,20 @@ export default function ContestEdit() {
       .min(Yup.ref('startDateTime'), '종료 날짜는 시작 날짜 이후여야 합니다.')
       .required('종료 날짜 시간을 선택해주세요.')
       .nullable(),
-    password: Yup.string()
-      .max(32, '비밀번호는 최대 32자까지 가능합니다.')
-      .nullable(),
+    // password: Yup.string()
+    //   .max(32, '비밀번호는 최대 32자까지 가능합니다.')
+    //   .nullable(),
     isVisible: Yup.boolean(),
-    allowedIpRanges: Yup.string()
-      .matches(
-        /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2})$/,
-        '유효한 IP 범위 형식이 아닙니다. 예: 192.168.1.0/24',
-      )
-      .required('허용 아이피 범위를 입력해주세요.'),
+    allowedIpRanges: Yup.string(),
   });
 
   const [startDateTime, setStartDateTime] = useState<Date | null>(new Date());
   const [endDateTime, setEndDateTime] = useState<Date | null>(new Date());
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [allowedIpRanges, setAllowedIpRanges] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [ipList, setIpList] = useState<string[]>([]); // 추가된 IP 목록
+
+  // const [password, setPassword] = useState<string>('');
 
   const {
     register,
@@ -65,7 +62,7 @@ export default function ContestEdit() {
       endDateTime,
       isVisible,
       allowedIpRanges,
-      password,
+      // password,
     },
   });
 
@@ -74,12 +71,13 @@ export default function ContestEdit() {
       setStartDateTime(new Date(contestInformation.data.start_time));
       setEndDateTime(new Date(contestInformation.data.end_time));
       setAllowedIpRanges(contestInformation.data.allowed_ip_ranges[0]);
+      setIpList(contestInformation.data.allowed_ip_ranges || []);
       reset({
         title: contestInformation.data.title,
         description: contestInformation.data.description,
         startDateTime: new Date(contestInformation.data.start_time),
         endDateTime: new Date(contestInformation.data.end_time),
-        password: contestInformation.data.password,
+        // password: contestInformation.data.password,
         isVisible: contestInformation.data.visible,
         allowedIpRanges: contestInformation.data.allowed_ip_ranges[0],
       });
@@ -109,11 +107,24 @@ export default function ContestEdit() {
       description: data.description,
       start_time: startDateTime?.toISOString(),
       end_time: endDateTime?.toISOString(),
-      password: data.password,
+      // password: data.password,
+      password: '',
       visible: isVisible,
-      allowed_ip_ranges: [allowedIpRanges],
+      // allowed_ip_ranges: [allowedIpRanges],
+      allowed_ip_ranges: ipList.length > 0 ? ipList : ['0.0.0.0/0'],
     };
     mutation.mutate(formattedData);
+  };
+
+  const handleAddIp = () => {
+    if (allowedIpRanges.trim() && !ipList.includes(allowedIpRanges.trim())) {
+      setIpList((prev) => [...prev, allowedIpRanges.trim()]);
+      setAllowedIpRanges(''); // 입력 필드 초기화
+    }
+  };
+
+  const handleRemoveIp = (ip: string) => {
+    setIpList((prev) => prev.filter((item) => item !== ip));
   };
 
   return (
@@ -204,7 +215,7 @@ export default function ContestEdit() {
               )}
             </div>
 
-            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            {/* <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="password">대회 비밀번호:</label>
                 <input
@@ -219,7 +230,7 @@ export default function ContestEdit() {
                   {errors.password.message}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
@@ -235,7 +246,7 @@ export default function ContestEdit() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            {/* <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="ip-ranges">허용 아이피 범위:</label>
                 <input
@@ -255,6 +266,45 @@ export default function ContestEdit() {
                   {errors.allowedIpRanges.message}
                 </p>
               )}
+            </div> */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+              <div className="flex items-center">
+                <label htmlFor="ip-ranges">허용 아이피 범위:</label>
+                <input
+                  id="ip-ranges"
+                  value={allowedIpRanges}
+                  onChange={(e) => setAllowedIpRanges(e.target.value)}
+                  className="ml-3 w-[40%] sm:w-[30%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  placeholder="192.168.1.0/24"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddIp}
+                  className="ml-2 px-2 py-2 text-sm font-normal text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                >
+                  추가
+                </button>
+              </div>
+              <div className="mt-4">
+                <h3 className="font-semibold text-sm">추가된 IP 목록:</h3>
+                <ul className="mt-2 space-x-1 flex flex-wrap gap-2">
+                  {ipList.map((ip, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm"
+                    >
+                      <span>{ip}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveIp(ip)}
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        ✖
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </section>
 

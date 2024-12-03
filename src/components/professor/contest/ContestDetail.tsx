@@ -144,9 +144,22 @@ export default function ContestDetail() {
             <span>공개 여부:</span>
             <span>{contestData.visible ? '공개' : '비공개'}</span>
           </div>
-          <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
+          <div className="flex-col space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>허용 IP 범위:</span>
-            <span>{contestData.allowed_ip_ranges}</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {contestData.allowed_ip_ranges?.length > 0 ? (
+                contestData.allowed_ip_ranges.map((ip, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-gray-100 rounded-full text-xs font-semibold text-gray-700"
+                  >
+                    {ip}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500"></span>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 'use client';
 import { getContestCheckUser } from '@/services/contestUser/getContestCheckUser';
+import { postContestJoinUser } from '@/services/contestUser/postContestJoinUser';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ReactNode } from 'react';
@@ -17,9 +18,10 @@ export default function ContestLayout({
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    console.log(params.contestid);
     const validateUser = async () => {
       try {
-        await getContestCheckUser(contestId);
+        await postContestJoinUser(contestId);
         setIsValid(true);
       } catch (error: any) {
         alert(error.response?.data?.message || '접근이 허용되지 않습니다.');

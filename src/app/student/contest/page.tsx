@@ -2,12 +2,16 @@
 
 import Link from 'next/link';
 import { HiOutlineComputerDesktop } from 'react-icons/hi2';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getContestListUser } from '@/services/contestUser/getContestListUser';
 import { formattedDate } from '@/utils/dateFormatter';
 import Skeleton from '@mui/material/Skeleton';
+import { postContestJoinUser } from '@/services/contestUser/postContestJoinUser';
+import { useRouter } from 'next/navigation';
+import { message } from 'antd';
 
 export default function ContestSelect() {
+  const router = useRouter();
   const { data: contestListData, isLoading } = useQuery({
     queryKey: ['contestListData'],
     queryFn: () => getContestListUser(),
@@ -25,6 +29,24 @@ export default function ContestSelect() {
   const finishedContests = contestList.filter(
     (contest: any) => contest.contest?.status === '-1',
   );
+
+  const mutation = useMutation({
+    mutationFn: (id: number) => postContestJoinUser(id),
+    onSuccess: (_, variables) => {
+      router.push(`/student/contest/${variables}?page=1`);
+    },
+    onError: (error: any) => {
+      if (error.response?.data?.message === '로그인이 필요합니다.') {
+        message.error('로그인이 필요합니다.');
+        router.push('/');
+      } else {
+        message.error(error.response?.data?.message || '오류가 발생했습니다.');
+      }
+    },
+  });
+  const onSubmit = (id: number) => {
+    mutation.mutate(id);
+  };
 
   return (
     <div className="bg-[#f0f4fc] min-h-screen flex justify-center items-center px-5 py-10">
@@ -87,14 +109,15 @@ export default function ContestSelect() {
                             ~{formattedDate(contest.contest?.end_time)}
                           </div>
                         </div>
-                        <Link
-                          href={`/student/contest/${contest.contest?.id}?page=1`}
-                          key={contest.contest?.id}
+
+                        <button
+                          className="px-4 py-2 text-sm  text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                          onClick={() => {
+                            onSubmit(contest.contest?.id);
+                          }}
                         >
-                          <button className="px-4 py-2 text-sm  text-white bg-blue-500 rounded-md hover:bg-blue-600">
-                            시작
-                          </button>
-                        </Link>
+                          시작
+                        </button>
                       </div>
                     </div>
                   ))}

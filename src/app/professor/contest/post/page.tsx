@@ -23,21 +23,29 @@ export default function PostContest() {
       .min(Yup.ref('startDateTime'), '종료 날짜는 시작 날짜 이후여야 합니다.')
       .required('종료 날짜 시간을 선택해주세요.')
       .nullable(),
-    password: Yup.string().max(32, '비밀번호는 최대 32자까지 가능합니다.'),
+    // password: Yup.string().max(32, '비밀번호는 최대 32자까지 가능합니다.'),
     isVisible: Yup.boolean(),
-    allowedIpRanges: Yup.string()
-      .matches(
-        /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2})$/,
-        '유효한 IP 범위 형식이 아닙니다. 예: 192.168.1.0/24',
-      )
-      .required('허용 아이피 범위를 입력해주세요.'),
+    allowedIpRanges: Yup.string(),
   });
 
   const [startDateTime, setStartDateTime] = useState<Date | null>(new Date());
   const [endDateTime, setEndDateTime] = useState<Date | null>(new Date());
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [allowedIpRanges, setAllowedIpRanges] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  // const [password, setPassword] = useState<string>('');
+
+  const [ipList, setIpList] = useState<string[]>([]); // 추가된 IP 목록
+
+  const handleAddIp = () => {
+    if (allowedIpRanges.trim() && !ipList.includes(allowedIpRanges.trim())) {
+      setIpList((prev) => [...prev, allowedIpRanges.trim()]);
+      setAllowedIpRanges(''); // 입력 필드 초기화
+    }
+  };
+
+  const handleRemoveIp = (ip: string) => {
+    setIpList((prev) => prev.filter((item) => item !== ip));
+  };
 
   const {
     register,
@@ -51,7 +59,7 @@ export default function PostContest() {
       endDateTime,
       isVisible,
       allowedIpRanges,
-      password,
+      // password,
     },
   });
 
@@ -89,9 +97,11 @@ export default function PostContest() {
       // end_time: endDateTime?.toISOString(),
       start_time: startTimeKST,
       end_time: endTimeKST,
-      password: data.password,
+      // password: data.password,
+      password: '',
       visible: isVisible,
-      allowed_ip_ranges: [allowedIpRanges],
+      // allowed_ip_ranges: [allowedIpRanges],
+      allowed_ip_ranges: ipList.length > 0 ? ipList : ['0.0.0.0/0'],
     };
     mutation.mutate(formattedData);
   };
@@ -186,7 +196,7 @@ export default function PostContest() {
               )}
             </div>
 
-            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            {/* <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="password">대회 비밀번호:</label>
                 <input
@@ -201,7 +211,7 @@ export default function PostContest() {
                   {errors.password.message}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
@@ -217,7 +227,7 @@ export default function PostContest() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            {/* <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
                 <label htmlFor="ip-ranges">허용 아이피 범위:</label>
                 <input
@@ -229,7 +239,7 @@ export default function PostContest() {
                     setValue('allowedIpRanges', e.target.value);
                   }}
                   className="ml-3 w-[60%] sm:w-[40%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                  placeholder="허용 아이피 범위를 입력하세요 (예: 192.168.1.0/24)"
+                  placeholder="허용 아이피 범위를 입력하세요 (예: 192.168.1.0~24)"
                 />
               </div>
               {errors.allowedIpRanges && (
@@ -237,6 +247,45 @@ export default function PostContest() {
                   {errors.allowedIpRanges.message}
                 </p>
               )}
+            </div> */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+              <div className="flex items-center">
+                <label htmlFor="ip-ranges">허용 아이피 범위:</label>
+                <input
+                  id="ip-ranges"
+                  value={allowedIpRanges}
+                  onChange={(e) => setAllowedIpRanges(e.target.value)}
+                  className="ml-3 w-[40%] sm:w-[30%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
+                  placeholder="192.168.1.0~24"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddIp}
+                  className="ml-2 px-2 py-2 font-normal text-sm text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                >
+                  추가
+                </button>
+              </div>
+              <div className="mt-4">
+                <h3 className="font-semibold text-sm">추가된 IP 목록:</h3>
+                <ul className="mt-2 space-x-1 flex">
+                  {ipList.map((ip, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between px-2 py-1 bg-gray-100 rounded-lg text-sm w-fit"
+                    >
+                      <span className="truncate">{ip}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveIp(ip)}
+                        className="text-red-500 hover:text-red-700 text-sm font-bold ml-2"
+                      >
+                        ✖
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </section>
 
