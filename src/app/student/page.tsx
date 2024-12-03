@@ -499,7 +499,7 @@ export default function StudentMain() {
             onGoingAssignment.map((item: any) => (
               <div className="flex justify-between items-center">
                 <span>
-                  {item.type === 'Quiz' ? '[퀴즈]' : '과제'} {item.title}
+                  {item.type === 'Quiz' ? '[퀴즈]' : '[과제]'} {item.title}
                 </span>
                 <span className="text-sm text-gray-500">
                   {formattedDate(item.start_time)} ~{' '}

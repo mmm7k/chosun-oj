@@ -44,6 +44,7 @@ export default function UserEnroll() {
   const [selectedUser, setSelectedUser] = useState<string | null>(initialUser);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  console.log(selectedStudents);
   const handleFilterChange = (key: 'user', value: string | null) => {
     if (key === 'user') setSelectedUser(value);
     setCurrentPage(1);
