@@ -18,7 +18,6 @@ export default function ContestLayout({
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log(params.contestid);
     const validateUser = async () => {
       try {
         await postContestJoinUser(contestId);

@@ -63,15 +63,15 @@ export default function Assignment({
         ) : (
           <>
             {/* 진행 중 */}
-            {ongoingAssignments.length > 0 && (
-              <div>
-                <div className="p-5 border-b border-gray-200">
-                  <h1 className="text-lg font-bold text-gray-700">
-                    진행 중 과제
-                  </h1>
-                </div>
-                <div className="p-5 space-y-3">
-                  {ongoingAssignments.map((assignment: any) => (
+            <div>
+              <div className="p-5 border-b border-gray-200">
+                <h1 className="text-lg font-bold text-gray-700">
+                  진행 중 과제
+                </h1>
+              </div>
+              <div className="p-5 space-y-3">
+                {ongoingAssignments.length > 0 ? (
+                  ongoingAssignments.map((assignment: any) => (
                     <Link
                       key={assignment.id}
                       href={`/student/assignment/${classId}/${assignment.id}?page=1`}
@@ -124,22 +124,27 @@ export default function Assignment({
                         </div>
                       </div>
                     </Link>
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center font-semibold text-gray-500">
+                    진행 중인 과제가 없습니다.
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* 시작 전 */}
-            {notStartedAssignments.length > 0 && (
-              <div>
-                <div className="p-5 border-b border-gray-200">
-                  <h1 className="text-lg font-bold text-gray-700">
-                    시작 전 과제
-                  </h1>
-                </div>
-                <div className="p-5 space-y-3">
-                  {notStartedAssignments.map((assignment: any) => (
+            <div>
+              <div className="p-5 border-b border-gray-200">
+                <h1 className="text-lg font-bold text-gray-700">
+                  시작 전 과제
+                </h1>
+              </div>
+              <div className="p-5 space-y-3">
+                {notStartedAssignments.length > 0 ? (
+                  notStartedAssignments.map((assignment: any) => (
                     <div
+                      key={assignment.id}
                       className={`flex items-center justify-between bg-white shadow rounded-md px-4 py-3 border-l-[4px] transition-all ${
                         assignment.type === 'Quiz'
                           ? 'border-blue-400 hover:shadow-lg'
@@ -185,22 +190,25 @@ export default function Assignment({
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center font-semibold text-gray-500">
+                    시작 전 과제가 없습니다.
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* 종료됨 */}
-            {finishedAssignments.length > 0 && (
-              <div>
-                <div className="p-5 border-b border-gray-200">
-                  <h1 className="text-lg font-bold text-gray-700">
-                    종료된 과제
-                  </h1>
-                </div>
-                <div className="p-5 space-y-3">
-                  {finishedAssignments.map((assignment: any) => (
+            <div>
+              <div className="p-5 border-b border-gray-200">
+                <h1 className="text-lg font-bold text-gray-700">종료된 과제</h1>
+              </div>
+              <div className="p-5 space-y-3">
+                {finishedAssignments.length > 0 ? (
+                  finishedAssignments.map((assignment: any) => (
                     <div
+                      key={assignment.id}
                       className={`flex items-center justify-between bg-white shadow rounded-md px-4 py-3 border-l-[4px] transition-all ${
                         assignment.type === 'Quiz'
                           ? 'border-blue-400 hover:shadow-lg'
@@ -246,10 +254,14 @@ export default function Assignment({
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center font-semibold text-gray-500">
+                    종료된 과제가 없습니다.
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </>
         )}
       </div>
