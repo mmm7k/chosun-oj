@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { IoAlertCircleOutline, IoSearchSharp } from 'react-icons/io5';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,6 +12,9 @@ import { getAllClass } from '@/services/classAdmin/getAllClass';
 import { deleteClass } from '@/services/classAdmin/deleteClass';
 import { RiUserAddLine } from 'react-icons/ri';
 import Link from 'next/link';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 export default function ClassList() {
   const router = useRouter();
@@ -20,19 +23,82 @@ export default function ClassList() {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const pagesPerBlock = 5;
 
+  const initialSearch = searchParams.get('search') || null;
+  const initialYear = searchParams.get('year') || null;
+  const initialQuarter = searchParams.get('quarter') || null;
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedSearch, setSelectedSearch] = useState<string | null>(
+    initialSearch,
+  );
+  const [selectedYear, setSelectedYear] = useState<string | null>(initialYear);
+  const [selectedQuarter, setSelectedQuarter] = useState<string | null>(
+    initialQuarter,
+  );
+
   const {
     data: classListData,
     refetch,
     isLoading,
   } = useQuery({
-    queryKey: ['classListData', currentPage],
-    queryFn: () => getAllClass(currentPage),
+    queryKey: [
+      'classListData',
+      currentPage,
+      selectedSearch,
+      selectedYear,
+      selectedQuarter,
+    ],
+    queryFn: () =>
+      getAllClass(
+        currentPage,
+        selectedSearch || undefined,
+        selectedYear || undefined,
+        selectedQuarter || undefined,
+      ),
   });
 
+  const handleFilterChange = (
+    key: 'search' | 'year' | 'quarter',
+    value: string | null,
+  ) => {
+    if (key === 'search') {
+      setSelectedSearch(value);
+    }
+    if (key === 'year') {
+      setSelectedYear(value);
+    }
+    if (key === 'quarter') {
+      setSelectedQuarter(value);
+    }
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    const searchValue = searchInputRef.current?.value || '';
+    handleFilterChange('search', searchValue);
+  };
+
+  // useEffect(() => {
+  //   router.push(`/professor/class/list?page=${currentPage}`);
+  //   refetch();
+  // }, [currentPage, router, refetch]);
+
   useEffect(() => {
-    router.push(`/professor/class/list?page=${currentPage}`);
+    const query = new URLSearchParams();
+    query.set('page', currentPage.toString());
+    if (selectedSearch) query.set('search', selectedSearch);
+    if (selectedYear) query.set('year', selectedYear);
+    if (selectedQuarter) query.set('quarter', selectedQuarter);
+
+    router.push(`/professor/class/list?${query.toString()}`);
     refetch();
-  }, [currentPage, router, refetch]);
+  }, [
+    currentPage,
+    router,
+    refetch,
+    selectedSearch,
+    selectedYear,
+    selectedQuarter,
+  ]);
 
   const classList = classListData?.data?.data || [];
   const totalPages = classListData?.data?.count
@@ -88,14 +154,51 @@ export default function ClassList() {
         {/* Header */}
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">분반 목록</h1>
-          {/* <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
-            <IoSearchSharp className="mr-2 text-lg text-gray-500" />
-            <input
-              className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
-              type="text"
-              placeholder="분반 이름으로 검색해보세요"
-            />
-          </div> */}
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <div className="space-x-2">
+              <Select
+                placeholder="년도"
+                value={selectedYear}
+                onChange={(value) => handleFilterChange('year', value)}
+                className="w-28"
+                allowClear
+              >
+                <Option value={'2024'}>2024</Option>
+                <Option value={'2025'}>2025</Option>
+              </Select>
+
+              <Select
+                placeholder="학기"
+                value={selectedQuarter}
+                onChange={(value) => handleFilterChange('quarter', value)}
+                className="w-36"
+                allowClear
+              >
+                <Option value={'1학기'}>1학기</Option>
+                <Option value={'2학기'}>2학기</Option>
+                <Option value={'동계계절학기'}>동계계절학기</Option>
+                <Option value={'하계계절학기'}>하계계절학기</Option>
+              </Select>
+            </div>
+
+            <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
+              <IoSearchSharp
+                className="mr-2 text-lg text-gray-500"
+                onClick={() => handleSearch()}
+              />
+              <input
+                className="w-full text-sm text-secondary placeholder:text-sm placeholder:font-normal focus:outline-none"
+                type="text"
+                placeholder="분반이름을 검색해보세요"
+                ref={searchInputRef}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('search', e.currentTarget.value);
+                  }
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         <hr className="mt-5 border-t-2 border-gray-200" />

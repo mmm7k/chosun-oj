@@ -9,6 +9,7 @@ import { TbEdit } from 'react-icons/tb';
 import { FiTrash2 } from 'react-icons/fi';
 import { message, Modal } from 'antd';
 import { deleteCourse } from '@/services/courseAdmin/deleteCourse';
+import { getGroupCourse } from '@/services/courseAdmin/getGroupCourse';
 
 export default function CourseDetail() {
   const pathname = usePathname();
@@ -23,6 +24,14 @@ export default function CourseDetail() {
   });
 
   const courseData: CourseData = courseInformation?.data || ({} as CourseData);
+
+  const { data: groupCourseData } = useQuery({
+    queryKey: ['groupCourseData', courseId],
+    queryFn: () => getGroupCourse(courseId),
+    enabled: !!courseId,
+  });
+
+  const groupCourse = groupCourseData?.data?.data || [];
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteCourse(id),
@@ -104,6 +113,43 @@ export default function CourseDetail() {
           <div className="flex space-x-2 border-b-[1.5px] border-gray-200 py-5 px-10">
             <span>마지막 수정 시간:</span>
             <span>{formattedDate(courseData.last_update_time)}</span>
+          </div>
+
+          <div className="border-b-[1.5px] border-gray-200 py-5 px-10">
+            <span className="block mb-2 font-semibold">분반 목록:</span>
+            {groupCourse.length === 0 ? (
+              <p className="text-center text-gray-500">
+                개설된 분반이 없습니다.
+              </p>
+            ) : (
+              <table className="table-auto w-full text-left ">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-4 py-2 border">분반 이름</th>
+                    <th className="px-4 py-2 border">년도</th>
+                    <th className="px-4 py-2 border">학기</th>
+                    <th className="px-4 py-2 border">개설 교수</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupCourse.map((group: any, index: number) => (
+                    <tr
+                      key={index}
+                      className={`hover:bg-gray-100 ${
+                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                      }`}
+                    >
+                      <td className="px-4 py-2 border">{group.group_name}</td>
+                      <td className="px-4 py-2 border">{group.year}</td>
+                      <td className="px-4 py-2 border">{group.quarter}</td>
+                      <td className="px-4 py-2 border">
+                        {group?.created_by?.name}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
