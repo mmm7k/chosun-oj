@@ -1,6 +1,6 @@
 'use client';
 
-import { Upload, Button, message, Checkbox, Modal } from 'antd';
+import { Upload, Button, message, Checkbox, Modal, Select } from 'antd';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as XLSX from 'xlsx';
@@ -17,7 +17,9 @@ import Skeleton from '@mui/material/Skeleton';
 import { getUsersContest } from '@/services/contestAdmin/getUsersContest';
 import { deleteUsersContest } from '@/services/contestAdmin/deleteUsersContest';
 import { enrollUsersContest } from '@/services/contestAdmin/enrollUsersContest';
-
+import { getClassList } from '@/services/assignmentAdmin/getClassList';
+import { getUsersClass } from '@/services/classAdmin/getUsersClass';
+const { Option } = Select;
 interface FormData {
   student_number: string;
   name: string;
@@ -31,6 +33,7 @@ export default function UserEnroll() {
   const [tempSelectedStudents, setTempSelectedStudents] = useState<Student[]>(
     [],
   );
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [deleteSelectedStudents, setDeleteSelectedStudents] = useState<
     Student[]
   >([]);
@@ -316,6 +319,51 @@ export default function UserEnroll() {
   //   const newUrl = `/admin/contest/enrolluser/${contestId}`;
   //   window.history.replaceState(null, '', newUrl);
   // };
+
+  // 분반목록 가져오고 유저 등록
+
+  const { data: classListData } = useQuery({
+    queryKey: ['classListData'],
+    queryFn: () => getClassList(),
+  });
+
+  const classList = classListData?.data?.data || [];
+
+  const { data: classStudentsData, isLoading: classStudentsIsLoading } =
+    useQuery({
+      queryKey: ['classUsersListData', selectedClassId],
+      queryFn: () =>
+        selectedClassId !== null
+          ? getUsersClass(selectedClassId)
+          : Promise.resolve([]),
+    });
+  const classStudents = classStudentsData?.data?.data || [];
+  const handleClassChange = (value: number) => {
+    setSelectedClassId(value);
+  };
+
+  useEffect(() => {
+    if (classStudents.length > 0) {
+      const studentsToAdd = classStudents.map(
+        (student: { user: { student_number: string; name: string } }) => ({
+          student_number: student.user.student_number,
+          name: student.user.name,
+        }),
+      );
+
+      setSelectedStudents((prev) => {
+        const uniqueStudents = studentsToAdd.filter(
+          (newStudent: { student_number: string }) =>
+            !prev.some(
+              (existingStudent) =>
+                existingStudent.student_number === newStudent.student_number,
+            ),
+        );
+        return [...prev, ...uniqueStudents];
+      });
+    }
+  }, [classStudents]);
+
   return (
     <div className="flex flex-col min-h-screen p-8 ">
       <div className="space-y-8">
@@ -392,6 +440,35 @@ export default function UserEnroll() {
                   {errors.name.message}
                 </p>
               )}
+            </div>
+
+            {/* 분반 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="assignment-class" className="mr-3">
+                  대회 등록 분반:
+                </label>
+                <Select
+                  placeholder="대회를 등록하실 분반을 선택하세요."
+                  className="w-[60%] sm:w-[25%] h-8"
+                  onChange={handleClassChange}
+                  allowClear
+                >
+                  {classList.map(
+                    (classData: {
+                      id: number;
+                      group_name: string;
+                      quarter: string;
+                      course: { title: string };
+                    }) => (
+                      <Option key={classData.id} value={classData.id}>
+                        {classData.course.title} - {classData.group_name} -{' '}
+                        {classData.quarter}
+                      </Option>
+                    ),
+                  )}
+                </Select>
+              </div>
             </div>
 
             <div className="flex justify-end px-10 mt-4">

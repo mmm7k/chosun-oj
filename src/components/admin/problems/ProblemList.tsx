@@ -208,32 +208,33 @@ export default function ProblemList() {
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <section className="flex flex-col items-center justify-between px-0 md:flex-row md:px-16">
           <h1 className="mb-3 text-lg md:mb-0">문제 목록</h1>
-          <div className="flex items-center gap-2">
-            <Select
-              placeholder="문제타입"
-              value={selectedType}
-              onChange={(value) => handleFilterChange('type', value)}
-              className="w-28"
-              allowClear
-            >
-              <Option value={'public'}>공통</Option>
-              <Option value={'other'}>대회/과제</Option>
-            </Select>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <div className="space-x-2">
+              <Select
+                placeholder="문제타입"
+                value={selectedType}
+                onChange={(value) => handleFilterChange('type', value)}
+                className="w-28"
+                allowClear
+              >
+                <Option value={'public'}>공통</Option>
+                <Option value={'other'}>대회/과제</Option>
+              </Select>
 
-            <Select
-              placeholder="언어"
-              value={selectedLanguage}
-              onChange={(value) => handleFilterChange('language', value)}
-              className="w-28"
-              allowClear
-            >
-              <Option value={'C'}>C</Option>
-              <Option value={'C++'}>C++</Option>
-              <Option value={'Java'}>Java</Option>
-              <Option value={'Python3'}>Python3</Option>
-              <Option value={'Rust'}>Rust</Option>
-            </Select>
-
+              <Select
+                placeholder="언어"
+                value={selectedLanguage}
+                onChange={(value) => handleFilterChange('language', value)}
+                className="w-28"
+                allowClear
+              >
+                <Option value={'C'}>C</Option>
+                <Option value={'C++'}>C++</Option>
+                <Option value={'Java'}>Java</Option>
+                <Option value={'Python3'}>Python3</Option>
+                <Option value={'Rust'}>Rust</Option>
+              </Select>
+            </div>
             <div className="flex items-center border-[1px] border-gray-300 rounded-lg px-3 py-2 w-[16rem] bg-white shadow-sm">
               <IoSearchSharp
                 className="mr-2 text-lg text-gray-500"
