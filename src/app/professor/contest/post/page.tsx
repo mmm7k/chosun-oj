@@ -59,7 +59,7 @@ export default function PostContest() {
     mutationFn: (data) => postContest(data),
     onSuccess: () => {
       message.success('대회가 성공적으로 등록되었습니다.');
-      router.push('/professor/contest/list');
+      router.push('/professor/contest/list?page=1');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {

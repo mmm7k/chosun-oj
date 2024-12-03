@@ -1,21 +1,24 @@
 'use client';
 
-import { postContest } from '@/services/contestAdmin/postContest';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from '@tanstack/react-query';
-import { Checkbox, message } from 'antd';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Checkbox, message, Select } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import 'react-datepicker/dist/react-datepicker.css';
+import { getClassList } from '@/services/assignmentAdmin/getClassList';
+import { postAssignment } from '@/services/assignmentAdmin/postAssignment';
+const { Option } = Select;
 
-export default function PostContest() {
+export default function PostAssignment() {
   const router = useRouter();
+
   const validationSchema = Yup.object().shape({
-    title: Yup.string().required('대회명을 입력해주세요.'),
-    description: Yup.string().required('대회 설명을 입력해주세요.'),
+    title: Yup.string().required('퀴즈명을 입력해주세요.'),
+    description: Yup.string().required('퀴즈 설명을 입력해주세요.'),
     startDateTime: Yup.date()
       .required('시작 날짜 시간을 선택해주세요.')
       .nullable(),
@@ -23,26 +26,25 @@ export default function PostContest() {
       .min(Yup.ref('startDateTime'), '종료 날짜는 시작 날짜 이후여야 합니다.')
       .required('종료 날짜 시간을 선택해주세요.')
       .nullable(),
-    password: Yup.string().max(32, '비밀번호는 최대 32자까지 가능합니다.'),
     isVisible: Yup.boolean(),
-    allowedIpRanges: Yup.string()
-      .matches(
-        /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2})$/,
-        '유효한 IP 범위 형식이 아닙니다. 예: 192.168.1.0/24',
-      )
-      .required('허용 아이피 범위를 입력해주세요.'),
+    tag: Yup.number().required('퀴즈를 등록하실 주차를 선택해주세요.'),
+    group: Yup.number().required('를 등록하실 분반을 선택해주세요.'),
   });
 
   const [startDateTime, setStartDateTime] = useState<Date | null>(new Date());
   const [endDateTime, setEndDateTime] = useState<Date | null>(new Date());
   const [isVisible, setIsVisible] = useState<boolean>(true);
-  const [allowedIpRanges, setAllowedIpRanges] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const { data: classListData } = useQuery({
+    queryKey: ['classListData'],
+    queryFn: () => getClassList(),
+  });
 
+  const classList = classListData?.data?.data || [];
   const {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -50,16 +52,14 @@ export default function PostContest() {
       startDateTime,
       endDateTime,
       isVisible,
-      allowedIpRanges,
-      password,
     },
   });
 
   const mutation = useMutation({
-    mutationFn: (data) => postContest(data),
+    mutationFn: (data) => postAssignment(data),
     onSuccess: () => {
-      message.success('대회가 성공적으로 등록되었습니다.');
-      router.push('/admin/contest/list?page=1');
+      message.success('퀴즈가 성공적으로 등록되었습니다.');
+      router.push('/tutor/assignment/list?page=1');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {
@@ -89,9 +89,10 @@ export default function PostContest() {
       // end_time: endDateTime?.toISOString(),
       start_time: startTimeKST,
       end_time: endTimeKST,
-      password: data.password,
       visible: isVisible,
-      allowed_ip_ranges: [allowedIpRanges],
+      tag: data.tag,
+      group: data.group,
+      type: 'Quiz',
     };
     mutation.mutate(formattedData);
   };
@@ -101,19 +102,19 @@ export default function PostContest() {
       <div className="w-full h-full py-8 font-semibold bg-white shadow-lg rounded-3xl text-secondary">
         <form onSubmit={handleSubmit(onSubmit)}>
           <section className="flex items-center justify-between px-16">
-            <h1 className="text-lg">대회 등록</h1>
+            <h1 className="text-lg">퀴즈 등록</h1>
           </section>
           <hr className="mt-5 border-t-2 border-gray-200" />
 
           <section className="flex flex-col text-sm">
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="contest-name">대회 이름:</label>
+                <label htmlFor="contest-name">퀴즈 이름:</label>
                 <input
                   {...register('title')}
                   className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
                   type="text"
-                  placeholder="대회 이름을 입력해주세요"
+                  placeholder="퀴즈 이름을 입력해주세요"
                 />
               </div>
               {errors.title && (
@@ -125,12 +126,12 @@ export default function PostContest() {
 
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="contest-description">대회 설명:</label>
+                <label htmlFor="contest-description">퀴즈 설명:</label>
                 <input
                   {...register('description')}
                   className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
                   type="text"
-                  placeholder="대회 설명을 입력해주세요"
+                  placeholder="퀴즈 설명을 입력해주세요"
                 />
               </div>
               {errors.description && (
@@ -188,23 +189,6 @@ export default function PostContest() {
 
             <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
               <div className="flex items-center">
-                <label htmlFor="password">대회 비밀번호:</label>
-                <input
-                  {...register('password')}
-                  className="ml-3 w-[60%] sm:w-[20%] h-8 rounded-lg border-[1px] border-gray-200 font-norm pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                  type="password"
-                  placeholder="대회 비밀번호를 입력해주세요"
-                />
-              </div>
-              {errors.password && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
-              <div className="flex items-center">
                 <label htmlFor="visibility-checkbox">공개 여부:</label>
                 <Checkbox
                   checked={isVisible}
@@ -217,24 +201,72 @@ export default function PostContest() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200">
+            {/* 태그 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
               <div className="flex items-center">
-                <label htmlFor="ip-ranges">허용 아이피 범위:</label>
-                <input
-                  id="ip-ranges"
-                  {...register('allowedIpRanges')}
-                  value={allowedIpRanges}
-                  onChange={(e) => {
-                    setAllowedIpRanges(e.target.value);
-                    setValue('allowedIpRanges', e.target.value);
-                  }}
-                  className="ml-3 w-[60%] sm:w-[40%] h-8 rounded-lg border-[1px] border-gray-200 pl-4 placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-gray-200 focus:outline-none"
-                  placeholder="허용 아이피 범위를 입력하세요 (예: 192.168.1.0/24)"
+                <label htmlFor="assignment-tag" className="mr-3">
+                  퀴즈 등록 주차:
+                </label>
+                <Controller
+                  name="tag"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="퀴즈 등록 주차를 선택하세요."
+                      className="w-[60%] sm:w-[20%] h-8"
+                    >
+                      {Array.from({ length: 20 }, (_, i) => (
+                        <Option key={i} value={i + 1}>
+                          {i + 1}주차
+                        </Option>
+                      ))}
+                    </Select>
+                  )}
                 />
               </div>
-              {errors.allowedIpRanges && (
+              {errors.tag && (
                 <p className="text-xs text-red-500 mt-1">
-                  {errors.allowedIpRanges.message}
+                  {errors.tag.message}
+                </p>
+              )}
+            </div>
+
+            {/* 분반 */}
+            <div className="flex flex-col justify-center px-10 py-4 border-b-[1.5px] border-gray-200 ">
+              <div className="flex items-center">
+                <label htmlFor="assignment-class" className="mr-3">
+                  퀴즈 등록 분반:
+                </label>
+                <Controller
+                  name="group"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="퀴즈를 등록하실 분반을 선택하세요."
+                      className="w-[60%] sm:w-[25%] h-8"
+                    >
+                      {classList.map(
+                        (classData: {
+                          id: number;
+                          group_name: string;
+                          quarter: string;
+                          course: { title: string };
+                        }) => (
+                          <Option key={classData.id} value={classData.id}>
+                            {classData.course.title} - {classData.group_name} -{' '}
+                            {classData.quarter}
+                          </Option>
+                        ),
+                      )}
+                    </Select>
+                  )}
+                />
+              </div>
+              {errors.group && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.group.message}
                 </p>
               )}
             </div>
@@ -245,7 +277,7 @@ export default function PostContest() {
               className="px-4 py-2 text-base font-normal text-white bg-primary rounded-xl hover:bg-primaryButtonHover"
               type="submit"
             >
-              대회 등록
+              퀴즈 등록
             </button>
           </div>
         </form>

@@ -60,7 +60,7 @@ export default function PostAssignment() {
     mutationFn: (data) => postAssignment(data),
     onSuccess: () => {
       message.success('과제가 성공적으로 등록되었습니다.');
-      router.push('/professor/assignment/list');
+      router.push('/professor/assignment/list?page=1');
     },
     onError: (error: any) => {
       if (error.response?.data?.message === '로그인이 필요합니다.') {

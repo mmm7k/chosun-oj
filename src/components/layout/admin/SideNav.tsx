@@ -440,7 +440,7 @@ export default function SideNav() {
         </div>
         {/* md 이하 메뉴 (햄버거 메뉴 클릭 시 열림) */}
         <div
-          className={`absolute top-20 left-0 w-screen  bg-white shadow-md flex flex-col justify-center items-center space-y-4 md:hidden z-50 overflow-hidden transition-all duration-[360ms] ease-in-out ${
+          className={`absolute top-16 left-0 w-screen  bg-white shadow-md flex flex-col justify-center items-center space-y-4 md:hidden z-50 overflow-hidden transition-all duration-[360ms] ease-in-out ${
             menuOpen
               ? 'max-h-auto opacity-100 visible'
               : 'max-h-0 opacity-0 invisible'

@@ -84,11 +84,14 @@ export default function Home() {
         <section className="flex items-center justify-center flex-1 ">
           <div className="w-[70%] h-[70%] lg:w-1/2 lg:h-1/2  space-y-4 rounded-sm border-solid border-[1px] border-slate-200 shadow-xl flex flex-col justify-center items-center">
             <div className="mb-4 font-bold ">
-              <span className="text-2xl text-primary sm:text-3xl md:text-4xl lg:text-2xl">
+              {/* <span className="text-2xl text-primary sm:text-3xl md:text-4xl lg:text-2xl">
                 Chosun &nbsp;
               </span>
               <span className="text-2xl text-secondary sm:text-3xl md:text-4xl lg:text-2xl">
                 Online Judge
+              </span> */}
+              <span className="text-2xl text-primary sm:text-3xl md:text-4xl lg:text-2xl">
+                Felis
               </span>
             </div>
 

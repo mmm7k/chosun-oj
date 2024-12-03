@@ -28,6 +28,7 @@ export default function HeaderNav() {
     // 'Regular User': '학생',
     Professor: '교수',
     'Super Admin': '관리자',
+    Tutor: '튜터',
   };
   const role = matchingRole[(userType as string) ?? ''];
   if (
@@ -67,8 +68,9 @@ export default function HeaderNav() {
               objectFit="contain"
             />
           </div>
-          <span className="text-primary">&nbsp;Chosun&nbsp;</span>
-          <span>Online Judge</span>
+          {/* <span className="text-primary">&nbsp;Chosun&nbsp;</span> */}
+          {/* <span>Online Judge</span> */}
+          <span className="text-primary  text-xl ml-1">Felis</span>
         </Link>
 
         {/* 햄버거 메뉴 */}
@@ -194,6 +196,15 @@ export default function HeaderNav() {
             </Link>
           )}
 
+          {role === '튜터' && (
+            <Link href="/tutor">
+              <div className="flex items-center transition cursor-pointer hover:text-secondaryHover">
+                <span>튜터</span>
+                <FaPersonWalkingArrowLoopLeft className="ml-2 text-xl" />
+              </div>
+            </Link>
+          )}
+
           <div
             onClick={onClickLogout}
             className="flex items-center transition cursor-pointer hover:text-secondaryHover"
@@ -311,6 +322,17 @@ export default function HeaderNav() {
           >
             <span className="font-semibold transition cursor-pointer flex items-center">
               교수 <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
+            </span>
+          </Link>
+        )}
+
+        {role === '튜터' && (
+          <Link
+            href="/tutor"
+            className="flex items-center justify-center w-full py-3 hover:bg-gray-100"
+          >
+            <span className="font-semibold transition cursor-pointer flex items-center">
+              튜터 <FaPersonWalkingArrowLoopLeft className="ml-2 text-lg" />
             </span>
           </Link>
         )}

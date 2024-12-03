@@ -490,8 +490,8 @@ export default function StudentMain() {
         </div>
       </section>
 
-      <section className=" w-[90%] lg:w-[62%] flex items-stretch gap-10 text-gray-700">
-        <div className="border border-gray-300 rounded-xl py-10 px-5 w-[50%] flex flex-col space-y-1">
+      <section className=" w-[90%] lg:w-[62%] flex flex-col sm:flex-row sm:items-stretch gap-10 text-gray-700">
+        <div className="border border-gray-300 rounded-xl py-10 px-5 w-full sm:w-[50%] flex flex-col space-y-1">
           <span className="font-semibold mb-5">📌 진행중인 과제</span>
           {onGoingAssignment.length === 0 ? (
             <span>진행중인 과제가 없습니다</span>
@@ -509,7 +509,7 @@ export default function StudentMain() {
             ))
           )}
         </div>
-        <div className="border border-gray-300 rounded-xl py-10 px-5 w-[50%] flex flex-col space-y-1">
+        <div className="border border-gray-300 rounded-xl py-10 px-5 w-full sm:w-[50%] flex flex-col space-y-1">
           <span className="font-semibold mb-5">📊 진행중인 대회</span>
           {onGoingCotest.length === 0 ? (
             <span>진행중인 대회가 없습니다</span>

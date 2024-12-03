@@ -17,6 +17,12 @@ const nextConfig = {
         destination: '/admin/dashboard',
         permanent: true,
       },
+
+      {
+        source: '/tutor',
+        destination: '/tutor/assignment/list?page=1',
+        permanent: true,
+      },
     ];
   },
   webpack: (config, { isServer }) => {
