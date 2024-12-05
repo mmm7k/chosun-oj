@@ -13,6 +13,7 @@ import { getAllContest } from '@/services/contestAdmin/getAllContest';
 import { deleteContest } from '@/services/contestAdmin/deleteContest';
 import { MdOutlineLibraryAdd } from 'react-icons/md';
 import Link from 'next/link';
+import { GrScorecard } from 'react-icons/gr';
 
 export default function ContestList() {
   const router = useRouter();
@@ -166,6 +167,16 @@ export default function ContestList() {
                     </td>
 
                     <td className="flex items-center p-4 space-x-2 ">
+                      <GrScorecard
+                        className="text-lg cursor-pointer  hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(
+                            `/professor/contest/scoreboard/${item.id}`,
+                          );
+                        }}
+                      />
+
                       <IoAlertCircleOutline
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {

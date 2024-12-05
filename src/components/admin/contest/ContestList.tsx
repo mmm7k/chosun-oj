@@ -12,6 +12,8 @@ import { RiUserAddLine } from 'react-icons/ri';
 import { getAllContest } from '@/services/contestAdmin/getAllContest';
 import { deleteContest } from '@/services/contestAdmin/deleteContest';
 import { MdOutlineLibraryAdd } from 'react-icons/md';
+import { GrScorecard } from 'react-icons/gr';
+
 import Link from 'next/link';
 
 export default function ContestList() {
@@ -159,6 +161,14 @@ export default function ContestList() {
                     </td>
 
                     <td className="flex items-center p-4 space-x-2 ">
+                      <GrScorecard
+                        className="text-lg cursor-pointer  hover:text-gray-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/contest/scoreboard/${item.id}`);
+                        }}
+                      />
+
                       <IoAlertCircleOutline
                         className="text-lg cursor-pointer lg:text-xl hover:text-gray-500"
                         onClick={(e) => {

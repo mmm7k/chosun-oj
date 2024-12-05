@@ -91,9 +91,11 @@ export default function JudgeServer() {
                   <td className="p-2 sm:p-4">
                     <span
                       className={`inline-block w-3 h-3 rounded-full ${
-                        server.status === 'normal'
-                          ? 'bg-green-500'
-                          : 'bg-red-500'
+                        server.is_disabled
+                          ? 'bg-red-500' // is_disabled가 true일 때 항상 빨간색
+                          : server.status === 'normal'
+                            ? 'bg-green-500' // status가 normal이면 초록색
+                            : 'bg-red-500' // status가 abnormal이면 빨간색
                       }`}
                     ></span>
                   </td>

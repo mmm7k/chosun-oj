@@ -100,7 +100,7 @@ export default function ContestProblemList({
               >
                 <div className="flex justify-between items-center text-sm py-5 px-5 border-b hover:bg-[#eeeff3] cursor-pointer">
                   <span className="w-[10%] text-green-500 font-bold pl-2">
-                    {problemItem.is_solved === true ? '✔' : ''}
+                    {problemItem.problem.is_solved === true ? '✔' : ''}
                   </span>
                   <span className="w-[50%]">{problemItem.problem.title}</span>
                   <span
