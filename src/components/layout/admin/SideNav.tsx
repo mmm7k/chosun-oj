@@ -15,6 +15,7 @@ import { GoTrophy } from 'react-icons/go';
 import { logout } from '@/services/accountUser/login';
 import { useRouter } from 'next/navigation';
 import { FiHome } from 'react-icons/fi';
+import { CiServer } from 'react-icons/ci';
 import useUserStore from '@/store/userstore';
 export default function SideNav() {
   const pathname = usePathname();
@@ -415,6 +416,24 @@ export default function SideNav() {
                 </li>
               </ul> */}
             </div>
+
+            {/* 저지서버 드롭다운 */}
+            <div>
+              <div
+                className={`flex justify-between cursor-pointer items-center ${
+                  pathname.startsWith('/admin/judgeserver')
+                    ? 'text-white border-b-[2px]  border-white'
+                    : 'text-white'
+                }`}
+              >
+                <Link href="/admin/judgeserver">
+                  <div className="flex items-center transition">
+                    <CiServer className="mr-2 text-xl" />
+                    <span className="text-base">저지서버</span>
+                  </div>
+                </Link>
+              </div>
+            </div>
           </section>
           {/* <section className="space-y-4"> */}
           <section className="flex justify-end space-x-5 flex-shrink-0">
@@ -792,6 +811,27 @@ export default function SideNav() {
               </ul>
             )} */}
           </div>
+
+          {/* 저지서버 드롭다운 */}
+          <div className="w-full">
+            <div
+              className={`flex justify-center cursor-pointer items-center px-5 py-3 hover:bg-gray-100 ${
+                pathname.startsWith('/admin/judgeserver') &&
+                'text-primary font-semibold'
+              }`}
+            >
+              <Link
+                href="/admin/judgeserver"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <span className="flex items-center">
+                  <CiServer className="mr-2 text-xl" />
+                  저지서버
+                </span>
+              </Link>
+            </div>
+          </div>
+
           <Link
             href={'/student'}
             className="flex items-center justify-center w-full py-4 hover:bg-gray-100"
