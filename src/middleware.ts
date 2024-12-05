@@ -93,6 +93,7 @@ export const config = {
     '/student/:path*',
     '/professor/:path*',
     '/admin/:path*',
+    '/tutor/:path*',
     '/login',
     '/signup',
   ],

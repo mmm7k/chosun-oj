@@ -56,6 +56,7 @@ export default function StudentMain() {
     'Regular User': '학생',
     Professor: '교수',
     'Super Admin': '관리자',
+    Tutor: '튜터',
   };
   const role = matchingRole[(userType as string) ?? ''];
 
