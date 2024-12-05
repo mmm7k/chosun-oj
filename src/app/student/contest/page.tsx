@@ -76,6 +76,10 @@ export default function ContestSelect() {
               </div>
             ))}
           </div>
+        ) : contestList.length === 0 ? (
+          <div className="text-center py-4 text-gray-500 text-lg  ">
+            참여중인 대회가 없습니다.
+          </div>
         ) : (
           <>
             {/* 진행 중 대회 */}
