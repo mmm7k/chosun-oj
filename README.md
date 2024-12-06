@@ -25,6 +25,10 @@
 - <img src="https://github.com/user-attachments/assets/3486e0f3-00b2-412d-a2ca-4c66cfeaae04" width="70%" height="35%"/>
 
 
+### ⭐️ 문제
+- 교수와 관리자가 등록한 문제를 학생들이 필터링 및 검색하여 풀 수 있습니다.
+- <img src="https://github.com/user-attachments/assets/b4d501d9-aeba-4816-9993-85bfb6720311" width="70%" height="35%"/>
+
 ---
 
 ### ⭐️ 학생, 교수, 관리자 전용 페이지
@@ -53,16 +57,6 @@
 - **공지사항**: 과제, 대회 등과 관련된 최신 공지를 확인 가능합니다.
 - <img src="https://github.com/user-attachments/assets/f19728ab-88e3-45cd-b761-4ec13384c9b8" width="70%" height="35%"/>
 - <img src="https://github.com/user-attachments/assets/527a558c-36dd-43a4-a575-81a3cdf1085b" width="70%" height="35%"/>
-
----
-
-### ⭐️ 대회 및 과제 관리
-
-- 대회: 학생들이 대회에 참여하여 문제를 해결할 수 있도록 설계되었습니다.
-- 과제: 교수 페이지에서 과제를 생성 및 관리하고, 학생은 제출할 수 있습니다.
-- <img src="https://github.com/user-attachments/assets/62e5c214-6d6d-4623-90dc-f40147ea2384" width="70%" height="35%"/>
-- <img src="https://github.com/user-attachments/assets/f948f407-881d-4b52-918c-7570b28258d6" width="70%" height="35%"/>
-
 
 ---
 
