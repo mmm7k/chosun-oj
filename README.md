@@ -22,13 +22,15 @@
 
 - 웹에서 코드를 작성하고 제출하면 실시간으로 컴파일 결과를 확인할 수 있습니다.
 - 다양한 프로그래밍 언어를 지원하며, 사용자 친화적인 UI/UX를 제공합니다.
+- <img src="https://github.com/user-attachments/assets/3486e0f3-00b2-412d-a2ca-4c66cfeaae04" width="70%" height="35%"/>
+
 
 ---
 
 ### ⭐️ 학생, 교수, 관리자 전용 페이지
 
 - **학생 페이지**: 과제 제출, 랭킹 확인, 대회 참여, 공지사항 확인 등.
-- <img src="https://github.com/user-attachments/assets/fa2a3aba-d69d-4f6b-8fbf-36bcf25818a4" width="70%" height="35%"/>
+- <img src="https://github.com/user-attachments/assets/1fe7a90a-d052-4749-8d27-f22a806bdfd6" width="70%" height="35%"/>
 
 - **교수 페이지**: 과제 및 대회 관리, 학생 관리 기능.
 - <img src="https://github.com/user-attachments/assets/52d52dd5-a694-418d-91fa-3862f6b34b04" width="70%" height="35%"/>
