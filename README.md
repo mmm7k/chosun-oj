@@ -28,15 +28,20 @@
 ### ⭐️ 학생, 교수, 관리자 전용 페이지
 
 - **학생 페이지**: 과제 제출, 랭킹 확인, 대회 참여, 공지사항 확인 등.
-- **교수 페이지**: 과제 및 대회 관리, 학생 관리 기능.
-- **관리자 페이지**: 시스템 전반 관리 및 데이터 모니터링.
+- <img src="https://github.com/user-attachments/assets/fa2a3aba-d69d-4f6b-8fbf-36bcf25818a4" width="70%" height="35%"/>
 
+- **교수 페이지**: 과제 및 대회 관리, 학생 관리 기능.
+- <img src="https://github.com/user-attachments/assets/52d52dd5-a694-418d-91fa-3862f6b34b04" width="70%" height="35%"/>
+
+- **관리자 페이지**: 시스템 전반 관리 및 데이터 모니터링.
+- <img src="https://github.com/user-attachments/assets/a2c5abc6-b403-4815-9d41-9fd6c10b4d23" width="70%" height="35%"/>
 ---
 
 ### ⭐️ 랭킹 시스템
 
 - 학생들의 저지 시스템 활동에 따라 실시간으로 랭킹이 업데이트됩니다.
-- 랭킹은 점수 및 참여도를 기준으로 산정됩니다.
+- 랭킹은 획득 점수를 기준으로 산정됩니다.
+- <img src="https://github.com/user-attachments/assets/da977a9a-86c6-4767-8a13-992959ff3d8b" width="70%" height="35%"/>
 
 ---
 
@@ -44,6 +49,8 @@
 
 - **Q&A**: 학생 및 교수 간 질문 및 답변을 주고받을 수 있는 페이지.
 - **공지사항**: 과제, 대회 등과 관련된 최신 공지를 확인 가능합니다.
+- <img src="https://github.com/user-attachments/assets/f19728ab-88e3-45cd-b761-4ec13384c9b8" width="70%" height="35%"/>
+- <img src="https://github.com/user-attachments/assets/527a558c-36dd-43a4-a575-81a3cdf1085b" width="70%" height="35%"/>
 
 ---
 
@@ -51,6 +58,9 @@
 
 - 대회: 학생들이 대회에 참여하여 문제를 해결할 수 있도록 설계되었습니다.
 - 과제: 교수 페이지에서 과제를 생성 및 관리하고, 학생은 제출할 수 있습니다.
+- <img src="https://github.com/user-attachments/assets/62e5c214-6d6d-4623-90dc-f40147ea2384" width="70%" height="35%"/>
+- <img src="https://github.com/user-attachments/assets/f948f407-881d-4b52-918c-7570b28258d6" width="70%" height="35%"/>
+
 
 ---
 
