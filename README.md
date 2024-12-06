@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Chosun Online Judge System
 
-## Getting Started
+> **실시간 저지 및 웹 IDE를 갖춘 온라인 저지 시스템** <br/> **개발기간: 2024** <br/> **1인 개발** <br/> **배포: 자체 서버 (http://chosuncnl.shop:5555)** <br/> **사용 기술 <br/> - Next.js (ver.14) <br/> - TypeScript <br/> - Zustand <br/> - React Query**  
 
-First, run the development server:
+---
+
+## 프로젝트 소개
+
+조선대학교 온라인 저지 시스템은 학생, 교수, 관리자용 페이지를 포함한 **종합 온라인 저지 플랫폼**입니다. 웹 기반의 **IDE**를 통해 코드 작성 및 실시간 컴파일이 가능하며, 과제 제출, 대회 참여, Q&A, 공지사항 확인, 랭킹 시스템을 제공합니다. 모든 CRUD 기능은 React Query를 사용해 **효율적으로 최적화**되었으며, 로그인 및 사용자 프로필은 **Zustand로 전역 상태 관리**를 구현했습니다.
+
+---
+
+## 아키텍처
+
+![image](https://github.com/user-attachments/assets/b2f7e129-af2b-43c9-abe0-ae408b8efdf6)
+
+---
+
+## 주요 기능 📦
+
+### ⭐️ 실시간 웹 IDE 및 컴파일러
+
+- 웹에서 코드를 작성하고 제출하면 실시간으로 컴파일 결과를 확인할 수 있습니다.
+- 다양한 프로그래밍 언어를 지원하며, 사용자 친화적인 UI/UX를 제공합니다.
+
+---
+
+### ⭐️ 학생, 교수, 관리자 전용 페이지
+
+- **학생 페이지**: 과제 제출, 랭킹 확인, 대회 참여, 공지사항 확인 등.
+- **교수 페이지**: 과제 및 대회 관리, 학생 관리 기능.
+- **관리자 페이지**: 시스템 전반 관리 및 데이터 모니터링.
+
+---
+
+### ⭐️ 랭킹 시스템
+
+- 학생들의 저지 시스템 활동에 따라 실시간으로 랭킹이 업데이트됩니다.
+- 랭킹은 점수 및 참여도를 기준으로 산정됩니다.
+
+---
+
+### ⭐️ Q&A 및 공지사항 페이지
+
+- **Q&A**: 학생 및 교수 간 질문 및 답변을 주고받을 수 있는 페이지.
+- **공지사항**: 과제, 대회 등과 관련된 최신 공지를 확인 가능합니다.
+
+---
+
+### ⭐️ 대회 및 과제 관리
+
+- 대회: 학생들이 대회에 참여하여 문제를 해결할 수 있도록 설계되었습니다.
+- 과제: 교수 페이지에서 과제를 생성 및 관리하고, 학생은 제출할 수 있습니다.
+
+---
+
+## 트러블 슈팅 💡
+
+
+---
+
+## 시작 가이드
+
+### Requirements
+
+- Node.js
+- npm
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+$ git clone https://github.com/mmm7k/chosun-judge.git
+$ npm install
+$ npm run dev
