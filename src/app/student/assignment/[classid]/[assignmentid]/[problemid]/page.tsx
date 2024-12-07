@@ -163,9 +163,11 @@ export default function Problem({
     }
   }, [problemData.description]);
   // 불러온 사용 언어에서 셀렉트 옵션 생성
-  const availableLanguages = useMemo(() => {
-    return problemData.languages || []; // problemData.languages 그대로 사용
-  }, [problemData.languages]);
+  // const availableLanguages = useMemo(() => {
+  //   return problemData.languages || []; // problemData.languages 그대로 사용
+  // }, [problemData.languages]);
+
+  const availableLanguages = problemData.languages || [];
 
   useEffect(() => {
     if (availableLanguages.length > 0) {

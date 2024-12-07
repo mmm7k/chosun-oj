@@ -26,7 +26,7 @@ import { getProblemDetailUser } from '@/services/problemUser/getProblemDetailUse
 import { postProblemSubmission } from '@/services/problemUser/postProblemSubmission';
 import Link from 'next/link';
 import { FaLock } from 'react-icons/fa6';
-import { set } from 'react-hook-form';
+
 import { getServerStatus } from '@/services/problemUser/getServerStatus';
 
 const { Option } = Select;
@@ -155,9 +155,11 @@ export default function Problem({ params }: { params: { problemid: string } }) {
     }
   }, [problem.description]);
   // 불러온 사용 언어에서 셀렉트 옵션 생성
-  const availableLanguages = useMemo(() => {
-    return problem.languages || []; // problemData.languages 그대로 사용
-  }, [problem.languages]);
+  // const availableLanguages = useMemo(() => {
+  //   return problem.languages || []; // problemData.languages 그대로 사용
+  // }, [problem.languages]);
+
+  const availableLanguages = problem.languages || [];
 
   useEffect(() => {
     if (availableLanguages.length > 0) {

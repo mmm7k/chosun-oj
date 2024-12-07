@@ -34,7 +34,6 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { rankColor } from '@/utils/rankColor';
 import { getTop3AnnouncementUser } from '@/services/announcementUser/getAnnouncementUser';
-import { on } from 'events';
 import { formattedDate } from '@/utils/dateFormatter';
 
 ChartJS.register(
@@ -46,20 +45,6 @@ ChartJS.register(
 );
 
 export default function StudentMain() {
-  const { data: profileData } = useQuery({
-    queryKey: ['profileData'],
-    queryFn: getMyProfile,
-  });
-  const profile: ProfileData | null = profileData?.data;
-  const userType = profile?.user.admin_type;
-  const matchingRole: { [key: string]: string } = {
-    'Regular User': '학생',
-    Professor: '교수',
-    'Super Admin': '관리자',
-    Tutor: '튜터',
-  };
-  const role = matchingRole[(userType as string) ?? ''];
-
   // 배너 캐러셀 세팅
   const bannerSettings = {
     dots: true,
@@ -88,17 +73,55 @@ export default function StudentMain() {
     waitForAnimate: false,
   };
 
-  const { data: announcementData } = useQuery({
-    queryKey: ['announcementData'],
-    queryFn: getTop3AnnouncementUser,
+  const { data: profileData } = useQuery({
+    queryKey: ['profileData'],
+    queryFn: getMyProfile,
   });
-  console.log(announcementData);
-  const announcement = announcementData?.data?.data || [];
+
   //잔디
   const { data: solveGrassData } = useQuery({
     queryKey: ['solveGrassData'],
     queryFn: getSolveGrass,
   });
+
+  //문제 해결 레벨
+  const { data: solveLevelData } = useQuery({
+    queryKey: ['solveLevelData'],
+    queryFn: getSolveLevel,
+  });
+
+  const { data: announcementData } = useQuery({
+    queryKey: ['announcementData'],
+    queryFn: getTop3AnnouncementUser,
+  });
+
+  // solveTagData를 기반으로 레이다 차트 데이터 생성
+  const { data: solveTagData } = useQuery({
+    queryKey: ['solveTagData'],
+    queryFn: getSolveTag,
+  });
+
+  const { data: onGoginAssignmentData } = useQuery({
+    queryKey: ['onGoginAssignmentData'],
+    queryFn: getOngoingAssignment,
+  });
+
+  const { data: onGoingCotestData } = useQuery({
+    queryKey: ['onGoingCotest'],
+    queryFn: getOngoingContest,
+  });
+
+  const profile: ProfileData | null = profileData?.data;
+  const userType = profile?.user.admin_type;
+  const matchingRole: { [key: string]: string } = {
+    'Regular User': '학생',
+    Professor: '교수',
+    'Super Admin': '관리자',
+    Tutor: '튜터',
+  };
+  const role = matchingRole[(userType as string) ?? ''];
+
+  const announcement = announcementData?.data?.data || [];
 
   const solveGrass = solveGrassData?.data || [];
 
@@ -130,12 +153,6 @@ export default function StudentMain() {
       date: formattedDate,
       count: solveGrassaMap[formattedDate] || 0, // API 데이터가 없으면 0으로 설정
     };
-  });
-
-  //문제 해결 레벨
-  const { data: solveLevelData } = useQuery({
-    queryKey: ['solveLevelData'],
-    queryFn: getSolveLevel,
   });
 
   const levelData = solveLevelData?.data?.levels || { Low: 0, Mid: 0, High: 0 };
@@ -198,12 +215,6 @@ export default function StudentMain() {
     );
     return donutData.labels[maxIndex];
   }, [donutData]);
-
-  // solveTagData를 기반으로 레이다 차트 데이터 생성
-  const { data: solveTagData } = useQuery({
-    queryKey: ['solveTagData'],
-    queryFn: getSolveTag,
-  });
 
   // 전체 태그 리스트
   const allTags = [
@@ -299,16 +310,6 @@ export default function StudentMain() {
     );
     return radarData.labels[maxIndex] || 'N/A'; // 데이터가 없을 경우 기본값 반환
   }, [radarData]);
-
-  const { data: onGoginAssignmentData } = useQuery({
-    queryKey: ['onGoginAssignmentData'],
-    queryFn: getOngoingAssignment,
-  });
-
-  const { data: onGoingCotestData } = useQuery({
-    queryKey: ['onGoingCotest'],
-    queryFn: getOngoingContest,
-  });
 
   const onGoingAssignment = onGoginAssignmentData?.data || [];
   const onGoingCotest = onGoingCotestData?.data || [];
