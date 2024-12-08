@@ -9,6 +9,7 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { logout } from '@/services/accountUser/login';
 import { FiHome } from 'react-icons/fi';
 import useUserStore from '@/store/userstore';
+import { HiOutlinePencilSquare } from 'react-icons/hi2';
 export default function SideNav() {
   const pathname = usePathname();
   const router = useRouter();
@@ -63,6 +64,24 @@ export default function SideNav() {
         <div className="hidden md:flex flex-1">
           {/* <section className="space-y-8"> */}
           <section className="w-full flex  items-center text-lg space-x-8 ml-[5%]">
+            {/* 문제 드롭다운 */}
+            <div>
+              <div
+                className={`flex justify-between cursor-pointer items-center ${
+                  pathname.startsWith('/tutor/problems')
+                    ? 'text-primary hover:text-primaryHover'
+                    : 'text-secondary hover:text-secondaryHover'
+                }`}
+              >
+                <Link href="/tutor/problems/list?page=1">
+                  <div className="flex items-center transition">
+                    <HiOutlinePencilSquare className="mr-2 text-xl" />
+                    <span className="text-base">문제</span>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
             {/* 퀴즈 드롭다운 */}
             <div>
               <div
@@ -108,6 +127,27 @@ export default function SideNav() {
               : 'max-h-0 opacity-0 invisible'
           }`}
         >
+          {/* 문제 드롭다운 */}
+          <div className="w-full">
+            <div
+              className={`flex justify-center cursor-pointer items-center px-5 py-3 hover:bg-gray-100 ${
+                pathname.startsWith('/tutor/problems') &&
+                'text-primary font-semibold'
+              }`}
+            >
+              <Link
+                href="/tutor/problems/list?page=1"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                {' '}
+                <span className="flex items-center">
+                  <HiOutlinePencilSquare className="mr-2 text-xl" />
+                  문제
+                </span>
+              </Link>
+            </div>
+          </div>
+
           {/* 퀴즈 드롭다운 */}
           <div className="w-full">
             <div
