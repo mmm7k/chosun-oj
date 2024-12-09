@@ -73,7 +73,7 @@
 React Query를 도입하여 독립적인 API 요청들을 병렬 처리하고, 자동 캐싱 및 재검증 기능을 활용하여 네트워크 요청을 최적화했습니다.
 
 ### 결과
-<img src="https://github.com/user-attachments/assets/b7ec1e20-e114-4b67-9106-38b4ddfd7aec" width="70%" height="35%"/>
+<img src="https://github.com/user-attachments/assets/b7ec1e20-e114-4b67-9106-38b4ddfd7aec" width="70%" height="35%"/> <br/>
 기존 354.12ms가 소요되던 API 요청 시간이 약 67% 단축되어 115.71ms로 개선되었고, 페이지 로딩 속도가 크게 향상되었습니다.
 
 
