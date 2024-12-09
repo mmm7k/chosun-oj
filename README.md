@@ -34,7 +34,7 @@
 ### ⭐️ 학생, 교수, 관리자 전용 페이지
 
 - **학생 페이지**: 과제 제출, 랭킹 확인, 대회 참여, 공지사항 확인 등.
-<img src="https://github.com/user-attachments/assets/1fe7a90a-d052-4749-8d27-f22a806bdfd6" width="70%" height="35%"/>
+<img src="https://github.com/user-attachments/assets/54d117cb-85fa-4876-8768-c19b97b1cf55" width="70%" height="35%"/>
 
 - **교수 페이지**: 과제 및 대회 관리, 학생 관리 기능.
 <img src="https://github.com/user-attachments/assets/52d52dd5-a694-418d-91fa-3862f6b34b04" width="70%" height="35%"/>
