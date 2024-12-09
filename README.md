@@ -12,7 +12,7 @@
 
 ## 아키텍처
 
-![image](https://github.com/user-attachments/assets/b2f7e129-af2b-43c9-abe0-ae408b8efdf6)
+![image](https://github.com/user-attachments/assets/8ce90164-5820-466b-b8df-d6f84d5b5ec2)
 
 ---
 
