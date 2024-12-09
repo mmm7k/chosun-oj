@@ -75,6 +75,6 @@
 ### Installation
 
 ```bash
-$ git clone https://github.com/mmm7k/chosun-judge.git
+$ git clone https://github.com/mmm7k/chosun-oj.git
 $ npm install
 $ npm run dev
