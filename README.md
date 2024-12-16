@@ -2,6 +2,9 @@
 
 > **실시간 저지 및 웹 IDE를 갖춘 온라인 저지 시스템** <br/> **개발기간: 2024.09 ~ 2024.12** <br/> **프론트엔드 1명, 백엔드 3명** <br/> **사용 기술 <br/> - Next.js (ver.14) <br/> - TypeScript <br/> - TailWind CSS <br/> - Zustand <br/> - react-query(v.5)**  
 
+## 배포 주소
+> [http://chosuncnl.shop:5555/](http://chosuncnl.shop:5555/)
+
 ---
 
 ## 프로젝트 소개
